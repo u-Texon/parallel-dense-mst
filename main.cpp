@@ -9,13 +9,22 @@ int main() {
         std::cout << "Timer started" << std::endl;
 
     //int solution = 23490234 * 247238423894789;
-   timer.stop("timer", 0);
+    timer.stop("timer", 0);
 
         std::cout << "Timer stopped with output: " << timer.output()  << std::endl;
 
 
+    int edgeCount = 5;
+    int vertexCount = 7;
+
     generate::Generator g;
-    g.randomGraph(18, 8);
+    std::vector<generate::Edge> edges = g.randomGraph(edgeCount, vertexCount);
+
+    for (size_t i = 0; i < edges.size(); i++)
+    {
+        std::cout << "(" << edges[i].source << "," << edges[i].target <<  ")" << std::endl;
+    }
+    
 
     return 0;
 }
