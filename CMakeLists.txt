@@ -18,11 +18,9 @@ target_link_libraries(base_target INTERFACE MPI::MPI_CXX TBB::tbb OpenMP::OpenMP
 add_library(timer ${CMAKE_CURRENT_SOURCE_DIR}/include/util/timer.cpp)
 target_link_libraries(timer PRIVATE base_target)
 
-add_library(generate ${CMAKE_CURRENT_SOURCE_DIR}/generateGraphs/generateGraph.cpp)
-target_link_libraries(generate PRIVATE base_target)
 
 add_executable(MST main.cpp)
-target_link_libraries(MST PUBLIC timer base_target generate)
+target_link_libraries(MST PUBLIC timer base_target)
 
 
 
