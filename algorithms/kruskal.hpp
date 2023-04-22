@@ -14,14 +14,13 @@ namespace kruskal {
 
 
     template<typename Compare = WeightOrder<WEdge>>
-    inline WEdgeList getMST(std::size_t n, WEdgeList &edges) {
+    inline WEdgeList getMST(WEdgeList &edges, UnionFind *uf) {
         std::sort(edges.begin(), edges.end(), Compare{});
         WEdgeList mst_edges;
-        UnionFind uf(n);
         for (auto &elem: edges) {
-            if (uf.find(elem.get_src()) == uf.find(elem.get_dst())) continue;
+            if (uf->find(elem.get_src()) == uf->find(elem.get_dst())) continue;
             mst_edges.push_back(elem);
-            uf.unify(elem.get_src(), elem.get_dst());
+            uf->unify(elem.get_src(), elem.get_dst());
         }
         return mst_edges;
     }

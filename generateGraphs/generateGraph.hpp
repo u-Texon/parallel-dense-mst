@@ -43,6 +43,8 @@ namespace generate {
                 }
             }
         }
+
+        assert(vec.size() == edgeCount);
         return vec;
     }
 
