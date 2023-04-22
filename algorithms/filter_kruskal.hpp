@@ -8,8 +8,8 @@ namespace filterKruskal {
         return edges->at(edges->size()/2);
     }
 
-    inline int threshold() {
-        return 30; //TODO: determine threshold;
+    inline int threshold(const int *n) {
+        return (int) (*n * log(*n) / 2); //TODO: is this a good threshold?
     }
 
     inline WEdgeList filter(WEdgeList *edges, UnionFind *uf) {
@@ -25,8 +25,8 @@ namespace filterKruskal {
     }
 
 
-    inline WEdgeList getMST(WEdgeList *edges, UnionFind *uf) {
-        if (edges->size() <= threshold()) {
+    inline WEdgeList getMST(int *n, WEdgeList *edges, UnionFind *uf) {
+        if (edges->size() <= threshold(n)) {
             return kruskal::getMST(edges, uf);
         }
 
@@ -41,9 +41,9 @@ namespace filterKruskal {
             }
         }
         WEdgeList mst;
-        mst = filterKruskal::getMST(&smaller, uf);
+        mst = filterKruskal::getMST(n, &smaller, uf);
         bigger = filter(&bigger, uf);
-        WEdgeList bigEdges = filterKruskal::getMST(&bigger, uf);
+        WEdgeList bigEdges = filterKruskal::getMST(n, &bigger, uf);
         mst.insert(mst.end(), bigEdges.begin(), bigEdges.end());
 
         return mst;

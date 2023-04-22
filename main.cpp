@@ -9,8 +9,8 @@ int main() {
     hybridMST::Timer timer;
 
 
-    int edgeCount = 1000;
-    int vertexCount = 50;
+    int edgeCount = 10000;
+    int vertexCount = 500;
     int maxWeight = 40;
 
 
@@ -45,7 +45,7 @@ int main() {
     UnionFind uf2(vertexCount);
 
     timer.start("timer", 0);
-    std::vector<WEdge> mst2 = filterKruskal::getMST(&edges, &uf2);
+    std::vector<WEdge> mst2 = filterKruskal::getMST(&vertexCount, &edges, &uf2);
     timer.stop("timer", 0);
     std::cout << "Filter Kruskal stopped with output: " << timer.output() << std::endl;
 
