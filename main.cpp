@@ -13,7 +13,7 @@
 
 
 int main(int argc, char **args) {
-    std::vector<WEdge> edges = generate::randomGraph(M, N, MAX_W);
+    WEdgeList edges = generate::randomGraph(M, N, MAX_W);
     int n = N;
     int m = M;
 
@@ -22,8 +22,8 @@ int main(int argc, char **args) {
         edgesArr[i] = edges.at(i);
     }
 
-    mergeMST::getMST(&n, &m, edgesArr);
-    /*
+    WEdgeList mergeMst =  mergeMST::getMST(&n, &m, edgesArr);
+
     hybridMST::mpi::MPIContext ctx;
     int rank = ctx.rank();
 
@@ -39,15 +39,25 @@ int main(int argc, char **args) {
         // std::cout << "Kruskal stopped with output: " << timer.output() << std::endl;
         // timer.reset();
 
-        // std::cout << "MST-edges are :" << std::endl;
+        std::cout << "MST-edges are :" << std::endl;
         int kruskalWeight = 0;
         for (auto &edge: mst) {
-            //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+            std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
             kruskalWeight += edge.get_weight();
         }
         std::cout << std::endl;
 
 
+
+        std::cout << "MergeMST-edges are :" << std::endl;
+        int mergeWeight = 0;
+        for (auto &edge: mergeMst) {
+            std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+            mergeWeight += edge.get_weight();
+        }
+        std::cout << std::endl;
+
+        /*
         UnionFind uf2(N);
         //  timer.start("timer", 0);
         std::vector<WEdge> mst2 = filterKruskal::getMST(&n, &edges, &uf2);
@@ -73,5 +83,6 @@ int main(int argc, char **args) {
     }
 
     */
+    }
     return 0;
 }
