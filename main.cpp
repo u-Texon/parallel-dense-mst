@@ -4,61 +4,74 @@
 #include "algorithms/kruskal.hpp"
 #include "include/definitions.hpp"
 #include "algorithms/filter_kruskal.hpp"
-
-int main() {
-    hybridMST::Timer timer;
+#include "algorithms/mergeMST.hpp"
 
 
-    int edgeCount = 10000;
-    int vertexCount = 500;
-    int maxWeight = 40;
+#define M 8
+#define N 6
+#define MAX_W 100
 
 
-    std::vector<WEdge> edges = generate::randomGraph(edgeCount, vertexCount, maxWeight);
+int main(int argc, char **args) {
+    std::vector<WEdge> edges = generate::randomGraph(M, N, MAX_W);
+    int n = N;
+    int m = M;
 
-    // std::cout << "edges are :" << std::endl;
-    for (auto &edge: edges) {
-
-        // std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+    WEdge edgesArr[M];
+    for (int i = 0; i < M; ++i) {
+        edgesArr[i] = edges.at(i);
     }
 
-    std::cout << std::endl;
+    mergeMST::getMST(&n, &m, edgesArr);
+    /*
+    hybridMST::mpi::MPIContext ctx;
+    int rank = ctx.rank();
 
-    UnionFind uf(vertexCount);
+
+    if (rank == 0) {
+
+        UnionFind uf(N);
+        hybridMST::Timer timer;
+        // timer.start("timer", 0);
+
+        std::vector<WEdge> mst = kruskal::getMST(&edges, &uf);
+        //  timer.stop("timer", 0);
+        // std::cout << "Kruskal stopped with output: " << timer.output() << std::endl;
+        // timer.reset();
+
+        // std::cout << "MST-edges are :" << std::endl;
+        int kruskalWeight = 0;
+        for (auto &edge: mst) {
+            //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+            kruskalWeight += edge.get_weight();
+        }
+        std::cout << std::endl;
 
 
-    timer.start("timer", 0);
-    std::vector<WEdge> mst = kruskal::getMST(&edges, &uf);
-    timer.stop("timer", 0);
-    std::cout << "Kruskal stopped with output: " << timer.output() << std::endl;
-    timer.reset();
+        UnionFind uf2(N);
+        //  timer.start("timer", 0);
+        std::vector<WEdge> mst2 = filterKruskal::getMST(&n, &edges, &uf2);
+        //  timer.stop("timer", 0);
+        //  std::cout << "Filter Kruskal stopped with output: " << timer.output() << std::endl;
 
-    // std::cout << "MST-edges are :" << std::endl;
-    int kruskalWeight = 0;
-    for (auto &edge: mst) {
-        //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
-        kruskalWeight += edge.get_weight();
+        int filterWeight = 0;
+        for (auto &edge: mst2) {
+            //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+            filterWeight += edge.get_weight();
+        }
+        std::cout << std::endl;
+
+
+        if (kruskalWeight != filterWeight) {
+            std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+            std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
+            std::cout << "filter-kruskal found MST with weight: " << filterWeight << std::endl;
+            std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+        }
+
+
     }
-    std::cout << std::endl;
 
-
-    UnionFind uf2(vertexCount);
-
-    timer.start("timer", 0);
-    std::vector<WEdge> mst2 = filterKruskal::getMST(&vertexCount, &edges, &uf2);
-    timer.stop("timer", 0);
-    std::cout << "Filter Kruskal stopped with output: " << timer.output() << std::endl;
-
-    int filterWeight = 0;
-    for (auto &edge: mst2) {
-        //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
-        filterWeight += edge.get_weight();
-    }
-    std::cout << std::endl;
-
-    std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
-    std::cout << "filter-kruskal found MST with weight: " << filterWeight << std::endl;
-
-
+    */
     return 0;
 }

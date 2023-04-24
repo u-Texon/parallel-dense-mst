@@ -9,7 +9,7 @@
 
 #include "context.hpp"
 #include "type_handling.hpp"
-#include "../util/communication_volume_measurements.hpp"
+#include "communication_volume_measurements.hpp"
 
 namespace hybridMST::mpi {
 

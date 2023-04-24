@@ -7,7 +7,7 @@
 
 #include "../mpi/context.hpp"
 #include "../mpi/type_handling.hpp"
-#include "macros.hpp"
+#include "../util/macros.hpp"
 
 namespace hybridMST {
 class CommunicationVolumeTracker {
