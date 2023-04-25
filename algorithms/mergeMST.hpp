@@ -53,41 +53,64 @@ namespace mergeMST {
         WEdgeList mstList;
         mstList = filterKruskal::getMST(n, &localEdges, &uf);
 
-
         int j = 2;
-        while (j <=cd  ctx.size()) {
+        while (j <= ctx.size()) { //is this fine?
+
             WEdge mst[mstList.size()];
             for (int i = 0; i < mstList.size(); ++i) {
                 mst[i] = mstList.at(i);
             }
 
+
             int myMSTsize = (int) mstList.size();
             int otherMSTsize;
             WEdge otherMST[edgesPerProc]; //TODO: how do I initialize this correctly??
 
-            MPI_Status s;
+
+
+
+
             int i = 0;
             while (i < ctx.size()) {
                 if (ctx.rank() == i) {
-                    MPI_Recv(&otherMSTsize, 1, MPI_INT, i, 0, MPI_COMM_WORLD, &status);
-                    MPI_Recv(&otherMST, otherMSTsize, mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD, &s);
+                    MPI_Status s;
+                    MPI_Recv(&otherMSTsize, 1, MPI_INT, i + j / 2, 0, MPI_COMM_WORLD, &status);
+                    MPI_Recv(&otherMST, otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD, &s);
+                    break;
                 }
-                if (ctx.rank() == i + j/2) {
-                    MPI_Send(&myMSTsize, 1, MPI_INT, i + 1, 0, MPI_COMM_WORLD);
-                    MPI_Send(mst, (int) mstList.size(), mapper.get_mpi_datatype(), i + 1, 0, MPI_COMM_WORLD);
+                if (ctx.rank() == i + j / 2) {
+
+
+                    MPI_Send(&myMSTsize, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+                    MPI_Send(mst, (int) mstList.size(), mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
+
+/*
+                    std::cout << ctx.rank() << " sending mst:";
+                    for (int x = 0; x < (int) mstList.size(); ++x) {
+                        WEdge edge = mst[x];
+                        std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+                    }
+                    std::cout << std::endl;
+*/
+
+                    break;
                 }
                 i += j;
             }
+
+//               std::cout << "send/recv worked for " << ctx.rank() << std::endl;
 
             if (ctx.rank() % j == 0) {
 
 
                 for (int x = 0; x < otherMSTsize; ++x) {
-                    mstList.push_back(otherMST[i]);
+                    mstList.push_back(otherMST[x]);
                 }
 
+
                 UnionFind uf2(*n);
-                mstList = filterKruskal::getMST(n, &mstList, &uf2);
+                mstList = kruskal::getMST(&mstList, &uf2);
+                      //TODO:  filterkruskal::getMST(n, &mstList, &uf2);
 
 
                 std::cout << ctx.rank() << " found mst:";
@@ -99,13 +122,12 @@ namespace mergeMST {
 
             }
 
+
             j *= 2;
         }
 
         return mstList;
     }
-
-
 
 
 } //namespace mergeMST
