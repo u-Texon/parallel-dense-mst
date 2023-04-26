@@ -32,7 +32,7 @@ int main(int argc, char **args) {
 
         UnionFind uf(N);
         hybridMST::Timer timer;
-        // timer.start("timer", 0);
+        //timer.start("timer", 0);
 
         std::vector<WEdge> mst = kruskal::getMST(&edges, &uf);
         //  timer.stop("timer", 0);

@@ -4,7 +4,7 @@
 
 namespace filterKruskal {
 
-    inline WEdge pickPivot(WEdgeList *edges) {
+    inline WEdge pickPivot(WEdgeList *edges) { // nimm 3 elemente
         return edges->at(edges->size()/2);
     }
 
