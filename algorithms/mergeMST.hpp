@@ -9,7 +9,7 @@
 namespace mergeMST {
 
 
-    inline WEdgeList getMST(int *n, const int *m, WEdge edges[]) { //vector.data
+    inline WEdgeList getMST(int *n, const int *m, WEdgeList edges) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
 
 
@@ -25,13 +25,8 @@ namespace mergeMST {
                 local[i] = edges[i];
             }
             for (int i = 1; i < ctx.size(); ++i) {
-                MPI_Send(edges + (i) * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
+                MPI_Send(edges.data() + i * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
             }
-            for (int i = 0; i < *m; i++) {
-                std::cout << "(" << edges[i].get_src() << "," << edges[i].get_dst() << "," << edges[i].get_weight()
-                          << ") ";
-            }
-            std::cout << std::endl;
         } else {
             MPI_Recv(local, edgesPerProc, mapper.get_mpi_datatype(), 0, 0, MPI_COMM_WORLD, &status);
         }
@@ -55,13 +50,6 @@ namespace mergeMST {
 
         int j = 2;
         while (j <= ctx.size()) { //is this fine?
-
-            WEdge mst[mstList.size()];
-            for (int i = 0; i < mstList.size(); ++i) {
-                mst[i] = mstList.at(i);
-            }
-
-
             int myMSTsize = (int) mstList.size();
             int otherMSTsize = 0;
             int i = 0;
@@ -84,7 +72,7 @@ namespace mergeMST {
                     MPI_Recv(&otherMST, otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD, &s);
                     break;
                 } else if (ctx.rank() == i + j / 2) {
-                    MPI_Send(mst, (int) mstList.size(), mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
+                    MPI_Send(mstList.data(), (int) mstList.size(), mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
                     break;
                 }
                 i += j;
@@ -103,11 +91,11 @@ namespace mergeMST {
                 //TODO:  filterKruskal::getMST(n, &mstList, &uf2);
 
 
-                std::cout << ctx.rank() << " found mst:";
+                //std::cout << ctx.rank() << " found mst:";
                 for (auto &edge: mstList) {
-                    std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+                //    std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
                 }
-                std::cout << std::endl;
+               // std::cout << std::endl;
 
 
             }

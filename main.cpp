@@ -7,8 +7,8 @@
 #include "algorithms/mergeMST.hpp"
 
 
-#define M 8
-#define N 6
+#define M 256
+#define N 50
 #define MAX_W 100
 
 
@@ -17,12 +17,8 @@ int main(int argc, char **args) {
     int n = N;
     int m = M;
 
-    WEdge edgesArr[M];
-    for (int i = 0; i < M; ++i) {
-        edgesArr[i] = edges.at(i);
-    }
 
-    WEdgeList mergeMst =  mergeMST::getMST(&n, &m, edgesArr);
+    WEdgeList mergeMst =  mergeMST::getMST(&n, &m, edges);
 
     hybridMST::mpi::MPIContext ctx;
     int rank = ctx.rank();
@@ -39,23 +35,26 @@ int main(int argc, char **args) {
         // std::cout << "Kruskal stopped with output: " << timer.output() << std::endl;
         // timer.reset();
 
-        std::cout << "MST-edges are :" << std::endl;
+       // std::cout << "MST-edges are :" << std::endl;
         int kruskalWeight = 0;
         for (auto &edge: mst) {
-            std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+          //  std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
             kruskalWeight += edge.get_weight();
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
 
 
 
-        std::cout << "MergeMST-edges are :" << std::endl;
+       // std::cout << "MergeMST-edges are :" << std::endl;
         int mergeWeight = 0;
         for (auto &edge: mergeMst) {
-            std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+         //   std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
             mergeWeight += edge.get_weight();
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
+
+        std::cout << "kruskal got mst with weight " << kruskalWeight << std::endl;
+        std::cout << "mergeMST got mst with weight " << mergeWeight << std::endl;
 
         /*
         UnionFind uf2(N);
