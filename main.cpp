@@ -7,9 +7,9 @@
 #include "algorithms/mergeMST.hpp"
 
 
-#define M 256
-#define N 50
-#define MAX_W 100
+#define M 800
+#define N 600
+#define MAX_W 10
 
 
 int main(int argc, char **args) {
@@ -47,7 +47,7 @@ int main(int argc, char **args) {
 
        // std::cout << "MergeMST-edges are :" << std::endl;
         int mergeWeight = 0;
-        for (auto &edge: mergeMst) {
+        for (auto edge: mergeMst) {
          //   std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
             mergeWeight += edge.get_weight();
         }

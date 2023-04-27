@@ -11,38 +11,24 @@ namespace mergeMST {
 
     inline WEdgeList getMST(int *n, const int *m, WEdgeList edges) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
-
+        hybridMST::mpi::TypeMapper<WEdge> mapper;
 
         int edgesPerProc = *m / ctx.size();
         //TODO: int rest = *m % ctx.size();
-        WEdge local[edgesPerProc];
-        hybridMST::mpi::TypeMapper<WEdge> mapper;
+        WEdgeList localEdges;
+
 
         MPI_Status status;
-
         if (ctx.rank() == 0) {
             for (int i = 0; i < edgesPerProc; ++i) {
-                local[i] = edges[i];
+                localEdges.push_back(edges[i]);
             }
             for (int i = 1; i < ctx.size(); ++i) {
                 MPI_Send(edges.data() + i * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
             }
         } else {
-            MPI_Recv(local, edgesPerProc, mapper.get_mpi_datatype(), 0, 0, MPI_COMM_WORLD, &status);
-        }
-
-        /*
-        std::cout << "process " << ctx.rank() << " received :";
-        for (int i = 0; i < edgesPerProc; i++) {
-            std::cout << "(" << local[i].get_src() << "," << local[i].get_dst() << "," << local[i].get_weight() << ") ";
-        }
-        std::cout << std::endl;
-    */
-
-
-        WEdgeList localEdges;
-        for (int i = 0; i < edgesPerProc; ++i) {
-            localEdges.push_back(local[i]);
+            localEdges.resize(edgesPerProc);
+            MPI_Recv(&localEdges[0], edgesPerProc, mapper.get_mpi_datatype(), 0, 0, MPI_COMM_WORLD, &status);
         }
         UnionFind uf(*n);
         WEdgeList mstList;
@@ -55,21 +41,20 @@ namespace mergeMST {
             int i = 0;
             while (i < ctx.size()) {
                 if (ctx.rank() == i) {
-                    MPI_Status s;
-                    MPI_Recv(&otherMSTsize, 1, MPI_INT, i + j / 2, 0, MPI_COMM_WORLD, &s);
+                    MPI_Recv(&otherMSTsize, 1, MPI_INT, i + j / 2, 0, MPI_COMM_WORLD, &status);
                 } else if (ctx.rank() == i + j / 2) {
                     MPI_Send(&myMSTsize, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
                 }
                 i += j;
             }
-            WEdge otherMST[otherMSTsize];
+            WEdgeList otherMST;
+            otherMST.resize(otherMSTsize);
 
 
             i = 0;
             while (i < ctx.size()) {
                 if (ctx.rank() == i) {
-                    MPI_Status s;
-                    MPI_Recv(&otherMST, otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD, &s);
+                    MPI_Recv(&otherMST[0], otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD, &status);
                     break;
                 } else if (ctx.rank() == i + j / 2) {
                     MPI_Send(mstList.data(), (int) mstList.size(), mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
@@ -80,9 +65,8 @@ namespace mergeMST {
 
 
             if (ctx.rank() % j == 0) {
-
-                for (int x = 0; x < otherMSTsize; ++x) {
-                    mstList.push_back(otherMST[x]);
+                for (auto edge: otherMST) {
+                    mstList.push_back(edge);
                 }
 
 
