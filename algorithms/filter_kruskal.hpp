@@ -4,13 +4,13 @@
 
 namespace filterKruskal {
 
-    inline WEdge pickPivot(WEdgeList *edges) { //alternative: pick 3 elements
-        int i = rand() % (edges->size());
+    inline WEdge pickPivot(WEdgeList *edges) { //TODO:alternative: pick 3 elements
+        int i = rand() % ( edges->size());
         return edges->at(i);
     }
 
     inline int threshold(const int *n) {
-        int t = (int) fmax(3, (log2(*n) / 2)); //TODO: is this a good threshold?
+        int t = (int) fmax(30, (log2(*n) / 2)); //TODO: is this a good threshold?
         return t;
     }
 
@@ -28,7 +28,8 @@ namespace filterKruskal {
 
 
     inline WEdgeList getMST(int *n, WEdgeList *edges, UnionFind *uf) {
-        if (edges->size() <= threshold(n)) {
+        int t = threshold(n);
+        if (edges->size() <= t) {
             return kruskal::getMST(edges, uf);
         }
         WEdge pivot = pickPivot(edges);
@@ -41,6 +42,11 @@ namespace filterKruskal {
                 bigger.push_back(edge);
             }
         }
+
+        if (bigger.empty() && (double) smaller.size() <=  t * log2(t)) { //error prevention
+            return kruskal::getMST(&smaller, uf);
+        }
+
         WEdgeList mst;
         mst = filterKruskal::getMST(n, &smaller, uf);
         bigger = filter(&bigger, uf);
