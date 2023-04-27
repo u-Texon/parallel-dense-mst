@@ -24,7 +24,8 @@ namespace mergeMST {
                 localEdges.push_back(edges[i]);
             }
             for (int i = 1; i < ctx.size(); ++i) {
-                MPI_Send(edges.data() + i * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
+                MPI_Send(edges.data() + i * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0,
+                         MPI_COMM_WORLD);
             }
         } else {
             localEdges.resize(edgesPerProc);
@@ -54,7 +55,8 @@ namespace mergeMST {
             i = 0;
             while (i < ctx.size()) {
                 if (ctx.rank() == i) {
-                    MPI_Recv(otherMST.data(), otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD, &status);
+                    MPI_Recv(otherMST.data(), otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD,
+                             &status);
                     break;
                 } else if (ctx.rank() == i + j / 2) {
                     MPI_Send(mstList.data(), (int) mstList.size(), mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
@@ -63,31 +65,15 @@ namespace mergeMST {
                 i += j;
             }
 
-
             if (ctx.rank() % j == 0) {
                 for (auto edge: otherMST) {
                     mstList.push_back(edge);
                 }
-
-
-                UnionFind uf2(*n);
-                mstList = kruskal::getMST(&mstList, &uf2); //TODO: use the same union find
-                //TODO:  filterKruskal::getMST(n, &mstList, &uf2);
-
-
-                //std::cout << ctx.rank() << " found mst:";
-                for (auto &edge: mstList) {
-                //    std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
-                }
-               // std::cout << std::endl;
-
-
+                uf.clear(); //TODO: is it even possible to keep the UF??
+                mstList = filterKruskal::getMST(n, &mstList, &uf);
             }
-
-
             j *= 2;
         }
-
         return mstList;
     }
 

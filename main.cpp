@@ -7,8 +7,8 @@
 #include "algorithms/mergeMST.hpp"
 
 
-#define M 800
-#define N 600
+#define M 8
+#define N 6
 #define MAX_W 10
 
 

@@ -26,6 +26,11 @@ public:
     data[a] = find(parent);
     return data[a];
   }
+  void clear() {
+      for (long & i : data) {
+          i = -1;
+      }
+  }
 
 private:
   std::vector<std::int64_t> data;
