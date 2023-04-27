@@ -28,7 +28,7 @@ namespace mergeMST {
             }
         } else {
             localEdges.resize(edgesPerProc);
-            MPI_Recv(&localEdges[0], edgesPerProc, mapper.get_mpi_datatype(), 0, 0, MPI_COMM_WORLD, &status);
+            MPI_Recv(localEdges.data(), edgesPerProc, mapper.get_mpi_datatype(), 0, 0, MPI_COMM_WORLD, &status);
         }
         UnionFind uf(*n);
         WEdgeList mstList;
@@ -54,7 +54,7 @@ namespace mergeMST {
             i = 0;
             while (i < ctx.size()) {
                 if (ctx.rank() == i) {
-                    MPI_Recv(&otherMST[0], otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD, &status);
+                    MPI_Recv(otherMST.data(), otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD, &status);
                     break;
                 } else if (ctx.rank() == i + j / 2) {
                     MPI_Send(mstList.data(), (int) mstList.size(), mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
