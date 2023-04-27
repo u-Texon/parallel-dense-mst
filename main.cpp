@@ -7,9 +7,9 @@
 #include "algorithms/mergeMST.hpp"
 
 
-#define M 801
-#define N 601
-#define MAX_W 1000
+#define M 803
+#define N 606
+#define MAX_W 1400
 
 
 int main(int argc, char **args) {

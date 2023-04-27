@@ -15,6 +15,7 @@ namespace mergeMST {
 
         int edgesPerProc = *m / ctx.size();
         int rest = *m % ctx.size();
+        int bigProcs = ctx.size() - rest;
         assert(edgesPerProc * ctx.size() + rest == edges.size());
         WEdgeList localEdges;
 
@@ -25,37 +26,23 @@ namespace mergeMST {
             for (int i = 0; i < edgesPerProc; ++i) {
                 localEdges.push_back(edges[i]);
             }
-            for (int i = 1; i < ctx.size() - 1; ++i) {
+            for (int i = 1; i < bigProcs; ++i) {
                 MPI_Send(edges.data() + i * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0,
                          MPI_COMM_WORLD);
             }
-            MPI_Send(edges.data() + (ctx.size() -1) * edgesPerProc, edgesPerProc + rest, mapper.get_mpi_datatype(),
-                     ctx.size() - 1, 0,
-                     MPI_COMM_WORLD);
-    /*
-            std::cout << "0 sent: ";
-            for (auto &edge: edges) {
-                std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+            int amount = edgesPerProc + 1;
+            for (int i = bigProcs; i < ctx.size(); ++i) {
+                MPI_Send(edges.data() + bigProcs * edgesPerProc + (i - bigProcs) * amount, amount,
+                         mapper.get_mpi_datatype(), i, 0,
+                         MPI_COMM_WORLD);
             }
-            std::cout << std::endl;
-            */
-
         } else {
-            if (ctx.rank() == ctx.size() - 1) {
-                edgesPerProc += rest;
+            if (ctx.rank() >= bigProcs) {
+                edgesPerProc += 1;
             }
             localEdges.resize(edgesPerProc);
             MPI_Recv(localEdges.data(), edgesPerProc, mapper.get_mpi_datatype(), 0, 0, MPI_COMM_WORLD, &status);
-            //   std::cout << "process " << ctx.rank() << " received!" << std::endl;
         }
-
-        /*
-        std::cout << ctx.rank() << " got: ";
-        for (auto &edge: localEdges) {
-            std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
-        }
-        std::cout << std::endl;
-        */
 
         UnionFind uf(*n);
         WEdgeList mstList;
