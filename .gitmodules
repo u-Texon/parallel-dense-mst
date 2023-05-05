@@ -1,0 +1,6 @@
+[submodule "external/graphs"]
+	path = external/graphs
+	url = https://github.com/mschimek/graphs.git
+[submodule "external/KaDiS"]
+	path = external/KaDiS
+	url = https://github.com/MichaelAxtmann/KaDiS.git

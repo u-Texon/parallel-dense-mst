@@ -5,7 +5,7 @@
 #include "include/definitions.hpp"
 #include "algorithms/filter_kruskal.hpp"
 #include "algorithms/mergeMST.hpp"
-
+#include "external/graphs/interface.hpp"
 
 #define M 400000
 #define N 1000
@@ -13,6 +13,13 @@
 
 
 int main() {
+    hybridMST::mpi::MPIContext ctx;
+    auto [edges, vertex_range] = graphs::get_gnm(10, 12);
+    for (auto edge: edges) {
+        std::cout << edge << std::endl;
+    }
+    hybridMST::mpi::MPIContext::finalize();
+    /*
     WEdgeList edges = generate::randomGraph(M, N, MAX_W);
     int n = N;
     int m = M;
@@ -87,6 +94,6 @@ int main() {
         std::cout << std::endl;
     }
 
-
+*/
     return 0;
 }

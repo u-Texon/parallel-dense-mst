@@ -5,7 +5,7 @@
 #include "../include/mpi/type_handling.hpp"
 #include "filter_kruskal.hpp"
 
-//TODO: view boost parallel graph library
+//TODO: view boost parallel graphs library
 namespace mergeMST {
 
 
