@@ -1,14 +1,14 @@
 #include <iostream>
 #include "include/util/timer.hpp"
-#include "generateGraphs/generateGraph.hpp"
 #include "algorithms/kruskal.hpp"
 #include "include/definitions.hpp"
 #include "algorithms/filter_kruskal.hpp"
 #include "algorithms/mergeMST.hpp"
 #include "external/graphs/interface.hpp"
+#include "algorithms/dense_boruvka.hpp"
 
-#define LOG_M 15
-#define LOG_N 10
+#define LOG_M 3
+#define LOG_N 3
 #define MAX_W 1000000
 
 
@@ -18,6 +18,21 @@ int main() {
 
     int n = (int) pow(2, LOG_N);
 
+    if (ctx.rank() == 1) {
+
+
+
+    std::cout << ctx.rank() << " got the following edges: ";
+    for (auto edge: edges)
+    {
+           std::cout << edge;
+    }
+    std::cout << std::endl;
+    }
+
+    dense_boruvka::getMST(&n, &edges);
+
+    /*
     hybridMST::Timer timer;
 
     if (ctx.rank() == 0) {
@@ -28,7 +43,7 @@ int main() {
 
 
     timer.start("merge", 0);
-    WEdgeList mergeMst = mergeMST::getMST(&n, edges);
+    WEdgeList mergeMst = mergeMST::getMST(&n, &edges);
     timer.stop("merge", 0);
     // std::cout << "MergeMST-edges are :" << std::endl;
     int mergeWeight = 0;
@@ -92,7 +107,7 @@ int main() {
         std::cout << std::endl;
     }
 
-
+*/
     hybridMST::mpi::MPIContext::finalize();
     return 0;
 }

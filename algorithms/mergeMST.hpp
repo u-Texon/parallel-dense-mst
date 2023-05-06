@@ -8,14 +8,13 @@
 namespace mergeMST {
 
 
-    inline WEdgeList getMST(int *n, WEdgeList edges) {
+    inline WEdgeList getMST(int *n, WEdgeList *edges) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdge> mapper;
 
-        int edgesPerProc = (int) edges.size() / ctx.size();
-        int rest = (int) edges.size() % ctx.size();
+        int edgesPerProc = (int) edges->size() / ctx.size();
+        int rest = (int) edges->size() % ctx.size();
         int bigProcs = ctx.size() - rest;
-        assert(edgesPerProc * ctx.size() + rest == edges.size());
         WEdgeList localEdges;
 
 
@@ -24,17 +23,17 @@ namespace mergeMST {
         //scatter edges over all processes
         if (ctx.rank() == 0) {
             for (int i = 0; i < edgesPerProc; ++i) {
-                localEdges.push_back(edges[i]);
+                localEdges.push_back(edges->at(i));
             }
             for (int i = 1; i < bigProcs; ++i) {
-                MPI_Send(edges.data() + i * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0,
-                         MPI_COMM_WORLD);
+                MPI_Send(edges->data() + i * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0,
+                         ctx.communicator());
             }
             int amount = edgesPerProc + 1;
             for (int i = bigProcs; i < ctx.size(); ++i) {
-                MPI_Send(edges.data() + bigProcs * edgesPerProc + (i - bigProcs) * amount, amount,
+                MPI_Send(edges->data() + bigProcs * edgesPerProc + (i - bigProcs) * amount, amount,
                          mapper.get_mpi_datatype(), i, 0,
-                         MPI_COMM_WORLD);
+                         ctx.communicator());
             }
 
         } else {
@@ -42,7 +41,7 @@ namespace mergeMST {
                 edgesPerProc += 1;
             }
             localEdges.resize(edgesPerProc);
-            MPI_Recv(localEdges.data(), edgesPerProc, mapper.get_mpi_datatype(), 0, 0, MPI_COMM_WORLD, &status);
+            MPI_Recv(localEdges.data(), edgesPerProc, mapper.get_mpi_datatype(), 0, 0, ctx.communicator(), &status);
         }
 
         // calculate local MST with filter kruskal
@@ -59,9 +58,9 @@ namespace mergeMST {
             int i = 0;
             while (i < ctx.size()) {   // send local mst size to other processor
                 if (ctx.rank() == i) {
-                    MPI_Recv(&otherMSTsize, 1, MPI_INT, i + j / 2, 0, MPI_COMM_WORLD, &status);
+                    MPI_Recv(&otherMSTsize, 1, MPI_INT, i + j / 2, 0, ctx.communicator(), &status);
                 } else if (ctx.rank() == i + j / 2) {
-                    MPI_Send(&myMSTsize, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+                    MPI_Send(&myMSTsize, 1, MPI_INT, i, 0, ctx.communicator());
                 }
                 i += j;
             }
@@ -72,11 +71,11 @@ namespace mergeMST {
             i = 0;
             while (i < ctx.size()) {   // send local mst to other processor
                 if (ctx.rank() == i) {
-                    MPI_Recv(otherMST.data(), otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, MPI_COMM_WORLD,
+                    MPI_Recv(otherMST.data(), otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, ctx.communicator(),
                              &status);
                     break;
                 } else if (ctx.rank() == i + j / 2) {
-                    MPI_Send(mstList.data(), (int) mstList.size(), mapper.get_mpi_datatype(), i, 0, MPI_COMM_WORLD);
+                    MPI_Send(mstList.data(), (int) mstList.size(), mapper.get_mpi_datatype(), i, 0, ctx.communicator());
                     break;
                 }
                 i += j;
