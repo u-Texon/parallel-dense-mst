@@ -43,7 +43,7 @@ namespace filterKruskal {
             }
         }
 
-        if (bigger.empty() && (double) smaller.size() <=  t * log2(t)) { //error prevention
+        if (bigger.empty()) { //error prevention for infinite loop
             return kruskal::getMST(&smaller, uf);
         }
 

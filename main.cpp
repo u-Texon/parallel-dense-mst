@@ -7,37 +7,40 @@
 #include "algorithms/mergeMST.hpp"
 #include "external/graphs/interface.hpp"
 
-#define M 400000
-#define N 1000
+#define LOG_M 15
+#define LOG_N 10
 #define MAX_W 1000000
 
 
 int main() {
     hybridMST::mpi::MPIContext ctx;
-    auto [edges, vertex_range] = graphs::get_gnm(10, 12);
-    for (auto edge: edges) {
-        std::cout << edge << std::endl;
-    }
-    hybridMST::mpi::MPIContext::finalize();
-    /*
-    WEdgeList edges = generate::randomGraph(M, N, MAX_W);
-    int n = N;
-    int m = M;
+    auto [edges, vertex_range] = graphs::get_gnm(LOG_N, LOG_M);
 
-    hybridMST::mpi::MPIContext ctx;
+    int n = (int) pow(2, LOG_N);
+
     hybridMST::Timer timer;
 
     if (ctx.rank() == 0) {
+        std::cout << "edgecount: " << edges.size() << std::endl;
+        std::cout << "vertexcount: " << n << " or " << edges.at(edges.size() -1).get_src() << std::endl;
         std::cout << "calculations start!" << std::endl;
     }
 
+
     timer.start("merge", 0);
-    WEdgeList mergeMst = mergeMST::getMST(&n, &m, edges);
+    WEdgeList mergeMst = mergeMST::getMST(&n, edges);
     timer.stop("merge", 0);
+    // std::cout << "MergeMST-edges are :" << std::endl;
+    int mergeWeight = 0;
+    for (auto edge: mergeMst) {
+        //   std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+        mergeWeight += edge.get_weight();
+    }
+    //std::cout << std::endl;
 
 
     timer.start("kruskal", 0);
-    UnionFind uf(N);
+    UnionFind uf(n);
     WEdgeList mst = kruskal::getMST(&edges, &uf);
     timer.stop("kruskal", 0);
 
@@ -50,16 +53,10 @@ int main() {
     //std::cout << std::endl;
 
 
-    // std::cout << "MergeMST-edges are :" << std::endl;
-    int mergeWeight = 0;
-    for (auto edge: mergeMst) {
-        //   std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
-        mergeWeight += edge.get_weight();
-    }
-    //std::cout << std::endl;
 
 
-    UnionFind uf2(N);
+
+    UnionFind uf2(n);
     timer.start("filter", 0);
     std::vector<WEdge> mst2 = filterKruskal::getMST(&n, &edges, &uf2);
     timer.stop("filter", 0);
@@ -89,11 +86,13 @@ int main() {
         std::cout << "calculations complete!" << std::endl;
     }
 
+
     std::cout << timer.output();
     if (ctx.rank() == 0) {
         std::cout << std::endl;
     }
 
-*/
+
+    hybridMST::mpi::MPIContext::finalize();
     return 0;
 }
