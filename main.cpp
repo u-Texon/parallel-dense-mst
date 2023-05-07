@@ -77,19 +77,6 @@ int main() {
     WEdgeList allEdges = hybridMST::mpi::gatherv(distEdges.data(), distEdges.size(), 0, ctx);
 
 
-    std::cout << ctx.rank() << " got: ";
-    for (auto edge: distEdges) {
-       std::cout << edge;
-    }
-    std::cout << std::endl;
-
-    if (ctx.rank() == 0) {
-        std::cout << "all edges: ";
-        for (auto edge: allEdges) {
-            std::cout << edge;
-        }
-        std::cout << std::endl;
-    }
 
 
     int n = (int) pow(2, LOG_N);
@@ -102,18 +89,16 @@ int main() {
     }
 
     hybridMST::Timer timer;
-
-    VId mergeWeight = 0;
-    //auto [mergeMST, mergeWeight] = testMergeMST(&n, &distEdges, timer);
-
-
+    auto [mergeMST, mergeWeight] = testMergeMST(&n, &distEdges, &timer);
     auto [kruskalMST, kruskalWeight] = testKruskal(&n, &allEdges, &timer);
-
-
     auto [filterMST, filterWeight] = testFilterKruskal(&n, &allEdges, &timer);
 
 
-      if (ctx.rank() == 0) {
+
+
+      if (ctx.rank() == 0) { //local tests
+
+
           if (kruskalWeight != filterWeight) {
               std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
               std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
