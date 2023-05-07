@@ -12,43 +12,10 @@ namespace mergeMST {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdge> mapper;
 
-        int edgesPerProc = (int) edges->size() / ctx.size();
-        int rest = (int) edges->size() % ctx.size();
-        int bigProcs = ctx.size() - rest;
-        WEdgeList localEdges;
-
-
-        MPI_Status status;
-
-        //scatter edges over all processes
-        if (ctx.rank() == 0) {
-            for (int i = 0; i < edgesPerProc; ++i) {
-                localEdges.push_back(edges->at(i));
-            }
-            for (int i = 1; i < bigProcs; ++i) {
-                MPI_Send(edges->data() + i * edgesPerProc, edgesPerProc, mapper.get_mpi_datatype(), i, 0,
-                         ctx.communicator());
-            }
-            int amount = edgesPerProc + 1;
-            for (int i = bigProcs; i < ctx.size(); ++i) {
-                MPI_Send(edges->data() + bigProcs * edgesPerProc + (i - bigProcs) * amount, amount,
-                         mapper.get_mpi_datatype(), i, 0,
-                         ctx.communicator());
-            }
-
-        } else {
-            if (ctx.rank() >= bigProcs) {
-                edgesPerProc += 1;
-            }
-            localEdges.resize(edgesPerProc);
-            MPI_Recv(localEdges.data(), edgesPerProc, mapper.get_mpi_datatype(), 0, 0, ctx.communicator(), &status);
-        }
-
         // calculate local MST with filter kruskal
         UnionFind uf(*n);
         WEdgeList mstList;
-        mstList = filterKruskal::getMST(n, &localEdges, &uf);
-
+        mstList = filterKruskal::getMST(n, edges, &uf);
 
 
         int j = 2;
@@ -58,6 +25,7 @@ namespace mergeMST {
             int i = 0;
             while (i < ctx.size()) {   // send local mst size to other processor
                 if (ctx.rank() == i) {
+                    MPI_Status status;
                     MPI_Recv(&otherMSTsize, 1, MPI_INT, i + j / 2, 0, ctx.communicator(), &status);
                 } else if (ctx.rank() == i + j / 2) {
                     MPI_Send(&myMSTsize, 1, MPI_INT, i, 0, ctx.communicator());
@@ -71,6 +39,7 @@ namespace mergeMST {
             i = 0;
             while (i < ctx.size()) {   // send local mst to other processor
                 if (ctx.rank() == i) {
+                    MPI_Status status;
                     MPI_Recv(otherMST.data(), otherMSTsize, mapper.get_mpi_datatype(), i + j / 2, 0, ctx.communicator(),
                              &status);
                     break;

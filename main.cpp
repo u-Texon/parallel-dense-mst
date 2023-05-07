@@ -6,58 +6,38 @@
 #include "algorithms/mergeMST.hpp"
 #include "external/graphs/interface.hpp"
 #include "algorithms/dense_boruvka.hpp"
+#include "include/mpi/gather.hpp"
+#include <mpi.h>
 
 #define LOG_M 3
 #define LOG_N 3
 #define MAX_W 1000000
 
 
-int main() {
-    hybridMST::mpi::MPIContext ctx;
-    auto [edges, vertex_range] = graphs::get_gnm(LOG_N, LOG_M);
-
-    int n = (int) pow(2, LOG_N);
-
-    if (ctx.rank() == 1) {
-
-
-
-    std::cout << ctx.rank() << " got the following edges: ";
-    for (auto edge: edges)
-    {
-           std::cout << edge;
-    }
-    std::cout << std::endl;
-    }
-
-    dense_boruvka::getMST(&n, &edges);
-
-    /*
-    hybridMST::Timer timer;
-
-    if (ctx.rank() == 0) {
-        std::cout << "edgecount: " << edges.size() << std::endl;
-        std::cout << "vertexcount: " << n << " or " << edges.at(edges.size() -1).get_src() << std::endl;
-        std::cout << "calculations start!" << std::endl;
-    }
-
-
-    timer.start("merge", 0);
-    WEdgeList mergeMst = mergeMST::getMST(&n, &edges);
-    timer.stop("merge", 0);
+std::pair<WEdgeList, VId> testMergeMST(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
+    timer->start("merge", 0);
+    WEdgeList mergeMst = mergeMST::getMST(n, edges);
+    timer->stop("merge", 0);
     // std::cout << "MergeMST-edges are :" << std::endl;
-    int mergeWeight = 0;
+    VId mergeWeight = 0;
     for (auto edge: mergeMst) {
         //   std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
         mergeWeight += edge.get_weight();
     }
     //std::cout << std::endl;
 
+    std::pair<WEdgeList, VId> pair;
+    pair.first = mergeMst;
+    pair.second = mergeWeight;
+    return pair;
+}
 
-    timer.start("kruskal", 0);
-    UnionFind uf(n);
-    WEdgeList mst = kruskal::getMST(&edges, &uf);
-    timer.stop("kruskal", 0);
+
+std::pair<WEdgeList, VId> testKruskal(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
+    timer->start("kruskal", 0);
+    UnionFind uf(*n);
+    WEdgeList mst = kruskal::getMST(edges, &uf);
+    timer->stop("kruskal", 0);
 
     // std::cout << "MST-edges are :" << std::endl;
     VId kruskalWeight = 0;
@@ -66,48 +46,96 @@ int main() {
         kruskalWeight += edge.get_weight();
     }
     //std::cout << std::endl;
+    std::pair<WEdgeList, VId> pair(mst, kruskalWeight);
+    return pair;
+}
 
+std::pair<WEdgeList, VId> testFilterKruskal(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
 
-
-
-
-    UnionFind uf2(n);
-    timer.start("filter", 0);
-    std::vector<WEdge> mst2 = filterKruskal::getMST(&n, &edges, &uf2);
-    timer.stop("filter", 0);
+    UnionFind uf2(*n);
+    timer->start("filter", 0);
+    std::vector<WEdge> mst = filterKruskal::getMST(n, edges, &uf2);
+    timer->stop("filter", 0);
 
     VId filterWeight = 0;
-    for (auto &edge: mst2) {
+    for (auto &edge: mst) {
         //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
         filterWeight += edge.get_weight();
     }
     //std::cout << std::endl;
 
+    std::pair<WEdgeList, VId> pair(mst, filterWeight);
+    return pair;
+}
 
-    if (ctx.rank() == 0) {
-        if (kruskalWeight != filterWeight) {
-            std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-            std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
-            std::cout << "filter-kruskal found MST with weight: " << filterWeight << std::endl;
-            std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-        }
-        if (kruskalWeight != mergeWeight) {
-            std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-            std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
-            std::cout << "mergeMST found MST with weight: " << mergeWeight << std::endl;
-            std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-        }
 
-        std::cout << "calculations complete!" << std::endl;
+int main() {
+    hybridMST::mpi::MPIContext ctx;
+    hybridMST::mpi::TypeMapper<WEdge> mapper;
+    //generate graph
+    auto [distEdges, vertex_range] = graphs::get_gnm(LOG_N, LOG_M);
+    WEdgeList allEdges = hybridMST::mpi::gatherv(distEdges.data(), distEdges.size(), 0, ctx);
+
+
+    std::cout << ctx.rank() << " got: ";
+    for (auto edge: distEdges) {
+       std::cout << edge;
     }
+    std::cout << std::endl;
 
-
-    std::cout << timer.output();
     if (ctx.rank() == 0) {
+        std::cout << "all edges: ";
+        for (auto edge: allEdges) {
+            std::cout << edge;
+        }
         std::cout << std::endl;
     }
 
-*/
-    hybridMST::mpi::MPIContext::finalize();
+
+    int n = (int) pow(2, LOG_N);
+
+
+    if (ctx.rank() == 0) {
+        //std::cout << "edgecount: " << distEdges.size() << std::endl;
+        //std::cout << "vertexcount: " << n << " or " << distEdges.at(distEdges.size() - 1).get_src() << std::endl;
+        std::cout << "calculations start!" << std::endl;
+    }
+
+    hybridMST::Timer timer;
+
+    VId mergeWeight = 0;
+    //auto [mergeMST, mergeWeight] = testMergeMST(&n, &distEdges, timer);
+
+
+    auto [kruskalMST, kruskalWeight] = testKruskal(&n, &allEdges, &timer);
+
+
+    auto [filterMST, filterWeight] = testFilterKruskal(&n, &allEdges, &timer);
+
+
+      if (ctx.rank() == 0) {
+          if (kruskalWeight != filterWeight) {
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+              std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
+              std::cout << "filter-kruskal found MST with weight: " << filterWeight << std::endl;
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+          }
+          if (kruskalWeight != mergeWeight) {
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+              std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
+              std::cout << "mergeMST found MST with weight: " << mergeWeight << std::endl;
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+          }
+
+          std::cout << "calculations complete!" << std::endl;
+      }
+
+
+      std::cout << timer.output();
+      if (ctx.rank() == 0) {
+          std::cout << std::endl;
+      }
+
+
     return 0;
 }
