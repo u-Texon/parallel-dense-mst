@@ -69,6 +69,26 @@ std::pair<WEdgeList, VId> testFilterKruskal(int *n, WEdgeList *edges, hybridMST:
 }
 
 
+std::pair<WEdgeList, VId> testDenseBoruvka(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
+
+    std::cout << "boruvka started" << std::endl;
+
+    timer->start("denseBoruvka", 0);
+    std::vector<WEdge> mst = dense_boruvka::getMST(n, edges);
+    timer->stop("denseBoruvka", 0);
+
+    VId bWeight = 0;
+    for (auto &edge: mst) {
+        //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+        bWeight += edge.get_weight();
+    }
+    //std::cout << std::endl;
+
+    std::pair<WEdgeList, VId> pair(mst, bWeight);
+    return pair;
+}
+
+
 int main() {
     hybridMST::mpi::MPIContext ctx;
     hybridMST::mpi::TypeMapper<WEdge> mapper;
@@ -92,12 +112,17 @@ int main() {
     auto [mergeMST, mergeWeight] = testMergeMST(&n, &distEdges, &timer);
     auto [kruskalMST, kruskalWeight] = testKruskal(&n, &allEdges, &timer);
     auto [filterMST, filterWeight] = testFilterKruskal(&n, &allEdges, &timer);
-
+    auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(&n, &allEdges, &timer);
 
 
 
       if (ctx.rank() == 0) { //local tests
-
+          if (kruskalWeight != bWeight) {
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+              std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
+              std::cout << "dense boruvka found MST with weight: " << filterWeight << std::endl;
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+          }
 
           if (kruskalWeight != filterWeight) {
               std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
