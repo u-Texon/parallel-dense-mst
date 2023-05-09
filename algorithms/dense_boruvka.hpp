@@ -60,7 +60,6 @@ namespace dense_boruvka {
             }
         }
 
-        std::cout << "before trees worked" << std::endl;
         std::vector<Vertex> vertices;
         //pseudo trees
         for (int i = 0; i < *n; ++i) {
@@ -76,13 +75,27 @@ namespace dense_boruvka {
             Vertex v(id, parent);
             vertices.push_back(v);
         }
+
+
+
         //rooted trees
         for (Vertex v: vertices) {
             Vertex parent = vertices.at(v.getParent());
-            if (v.getID() == parent.getParent() && v.getID() < v.getParent()) {
-                v.setParent(v.getID());
+            if (v.getID() == parent.getParent() && v.getID() > parent.getID()) {
+                vertices.at(v.getParent()).setParent(parent.getID());
             }
         }
+        std::cout << "before rooted stars worked" << std::endl;
+
+
+        if (ctx.rank() == 0) {
+
+            for (Vertex v: vertices) {
+                std::cout << v.getID() << " has parent " << v.getParent();
+                std::cout << std::endl;
+            }
+        }
+
 
         //rooted stars
         for (Vertex v: vertices) {
