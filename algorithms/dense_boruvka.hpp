@@ -9,32 +9,39 @@
 namespace dense_boruvka {
 
     inline WEdgeList getMST(int *n, WEdgeList *edges) {
+        hybridMST::mpi::MPIContext ctx;
         if (*n == 1) {
             return {}; //base case
         }
 
         UnionFind uf(*n);
-        WEdgeList newEdges = filterKruskal::getMST(n, edges, &uf);
+        WEdgeList newEdges = kruskal::getMST(edges, &uf);
 
         //calculate newEdges incident to each vertex
-        WEdge incident[*n]; //keeps the lightest incident edges. e.g. incident[4] is the lightest edge incidcent to 4
+        WEdge incident[*n]; //keeps the lightest incident edges. e.g. incident[4] is the lightest edge incident to 4
         for (int i = 0; i < *n; ++i) {
-            WEdge e(i, i, -1); //initialize "empty" entries
-            incident[i] = e;
+            incident[i] = WEdge(i, i, -1); //initialize "empty" entries
         }
+        WEdgeList newEdges2;
         for (auto edge: newEdges) {
             VId u = edge.get_src();
             VId v = edge.get_dst();
+            bool keep = true;
             if (incident[u].get_weight() > edge.get_weight()) {
                 incident[u] = edge;
+                keep = false;
             }
             if (incident[v].get_weight() > edge.get_weight()) {
                 incident[v] = edge;
+                keep = false;
+            }
+            if (keep) {
+                newEdges2.push_back(edge);
             }
         }
+        newEdges = newEdges2; //TODO: needed?
 
         //perform all reduce to get the lightest edges for each vertex
-        hybridMST::mpi::MPIContext ctx;
         hybridMST::mpi::TypeMapper<WEdge> mapper;
         if (ctx.rank() == 0) {
             WEdge other[*n];
@@ -59,14 +66,18 @@ namespace dense_boruvka {
                 mstEdges.push_back(edge);
             }
         }
+        UnionFind uf3(*n);
+        mstEdges = kruskal::getMST(&mstEdges, &uf3); //remove duplicate edges
 
-        std::vector<Vertex> vertices;
         //pseudo trees
+        int x = 0;
+        std::vector<Vertex> vertices;
         for (int i = 0; i < *n; ++i) {
             VId id = i;
             VId parent;
             if (incident[i].get_weight() == -1) {
                 parent = i;
+                x++;
             } else if (incident[i].get_src() == i) {
                 parent = incident[i].get_dst();
             } else {
@@ -76,6 +87,9 @@ namespace dense_boruvka {
             vertices.push_back(v);
         }
 
+        if (x == *n) {
+            return mstEdges;
+        }
 
 
         //rooted trees
@@ -85,17 +99,6 @@ namespace dense_boruvka {
                 vertices.at(v.getParent()).setParent(parent.getID());
             }
         }
-        std::cout << "before rooted stars worked" << std::endl;
-
-
-        if (ctx.rank() == 0) {
-
-            for (Vertex v: vertices) {
-                std::cout << v.getID() << " has parent " << v.getParent();
-                std::cout << std::endl;
-            }
-        }
-
 
         //rooted stars
         for (Vertex v: vertices) {
@@ -107,37 +110,50 @@ namespace dense_boruvka {
         }
 
 
-        std::cout << "before relabel worked" << std::endl;
         //relable vertices
-        int v = 1;
-        for (int i = 1; i < *n; ++i) {
+        int v = 0;
+        for (int i = 0; i < *n; ++i) {
             if (vertices[i].getID() == vertices[i].getParent()) {
                 v++;
+            }
+        }
+        std::map<VId , VId> map;
+        VId i = 0;
+        for (Vertex vertex: vertices) {
+            if (vertex.getID() == vertex.getParent()) {
+                if (map.find(vertex.getID()) == map.end()) {
+                    map.insert({ vertex.getID(), i});
+                    i++;
+                }
             }
         }
 
         //relable edges
         WEdgeList e;
         for (auto edge: newEdges) {
-            WEdge r;
-            r.src = vertices[edge.get_src()].getParent();
-            r.dst = vertices[edge.get_dst()].getParent();
-            r.weight = edge.get_weight();
-            e.push_back(r);
+            VId s = vertices[edge.get_src()].getParent();
+            VId t = vertices[edge.get_dst()].getParent();
+            VId w = edge.get_weight();
+
+            WEdge r(map.find(s)->second, map.find(t)->second, w);
+            if (s != t) {
+                e.push_back(r);
+            }
         }
+
 
         //remove parallel edges
         UnionFind uf2(v);
-        e = filterKruskal::getMST(&v, &e, &uf2); //TODO: is this slow?
+        e = kruskal::getMST(&e, &uf2); //TODO: is this slow?
+
 
         //TODO: build edge-map for relabeling
 
-
-        std::cout << "before recursion worked" << std::endl;
         WEdgeList otherMSTEdges = dense_boruvka::getMST(&v, &e);
         for (auto edge: otherMSTEdges) {
             mstEdges.push_back(edge);
         }
+
         return mstEdges;
     }
 

@@ -9,8 +9,8 @@
 #include "include/mpi/gather.hpp"
 #include <mpi.h>
 
-#define LOG_M 3
-#define LOG_N 3
+#define LOG_M 12
+#define LOG_N 10
 #define MAX_W 1000000
 
 
@@ -70,9 +70,6 @@ std::pair<WEdgeList, VId> testFilterKruskal(int *n, WEdgeList *edges, hybridMST:
 
 
 std::pair<WEdgeList, VId> testDenseBoruvka(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
-
-    std::cout << "boruvka started" << std::endl;
-
     timer->start("denseBoruvka", 0);
     std::vector<WEdge> mst = dense_boruvka::getMST(n, edges);
     timer->stop("denseBoruvka", 0);
@@ -97,8 +94,6 @@ int main() {
     WEdgeList allEdges = hybridMST::mpi::gatherv(distEdges.data(), distEdges.size(), 0, ctx);
 
 
-
-
     int n = (int) pow(2, LOG_N);
 
 
@@ -115,12 +110,11 @@ int main() {
     auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(&n, &allEdges, &timer);
 
 
-
       if (ctx.rank() == 0) { //local tests
           if (kruskalWeight != bWeight) {
               std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
               std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
-              std::cout << "dense boruvka found MST with weight: " << filterWeight << std::endl;
+              std::cout << "dense boruvka found MST with weight: " << bWeight << std::endl;
               std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
           }
 
