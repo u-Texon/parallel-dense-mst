@@ -9,7 +9,7 @@
 #include "include/mpi/gather.hpp"
 #include <mpi.h>
 
-#define LOG_M 12
+#define LOG_M 18
 #define LOG_N 10
 #define MAX_W 1000000
 
@@ -51,10 +51,9 @@ std::pair<WEdgeList, VId> testKruskal(int *n, WEdgeList *edges, hybridMST::Timer
 }
 
 std::pair<WEdgeList, VId> testFilterKruskal(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
-
-    UnionFind uf2(*n);
     timer->start("filter", 0);
-    std::vector<WEdge> mst = filterKruskal::getMST(n, edges, &uf2);
+    UnionFind uf(*n);
+    std::vector<WEdge> mst = filterKruskal::getMST(n, edges, &uf);
     timer->stop("filter", 0);
 
     VId filterWeight = 0;
@@ -108,6 +107,24 @@ int main() {
     auto [kruskalMST, kruskalWeight] = testKruskal(&n, &allEdges, &timer);
     auto [filterMST, filterWeight] = testFilterKruskal(&n, &allEdges, &timer);
     auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(&n, &allEdges, &timer);
+
+
+    /*
+
+    if (ctx.rank() == 0) {
+        std::cout << "kruskal found: ";
+        for ( auto e: kruskalMST) {
+            std::cout << e;
+        }
+        std::cout << std::endl;
+
+
+        std::cout << "boruvka found: ";
+        for ( auto e: denseBoruvkaMST) {
+            std::cout << e;
+        }
+        std::cout << std::endl;
+    } */
 
 
       if (ctx.rank() == 0) { //local tests

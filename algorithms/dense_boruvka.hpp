@@ -15,10 +15,10 @@ namespace dense_boruvka {
         }
 
         UnionFind uf(*n);
-        WEdgeList newEdges = kruskal::getMST(edges, &uf);
+        WEdgeList newEdges = filterKruskal::getMST(n, edges, &uf);
 
         //calculate newEdges incident to each vertex
-        WEdge incident[*n]; //keeps the lightest incident edges. e.g. incident[4] is the lightest edge incident to 4
+        WEdge incident[*n]; //keeps the lightest incident edges. edgeList.g. incident[4] is the lightest edge incident to 4
         for (int i = 0; i < *n; ++i) {
             incident[i] = WEdge(i, i, -1); //initialize "empty" entries
         }
@@ -39,7 +39,10 @@ namespace dense_boruvka {
                 newEdges2.push_back(edge);
             }
         }
-        newEdges = newEdges2; //TODO: needed?
+        newEdges = newEdges2;
+
+
+
 
         //perform all reduce to get the lightest edges for each vertex
         hybridMST::mpi::TypeMapper<WEdge> mapper;
@@ -66,8 +69,9 @@ namespace dense_boruvka {
                 mstEdges.push_back(edge);
             }
         }
+
         UnionFind uf3(*n);
-        mstEdges = kruskal::getMST(&mstEdges, &uf3); //remove duplicate edges
+        mstEdges = filterKruskal::getMST(n, &mstEdges, &uf3); //remove duplicate edges
 
         //pseudo trees
         int x = 0;
@@ -101,14 +105,15 @@ namespace dense_boruvka {
         }
 
         //rooted stars
+        std::vector<Vertex> vertices2; //TODO: why is this necessary ????
         for (Vertex v: vertices) {
-            VId parent = v.getParent();
-            while (parent != vertices.at(parent).getParent()) {
-                v.setParent(vertices.at(parent).getParent());
-                parent = vertices.at(parent).getParent();
+            while (v.getParent() != vertices.at(v.getParent()).getParent()) {
+                VId old = v.getParent();
+                v.setParent(vertices.at(v.getParent()).getParent());
             }
+            vertices2.push_back(v);
         }
-
+        vertices = vertices2;
 
         //relable vertices
         int v = 0;
@@ -128,8 +133,10 @@ namespace dense_boruvka {
             }
         }
 
+
+
         //relable edges
-        WEdgeList e;
+        WEdgeList edgeList;
         for (auto edge: newEdges) {
             VId s = vertices[edge.get_src()].getParent();
             VId t = vertices[edge.get_dst()].getParent();
@@ -137,19 +144,21 @@ namespace dense_boruvka {
 
             WEdge r(map.find(s)->second, map.find(t)->second, w);
             if (s != t) {
-                e.push_back(r);
+                edgeList.push_back(r);
             }
         }
 
 
+
         //remove parallel edges
         UnionFind uf2(v);
-        e = kruskal::getMST(&e, &uf2); //TODO: is this slow?
+        edgeList = filterKruskal::getMST(n, &edgeList, &uf2); //TODO: is this slow?
+
 
 
         //TODO: build edge-map for relabeling
 
-        WEdgeList otherMSTEdges = dense_boruvka::getMST(&v, &e);
+        WEdgeList otherMSTEdges = dense_boruvka::getMST(&v, &edgeList);
         for (auto edge: otherMSTEdges) {
             mstEdges.push_back(edge);
         }
