@@ -14,13 +14,13 @@
 #define MAX_W 1000000
 
 
-std::pair<WEdgeList, VId> testMergeMST(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
-    timer->start("merge", 0);
+std::pair<WEdgeList, VId> testMergeMST(int &n, WEdgeList &edges, hybridMST::Timer &timer) {
+    timer.start("merge", 0);
     WEdgeList mergeMst = mergeMST::getMST(n, edges);
-    timer->stop("merge", 0);
+    timer.stop("merge", 0);
     // std::cout << "MergeMST-edges are :" << std::endl;
     VId mergeWeight = 0;
-    for (auto edge: mergeMst) {
+    for (auto &edge: mergeMst) {
         //   std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
         mergeWeight += edge.get_weight();
     }
@@ -33,11 +33,11 @@ std::pair<WEdgeList, VId> testMergeMST(int *n, WEdgeList *edges, hybridMST::Time
 }
 
 
-std::pair<WEdgeList, VId> testKruskal(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
-    timer->start("kruskal", 0);
-    UnionFind uf(*n);
-    WEdgeList mst = kruskal::getMST(edges, &uf);
-    timer->stop("kruskal", 0);
+std::pair<WEdgeList, VId> testKruskal(int &n, WEdgeList &edges, hybridMST::Timer &timer) {
+    timer.start("kruskal", 0);
+    UnionFind uf(n);
+    WEdgeList mst = kruskal::getMST(edges, uf);
+    timer.stop("kruskal", 0);
 
     // std::cout << "MST-edges are :" << std::endl;
     VId kruskalWeight = 0;
@@ -50,11 +50,11 @@ std::pair<WEdgeList, VId> testKruskal(int *n, WEdgeList *edges, hybridMST::Timer
     return pair;
 }
 
-std::pair<WEdgeList, VId> testFilterKruskal(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
-    timer->start("filter", 0);
-    UnionFind uf(*n);
-    std::vector<WEdge> mst = filterKruskal::getMST(n, edges, &uf);
-    timer->stop("filter", 0);
+std::pair<WEdgeList, VId> testFilterKruskal(int &n, WEdgeList &edges, hybridMST::Timer &timer) {
+    timer.start("filter", 0);
+    UnionFind uf(n);
+    std::vector<WEdge> mst = filterKruskal::getMST(n, edges, uf);
+    timer.stop("filter", 0);
 
     VId filterWeight = 0;
     for (auto &edge: mst) {
@@ -68,10 +68,10 @@ std::pair<WEdgeList, VId> testFilterKruskal(int *n, WEdgeList *edges, hybridMST:
 }
 
 
-std::pair<WEdgeList, VId> testDenseBoruvka(int *n, WEdgeList *edges, hybridMST::Timer *timer) {
-    timer->start("denseBoruvka", 0);
+std::pair<WEdgeList, VId> testDenseBoruvka(int n, WEdgeList &edges, hybridMST::Timer &timer) {
+    timer.start("denseBoruvka", 0);
     std::vector<WEdge> mst = dense_boruvka::getMST(n, edges);
-    timer->stop("denseBoruvka", 0);
+    timer.stop("denseBoruvka", 0);
 
     VId bWeight = 0;
     for (auto &edge: mst) {
@@ -103,10 +103,10 @@ int main() {
     }
 
     hybridMST::Timer timer;
-    auto [mergeMST, mergeWeight] = testMergeMST(&n, &distEdges, &timer);
-    auto [kruskalMST, kruskalWeight] = testKruskal(&n, &allEdges, &timer);
-    auto [filterMST, filterWeight] = testFilterKruskal(&n, &allEdges, &timer);
-    auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(&n, &allEdges, &timer);
+    auto [mergeMST, mergeWeight] = testMergeMST(n, allEdges, timer);
+    auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer);
+    auto [filterMST, filterWeight] = testFilterKruskal(n, allEdges, timer);
+    auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(n, allEdges, timer);
 
 
     /*

@@ -6,20 +6,20 @@
 #include "filter_kruskal.hpp"
 #include "../include/dataStructures/Vertex.hpp"
 
-namespace dense_boruvka {
+namespace dense_boruvka { //TODO: union find bzw parent array wiederverwenden in schliefe
 
-    inline WEdgeList getMST(int *n, WEdgeList *edges) {
+    inline WEdgeList getMST(int &n, WEdgeList &edges) {
         hybridMST::mpi::MPIContext ctx;
-        if (*n == 1) {
+        if (n == 1) {
             return {}; //base case
         }
 
-        UnionFind uf(*n);
-        WEdgeList newEdges = filterKruskal::getMST(n, edges, &uf);
+        UnionFind uf(n);
+        WEdgeList newEdges = filterKruskal::getMST(n, edges, uf); //TODO: erst insidente kanten schicen, für nebenläufige abrarbeitung
 
         //calculate newEdges incident to each vertex
-        WEdge incident[*n]; //keeps the lightest incident edges. edgeList.g. incident[4] is the lightest edge incident to 4
-        for (int i = 0; i < *n; ++i) {
+        WEdge incident[n]; //keeps the lightest incident edges. edgeList.g. incident[4] is the lightest edge incident to 4
+        for (int i = 0; i < n; ++i) {
             incident[i] = WEdge(i, i, -1); //initialize "empty" entries
         }
         WEdgeList newEdges2;
@@ -42,25 +42,25 @@ namespace dense_boruvka {
         newEdges = newEdges2;
 
 
-
+        //TODO: MPI_OP
 
         //perform all reduce to get the lightest edges for each vertex
         hybridMST::mpi::TypeMapper<WEdge> mapper;
         if (ctx.rank() == 0) {
-            WEdge other[*n];
+            WEdge other[n];
             MPI_Status status;
             for (int i = 1; i < ctx.size(); ++i) {
-                MPI_Recv(other, *n, mapper.get_mpi_datatype(), i, 0, ctx.communicator(), &status);
-                for (int j = 0; j < *n; ++j) {
+                MPI_Recv(other, n, mapper.get_mpi_datatype(), i, 0, ctx.communicator(), &status);
+                for (int j = 0; j < n; ++j) {
                     if (other[j].get_weight() < incident[j].get_weight()) {
                         incident[j] = other[j];
                     }
                 }
             }
         } else {
-            MPI_Send(incident, *n, mapper.get_mpi_datatype(), 0, 0, ctx.communicator());
+            MPI_Send(incident, n, mapper.get_mpi_datatype(), 0, 0, ctx.communicator());
         }
-        MPI_Bcast(incident, *n, mapper.get_mpi_datatype(), 0, ctx.communicator());
+        MPI_Bcast(incident, n, mapper.get_mpi_datatype(), 0, ctx.communicator());
 
 
         WEdgeList mstEdges;
@@ -70,13 +70,14 @@ namespace dense_boruvka {
             }
         }
 
-        UnionFind uf3(*n);
-        mstEdges = filterKruskal::getMST(n, &mstEdges, &uf3); //remove duplicate edges
+        UnionFind uf3(n);
+        mstEdges = filterKruskal::getMST(n, mstEdges, uf3); //remove duplicate edges
+        //TODO: verwende keinen Kruskal
 
         //pseudo trees
         int x = 0;
         std::vector<Vertex> vertices;
-        for (int i = 0; i < *n; ++i) {
+        for (int i = 0; i < n; ++i) {
             VId id = i;
             VId parent;
             if (incident[i].get_weight() == -1) {
@@ -91,7 +92,7 @@ namespace dense_boruvka {
             vertices.push_back(v);
         }
 
-        if (x == *n) {
+        if (x == n) {
             return mstEdges;
         }
 
@@ -105,24 +106,21 @@ namespace dense_boruvka {
         }
 
         //rooted stars
-        std::vector<Vertex> vertices2; //TODO: why is this necessary ????
-        for (Vertex v: vertices) {
+        for (Vertex &v: vertices) {
             while (v.getParent() != vertices.at(v.getParent()).getParent()) {
                 VId old = v.getParent();
-                v.setParent(vertices.at(v.getParent()).getParent());
+                v.setParent(vertices.at(v.getParent()).getParent()); //TODO:  at() hat overhead für out of boud checks
             }
-            vertices2.push_back(v);
         }
-        vertices = vertices2;
 
         //relable vertices
         int v = 0;
-        for (int i = 0; i < *n; ++i) {
+        for (int i = 0; i < n; ++i) {
             if (vertices[i].getID() == vertices[i].getParent()) {
                 v++;
             }
         }
-        std::map<VId , VId> map;
+        std::map<VId , VId> map; //TOOO: wenn dann unordered map. versuchenweg zu lassen
         VId i = 0;
         for (Vertex vertex: vertices) {
             if (vertex.getID() == vertex.getParent()) {
@@ -137,7 +135,7 @@ namespace dense_boruvka {
 
         //relable edges
         WEdgeList edgeList;
-        for (auto edge: newEdges) {
+        for (auto &edge: newEdges) {
             VId s = vertices[edge.get_src()].getParent();
             VId t = vertices[edge.get_dst()].getParent();
             VId w = edge.get_weight();
@@ -152,14 +150,15 @@ namespace dense_boruvka {
 
         //remove parallel edges
         UnionFind uf2(v);
-        edgeList = filterKruskal::getMST(n, &edgeList, &uf2); //TODO: is this slow?
+        edgeList = filterKruskal::getMST(n, edgeList, uf2); //TODO: is this slow?
+        //TODO: ausprobieren was schneller ist. z.b sortieren (ohne union find)
 
 
 
-        //TODO: build edge-map for relabeling
+        //TODO: build edge-map for relabeling, verwende WEdgeID ohne lookup
 
-        WEdgeList otherMSTEdges = dense_boruvka::getMST(&v, &edgeList);
-        for (auto edge: otherMSTEdges) {
+        WEdgeList otherMSTEdges = dense_boruvka::getMST(v, edgeList); //TODO: while schleife
+        for (auto &edge: otherMSTEdges) {
             mstEdges.push_back(edge);
         }
 

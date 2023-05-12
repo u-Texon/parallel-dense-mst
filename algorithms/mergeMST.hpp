@@ -7,15 +7,14 @@
 
 namespace mergeMST {
 
-
-    inline WEdgeList getMST(int *n, WEdgeList *edges) {
+    inline WEdgeList getMST(int &n, WEdgeList &edges) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdge> mapper;
 
         // calculate local MST with filter kruskal
-        UnionFind uf(*n);
+        UnionFind uf(n);
         WEdgeList mstList;
-        mstList = filterKruskal::getMST(n, edges, &uf);
+        mstList = filterKruskal::getMST(n, edges, uf);
 
 
         int j = 2;
@@ -55,8 +54,8 @@ namespace mergeMST {
                 for (auto edge: otherMST) {
                     mstList.push_back(edge);
                 }
-                uf.clear(); //TODO: is it even possible to keep the UF??
-                mstList = filterKruskal::getMST(n, &mstList, &uf);
+                uf.clear();
+                mstList = filterKruskal::getMST(n, mstList, uf);
             }
             j *= 2;
         }
