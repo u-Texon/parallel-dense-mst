@@ -13,16 +13,20 @@ namespace dense_boruvka {
         int n = vertexCount;
         WEdgeOriginList edges = e;
         WEdgeOriginList mst;
-        WEdgeOrigin incident[n]; //keeps the lightest incident edges. relabeledEdges.g. incident[4] is the lightest edge incident to vertex 4
-        VId parent[n]; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
+        WEdgeOriginList incident; //keeps the lightest incident edges. relabeledEdges.g. incident[4] is the lightest edge incident to vertex 4
+        std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
         UnionFind uf(n);
-        VId vertices[n];
-        int iteration = 1; //TODO: only for debugging
+        std::vector<VId> vertices;
         while (n > 1) {
+            //shrink arrays
+            incident.resize(n);
+            parent.resize(n);
+            vertices.resize(n);
+            uf.clear(n);
 
-            uf.clear();
-            WEdgeOriginList newEdges = filterKruskal::getMST(n, edges,
-                                                             uf); //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
+
+            //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
+            WEdgeOriginList newEdges = filterKruskal::getMST(n, edges, uf);
 
             //calculate edges incident to each vertex
             for (int i = 0; i < n; ++i) {
@@ -55,9 +59,9 @@ namespace dense_boruvka {
                     }
                 }
             } else {
-                MPI_Send(incident, n, mapper.get_mpi_datatype(), 0, 0, ctx.communicator());
+                MPI_Send(incident.data(), n, mapper.get_mpi_datatype(), 0, 0, ctx.communicator());
             }
-            MPI_Bcast(incident, n, mapper.get_mpi_datatype(), 0, ctx.communicator());
+            MPI_Bcast(incident.data(), n, mapper.get_mpi_datatype(), 0, ctx.communicator());
 
 
 
@@ -86,7 +90,7 @@ namespace dense_boruvka {
             }
 
             //continue with the edges that are not (yet) added to the mst
-            WEdgeOriginList newEdges2; //TODO: this seems ugly
+            WEdgeOriginList newEdges2;
             for (auto &edge: newEdges) {
                 VId u = edge.get_src();
                 VId v = edge.get_dst();
@@ -156,9 +160,8 @@ namespace dense_boruvka {
             relabeledEdges = filterKruskal::getMST(n, relabeledEdges, uf);
             //TODO: ausprobieren was schneller ist. z.b sortieren (ohne union find)
 
-           n = v;
-           edges = relabeledEdges;
-           iteration++;
+            n = v;
+            edges = relabeledEdges;
         }
 
 

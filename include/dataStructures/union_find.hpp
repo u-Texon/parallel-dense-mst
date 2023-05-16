@@ -26,11 +26,18 @@ public:
     data[a] = find(parent);
     return data[a];
   }
-  void clear() {
+  void clear(std::size_t n) {
+      data.resize(n);
       for (long & i : data) {
           i = -1;
       }
   }
+
+    void clear() {
+        for (long & i : data) {
+            i = -1;
+        }
+    }
 
 private:
   std::vector<std::int64_t> data;
