@@ -4,7 +4,8 @@
 
 namespace filterKruskal {
 
-    inline WEdge pickPivot(WEdgeList &edges) { //TODO:alternative: pick 3 elements
+    template<typename Edge>
+    inline Edge pickPivot(std::vector<Edge> &edges) { //TODO:alternative: pick 3 elements
         int i = rand() % ( edges.size());
         return edges.at(i);
     }
@@ -14,8 +15,9 @@ namespace filterKruskal {
         return t;
     }
 
-    inline WEdgeList filter(WEdgeList &edges, UnionFind &uf) {
-        WEdgeList newList;
+    template<typename Edge>
+    inline std::vector<Edge> filter(std::vector<Edge> &edges, UnionFind &uf) {
+        std::vector<Edge> newList;
         for (auto &edge: edges) {
             VId f1 = uf.find(edge.get_src());
             VId f2 = uf.find(edge.get_dst());
@@ -27,14 +29,15 @@ namespace filterKruskal {
     }
 
 
-    inline WEdgeList getMST(int &n, WEdgeList &edges, UnionFind &uf) {
+    template<typename Edge>
+    inline std::vector<Edge> getMST(int &n, std::vector<Edge> &edges, UnionFind &uf) {
         int t = threshold(n);
         if (edges.size() <= t) {
             return kruskal::getMST(edges, uf);
         }
-        WEdge pivot = pickPivot(edges);
-        WEdgeList smaller;
-        WEdgeList bigger;
+        Edge pivot = pickPivot(edges);
+        std::vector<Edge> smaller;
+        std::vector<Edge> bigger;
         for (auto &edge: edges) {
             if (edge.get_weight() <= pivot.get_weight()) {
                 smaller.push_back(edge);
@@ -47,14 +50,13 @@ namespace filterKruskal {
             return kruskal::getMST(smaller, uf);
         }
 
-        WEdgeList mst;
+        std::vector<Edge> mst;
         mst = filterKruskal::getMST(n, smaller, uf);
         bigger = filter(bigger, uf);
-        WEdgeList bigEdges = filterKruskal::getMST(n, bigger, uf);
+        std::vector<Edge> bigEdges = filterKruskal::getMST(n, bigger, uf);
         mst.insert(mst.end(), bigEdges.begin(), bigEdges.end());
 
         return mst;
     }
-
 
 }

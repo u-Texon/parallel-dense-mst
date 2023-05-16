@@ -7,7 +7,6 @@
 #include "external/graphs/interface.hpp"
 #include "algorithms/dense_boruvka.hpp"
 #include "include/mpi/gather.hpp"
-#include <mpi.h>
 
 #define LOG_M 18
 #define LOG_N 10
@@ -18,14 +17,10 @@ std::pair<WEdgeList, VId> testMergeMST(int &n, WEdgeList &edges, hybridMST::Time
     timer.start("merge", 0);
     WEdgeList mergeMst = mergeMST::getMST(n, edges);
     timer.stop("merge", 0);
-    // std::cout << "MergeMST-edges are :" << std::endl;
     VId mergeWeight = 0;
     for (auto &edge: mergeMst) {
-        //   std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
         mergeWeight += edge.get_weight();
     }
-    //std::cout << std::endl;
-
     std::pair<WEdgeList, VId> pair;
     pair.first = mergeMst;
     pair.second = mergeWeight;
@@ -38,14 +33,11 @@ std::pair<WEdgeList, VId> testKruskal(int &n, WEdgeList &edges, hybridMST::Timer
     UnionFind uf(n);
     WEdgeList mst = kruskal::getMST(edges, uf);
     timer.stop("kruskal", 0);
-
-    // std::cout << "MST-edges are :" << std::endl;
     VId kruskalWeight = 0;
     for (auto &edge: mst) {
-        //  std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
+
         kruskalWeight += edge.get_weight();
     }
-    //std::cout << std::endl;
     std::pair<WEdgeList, VId> pair(mst, kruskalWeight);
     return pair;
 }
@@ -58,10 +50,8 @@ std::pair<WEdgeList, VId> testFilterKruskal(int &n, WEdgeList &edges, hybridMST:
 
     VId filterWeight = 0;
     for (auto &edge: mst) {
-        //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
         filterWeight += edge.get_weight();
     }
-    //std::cout << std::endl;
 
     std::pair<WEdgeList, VId> pair(mst, filterWeight);
     return pair;
@@ -69,17 +59,20 @@ std::pair<WEdgeList, VId> testFilterKruskal(int &n, WEdgeList &edges, hybridMST:
 
 
 std::pair<WEdgeList, VId> testDenseBoruvka(int n, WEdgeList &edges, hybridMST::Timer &timer) {
+
+    WEdgeOriginList newEdges;
+    for (auto &edge: edges) {
+        newEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
+    }
+
     timer.start("denseBoruvka", 0);
-    std::vector<WEdge> mst = dense_boruvka::getMST(n, edges);
+    std::vector<WEdge> mst = dense_boruvka::getMST(n, newEdges);
     timer.stop("denseBoruvka", 0);
 
     VId bWeight = 0;
     for (auto &edge: mst) {
-        //std::cout << "(" << edge.get_src() << "," << edge.get_dst() << "," << edge.get_weight() << ") ";
         bWeight += edge.get_weight();
     }
-    //std::cout << std::endl;
-
     std::pair<WEdgeList, VId> pair(mst, bWeight);
     return pair;
 }
@@ -97,37 +90,25 @@ int main() {
 
 
     if (ctx.rank() == 0) {
-        //std::cout << "edgecount: " << distEdges.size() << std::endl;
-        //std::cout << "vertexcount: " << n << " or " << distEdges.at(distEdges.size() - 1).get_src() << std::endl;
         std::cout << "calculations start!" << std::endl;
     }
 
     hybridMST::Timer timer;
-    auto [mergeMST, mergeWeight] = testMergeMST(n, allEdges, timer);
+    auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(n, distEdges, timer);
+    auto [mergeMST, mergeWeight] = testMergeMST(n, distEdges, timer);
     auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer);
     auto [filterMST, filterWeight] = testFilterKruskal(n, allEdges, timer);
-    auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(n, allEdges, timer);
 
 
-    /*
-
-    if (ctx.rank() == 0) {
-        std::cout << "kruskal found: ";
-        for ( auto e: kruskalMST) {
-            std::cout << e;
-        }
-        std::cout << std::endl;
 
 
-        std::cout << "boruvka found: ";
-        for ( auto e: denseBoruvkaMST) {
-            std::cout << e;
-        }
-        std::cout << std::endl;
-    } */
+
+
+
 
 
       if (ctx.rank() == 0) { //local tests
+
           if (kruskalWeight != bWeight) {
               std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
               std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;

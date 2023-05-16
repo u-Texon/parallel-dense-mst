@@ -4,165 +4,170 @@
 #include "../include/definitions.hpp"
 #include "../include/mpi/type_handling.hpp"
 #include "filter_kruskal.hpp"
-#include "../include/dataStructures/Vertex.hpp"
 
-namespace dense_boruvka { //TODO: union find bzw parent array wiederverwenden in schliefe
+namespace dense_boruvka {
 
-    inline WEdgeList getMST(int &n, WEdgeList &edges) {
+    inline WEdgeList getMST(int &vertexCount, WEdgeOriginList &e) {
         hybridMST::mpi::MPIContext ctx;
-        if (n == 1) {
-            return {}; //base case
-        }
 
+        int n = vertexCount;
+        WEdgeOriginList edges = e;
+        WEdgeOriginList mst;
+        WEdgeOrigin incident[n]; //keeps the lightest incident edges. relabeledEdges.g. incident[4] is the lightest edge incident to vertex 4
+        VId parent[n]; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
         UnionFind uf(n);
-        WEdgeList newEdges = filterKruskal::getMST(n, edges, uf); //TODO: erst insidente kanten schicen, für nebenläufige abrarbeitung
+        VId vertices[n];
+        int iteration = 1; //TODO: only for debugging
+        while (n > 1) {
 
-        //calculate newEdges incident to each vertex
-        WEdge incident[n]; //keeps the lightest incident edges. edgeList.g. incident[4] is the lightest edge incident to 4
-        for (int i = 0; i < n; ++i) {
-            incident[i] = WEdge(i, i, -1); //initialize "empty" entries
-        }
-        WEdgeList newEdges2;
-        for (auto edge: newEdges) {
-            VId u = edge.get_src();
-            VId v = edge.get_dst();
-            bool keep = true;
-            if (incident[u].get_weight() > edge.get_weight()) {
-                incident[u] = edge;
-                keep = false;
+            uf.clear();
+            WEdgeOriginList newEdges = filterKruskal::getMST(n, edges,
+                                                             uf); //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
+
+            //calculate edges incident to each vertex
+            for (int i = 0; i < n; ++i) {
+                incident[i] = WEdgeOrigin(i, i, -1); //initialize "empty" entries
             }
-            if (incident[v].get_weight() > edge.get_weight()) {
-                incident[v] = edge;
-                keep = false;
+            for (auto &edge: newEdges) {
+                VId u = edge.get_src();
+                VId v = edge.get_dst();
+                if (edge.get_weight() < incident[u].get_weight()) {
+                    incident[u] = edge;
+                }
+                if (edge.get_weight() < incident[v].get_weight()) {
+                    incident[v] = edge;
+                }
             }
-            if (keep) {
-                newEdges2.push_back(edge);
+
+
+            //TODO: MPI_OP
+            //perform all reduce to get the lightest edges for each vertex
+            hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
+            if (ctx.rank() == 0) {
+                WEdgeOrigin other[n];
+                MPI_Status status;
+                for (int i = 1; i < ctx.size(); ++i) {
+                    MPI_Recv(other, n, mapper.get_mpi_datatype(), i, 0, ctx.communicator(), &status);
+                    for (int j = 0; j < n; ++j) {
+                        if (other[j].get_weight() < incident[j].get_weight()) {
+                            incident[j] = other[j];
+                        }
+                    }
+                }
+            } else {
+                MPI_Send(incident, n, mapper.get_mpi_datatype(), 0, 0, ctx.communicator());
             }
-        }
-        newEdges = newEdges2;
+            MPI_Bcast(incident, n, mapper.get_mpi_datatype(), 0, ctx.communicator());
 
 
-        //TODO: MPI_OP
 
-        //perform all reduce to get the lightest edges for each vertex
-        hybridMST::mpi::TypeMapper<WEdge> mapper;
-        if (ctx.rank() == 0) {
-            WEdge other[n];
-            MPI_Status status;
-            for (int i = 1; i < ctx.size(); ++i) {
-                MPI_Recv(other, n, mapper.get_mpi_datatype(), i, 0, ctx.communicator(), &status);
-                for (int j = 0; j < n; ++j) {
-                    if (other[j].get_weight() < incident[j].get_weight()) {
-                        incident[j] = other[j];
+            //add edges to mst
+            WEdgeOriginList mstEdges;
+            for (int i = 0; i < n; ++i) {
+                WEdgeOrigin edge = incident[i];
+                if (edge.get_weight() != -1) {
+                    //don't add the same edge twice
+                    bool contains = false;
+                    for (auto &mstEdge: mstEdges) {
+                        if (mstEdge.get_src() == edge.get_src() && mstEdge.get_dst() == edge.get_dst()) {
+                            contains = true;
+                            break;
+                        }
+                        if (mstEdge.get_dst() == edge.get_src() && mstEdge.get_src() == edge.get_dst()) {
+                            contains = true;
+                            break;
+                        }
+                    }
+                    if (!contains) {
+                        mstEdges.push_back(edge);
+                        mst.push_back(edge);
                     }
                 }
             }
-        } else {
-            MPI_Send(incident, n, mapper.get_mpi_datatype(), 0, 0, ctx.communicator());
-        }
-        MPI_Bcast(incident, n, mapper.get_mpi_datatype(), 0, ctx.communicator());
 
-
-        WEdgeList mstEdges;
-        for (auto edge: incident) {
-            if (edge.get_weight() != -1) {
-                mstEdges.push_back(edge);
-            }
-        }
-
-        UnionFind uf3(n);
-        mstEdges = filterKruskal::getMST(n, mstEdges, uf3); //remove duplicate edges
-        //TODO: verwende keinen Kruskal
-
-        //pseudo trees
-        int x = 0;
-        std::vector<Vertex> vertices;
-        for (int i = 0; i < n; ++i) {
-            VId id = i;
-            VId parent;
-            if (incident[i].get_weight() == -1) {
-                parent = i;
-                x++;
-            } else if (incident[i].get_src() == i) {
-                parent = incident[i].get_dst();
-            } else {
-                parent = incident[i].get_src();
-            }
-            Vertex v(id, parent);
-            vertices.push_back(v);
-        }
-
-        if (x == n) {
-            return mstEdges;
-        }
-
-
-        //rooted trees
-        for (Vertex v: vertices) {
-            Vertex parent = vertices.at(v.getParent());
-            if (v.getID() == parent.getParent() && v.getID() > parent.getID()) {
-                vertices.at(v.getParent()).setParent(parent.getID());
-            }
-        }
-
-        //rooted stars
-        for (Vertex &v: vertices) {
-            while (v.getParent() != vertices.at(v.getParent()).getParent()) {
-                VId old = v.getParent();
-                v.setParent(vertices.at(v.getParent()).getParent()); //TODO:  at() hat overhead für out of boud checks
-            }
-        }
-
-        //relable vertices
-        int v = 0;
-        for (int i = 0; i < n; ++i) {
-            if (vertices[i].getID() == vertices[i].getParent()) {
-                v++;
-            }
-        }
-        std::map<VId , VId> map; //TOOO: wenn dann unordered map. versuchenweg zu lassen
-        VId i = 0;
-        for (Vertex vertex: vertices) {
-            if (vertex.getID() == vertex.getParent()) {
-                if (map.find(vertex.getID()) == map.end()) {
-                    map.insert({ vertex.getID(), i});
-                    i++;
+            //continue with the edges that are not (yet) added to the mst
+            WEdgeOriginList newEdges2; //TODO: this seems ugly
+            for (auto &edge: newEdges) {
+                VId u = edge.get_src();
+                VId v = edge.get_dst();
+                bool keep = true;
+                if (edge == incident[u] || edge == incident[v]) {
+                    keep = false;
+                }
+                if (keep) {
+                    newEdges2.push_back(edge);
                 }
             }
-        }
+            newEdges = newEdges2;
 
-
-
-        //relable edges
-        WEdgeList edgeList;
-        for (auto &edge: newEdges) {
-            VId s = vertices[edge.get_src()].getParent();
-            VId t = vertices[edge.get_dst()].getParent();
-            VId w = edge.get_weight();
-
-            WEdge r(map.find(s)->second, map.find(t)->second, w);
-            if (s != t) {
-                edgeList.push_back(r);
+            //pseudo trees
+            for (int i = 0; i < n; ++i) {
+                VId p;
+                if (incident[i].get_weight() == -1) {
+                    p = i;
+                } else if (incident[i].get_src() == i) {
+                    p = incident[i].get_dst();
+                } else {
+                    p = incident[i].get_src();
+                }
+                parent[i] = p;
             }
+
+            //rooted trees
+            for (int i = 0; i < n; ++i) {
+                if (parent[parent[i]] == i) {
+                    parent[i] = i;
+                }
+            }
+
+            //rooted stars
+            for (int i = 0; i < n; ++i) {
+                while (parent[parent[i]] != parent[i]) {
+                    parent[i] = parent[parent[i]];
+                }
+            }
+
+            //relable vertices
+            int v = 0;
+            for (int i = 0; i < n; ++i) {
+                if (parent[i] == i && incident[i].get_weight() != -1) {
+                    vertices[i] = v;
+                    v++;
+                }
+            }
+
+
+            //relable edges
+            WEdgeOriginList relabeledEdges;
+            for (auto &edge: newEdges) {
+                VId s = parent[edge.get_src()];
+                VId t = parent[edge.get_dst()];
+                VId w = edge.get_weight();
+
+                WEdgeOrigin r(vertices[s], edge.get_src_origin(), vertices[t], edge.get_dst_origin(), w);
+                if (s != t) {
+                    relabeledEdges.push_back(r);
+                }
+            }
+
+
+            //remove parallel edges
+            uf.clear();
+            relabeledEdges = filterKruskal::getMST(n, relabeledEdges, uf);
+            //TODO: ausprobieren was schneller ist. z.b sortieren (ohne union find)
+
+           n = v;
+           edges = relabeledEdges;
+           iteration++;
         }
 
 
-
-        //remove parallel edges
-        UnionFind uf2(v);
-        edgeList = filterKruskal::getMST(n, edgeList, uf2); //TODO: is this slow?
-        //TODO: ausprobieren was schneller ist. z.b sortieren (ohne union find)
-
-
-
-        //TODO: build edge-map for relabeling, verwende WEdgeID ohne lookup
-
-        WEdgeList otherMSTEdges = dense_boruvka::getMST(v, edgeList); //TODO: while schleife
-        for (auto &edge: otherMSTEdges) {
-            mstEdges.push_back(edge);
+        WEdgeList returnEdges;
+        for (auto &edge: mst) {
+            returnEdges.push_back(edge.toWEdge());
         }
+        return returnEdges;
 
-        return mstEdges;
     }
 
 
