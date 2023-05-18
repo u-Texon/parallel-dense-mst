@@ -7,22 +7,40 @@
 
 namespace dense_boruvka {
 
+
+    void reduceEdges(WEdgeOrigin *in, WEdgeOrigin *inout, const int *n, MPI_Datatype *datatype) {
+        for (int i = 0; i < *n; i++) {
+            if (in[i].get_weight() < inout[i].get_weight()) {
+                inout[i] = in[i];
+            }
+        }
+    }
+
+
     inline WEdgeList getMST(int &vertexCount, WEdgeOriginList &e) {
+
+
+
         hybridMST::mpi::MPIContext ctx;
 
         int n = vertexCount;
         WEdgeOriginList edges = e;
         WEdgeOriginList mst;
-        WEdgeOriginList incident; //keeps the lightest incident edges. relabeledEdges.g. incident[4] is the lightest edge incident to vertex 4
+        WEdgeOriginList incidentLocal;
+        WEdgeOriginList incident; //keeps the lightest incidentLocal edges. relabeledEdges.g. incidentLocal[4] is the lightest edge incidentLocal to vertex 4
         std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
         UnionFind uf(n);
         std::vector<VId> vertices;
+        int iteration = 1; //TODO: remove
         while (n > 1) {
             //shrink arrays
+            incidentLocal.resize(n);
             incident.resize(n);
             parent.resize(n);
             vertices.resize(n);
             uf.clear(n);
+
+            //TODO: idee: processor mit kleinstem n broadcastet seine kanten
 
 
             //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
@@ -30,38 +48,31 @@ namespace dense_boruvka {
 
             //calculate edges incident to each vertex
             for (int i = 0; i < n; ++i) {
-                incident[i] = WEdgeOrigin(i, i, -1); //initialize "empty" entries
+                incidentLocal[i] = WEdgeOrigin(i, i, -1); //initialize "empty" entries
             }
             for (auto &edge: newEdges) {
                 VId u = edge.get_src();
                 VId v = edge.get_dst();
-                if (edge.get_weight() < incident[u].get_weight()) {
-                    incident[u] = edge;
+                if (edge.get_weight() < incidentLocal[u].get_weight()) {
+                    incidentLocal[u] = edge;
                 }
-                if (edge.get_weight() < incident[v].get_weight()) {
-                    incident[v] = edge;
+                if (edge.get_weight() < incidentLocal[v].get_weight()) {
+                    incidentLocal[v] = edge;
                 }
             }
 
 
-            //TODO: MPI_OP
+
             //perform all reduce to get the lightest edges for each vertex
             hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
-            if (ctx.rank() == 0) {
-                WEdgeOrigin other[n];
-                MPI_Status status;
-                for (int i = 1; i < ctx.size(); ++i) {
-                    MPI_Recv(other, n, mapper.get_mpi_datatype(), i, 0, ctx.communicator(), &status);
-                    for (int j = 0; j < n; ++j) {
-                        if (other[j].get_weight() < incident[j].get_weight()) {
-                            incident[j] = other[j];
-                        }
-                    }
-                }
-            } else {
-                MPI_Send(incident.data(), n, mapper.get_mpi_datatype(), 0, 0, ctx.communicator());
-            }
+            MPI_Op reduce;
+            MPI_Op_create((MPI_User_function *) reduceEdges, true, &reduce);
+            MPI_Reduce(incidentLocal.data(), incident.data(), n, mapper.get_mpi_datatype(), reduce, 0,
+                          ctx.communicator());
             MPI_Bcast(incident.data(), n, mapper.get_mpi_datatype(), 0, ctx.communicator());
+            //TODO: with allreduce instead of broadcast errors occur because edge-src/dst can be swopped
+
+
 
 
 
@@ -162,6 +173,7 @@ namespace dense_boruvka {
 
             n = v;
             edges = relabeledEdges;
+            iteration++;
         }
 
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "../external/graphs/include/edge_types.hpp"
 
 using Weight = std::uint32_t;
