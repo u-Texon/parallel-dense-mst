@@ -8,17 +8,24 @@
 namespace dense_boruvka {
 
 
-    void reduceEdges(WEdgeOrigin *in, WEdgeOrigin *inout, const int *n, MPI_Datatype *datatype) {
+    void minEdges(WEdgeOrigin *in, WEdgeOrigin *inout, const int *n, MPI_Datatype *datatype) {
         for (int i = 0; i < *n; i++) {
-            if (in[i].get_weight() < inout[i].get_weight()) {
+            if (in[i].get_weight() < inout[i].get_weight()) { //save edge with min weight
                 inout[i] = in[i];
+            } else if (in[i].get_weight() == inout[i].get_weight()) { //select edge with smaller destination
+                if (in[i].get_src() + in[i].get_dst() < inout[i].get_src() + inout[i].get_dst()) {
+                    inout[i] = in[i];
+                }
+            }
+            if (inout[i].get_src() != i) { //swap src/dest for no ambiguity
+                inout[i].set_dst(inout[i].get_src());
+                inout[i].set_src(i);
             }
         }
     }
 
 
     inline WEdgeList getMST(int &vertexCount, WEdgeOriginList &e) {
-
 
 
         hybridMST::mpi::MPIContext ctx;
@@ -66,14 +73,9 @@ namespace dense_boruvka {
             //perform all reduce to get the lightest edges for each vertex
             hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
             MPI_Op reduce;
-            MPI_Op_create((MPI_User_function *) reduceEdges, true, &reduce);
-            MPI_Reduce(incidentLocal.data(), incident.data(), n, mapper.get_mpi_datatype(), reduce, 0,
+            MPI_Op_create((MPI_User_function *) minEdges, true, &reduce);
+            MPI_Allreduce(incidentLocal.data(), incident.data(), n, mapper.get_mpi_datatype(), reduce,
                           ctx.communicator());
-            MPI_Bcast(incident.data(), n, mapper.get_mpi_datatype(), 0, ctx.communicator());
-            //TODO: with allreduce instead of broadcast errors occur because edge-src/dst can be swopped
-
-
-
 
 
             //add edges to mst
