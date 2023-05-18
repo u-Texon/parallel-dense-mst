@@ -10,7 +10,7 @@ namespace filterKruskal {
         return edges.at(i);
     }
 
-    inline int threshold(const int &n) {
+    inline int threshold(const VId &n) {
         int t = (int) fmax(30, (log2(n) / 2)); //TODO: is this a good threshold?
         return t;
     }
@@ -30,7 +30,7 @@ namespace filterKruskal {
 
 
     template<typename Edge>
-    inline std::vector<Edge> getMST(int &n, std::vector<Edge> &edges, UnionFind &uf) {
+    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges, UnionFind &uf) {
         int t = threshold(n);
         if (edges.size() <= t) {
             return kruskal::getMST(edges, uf);

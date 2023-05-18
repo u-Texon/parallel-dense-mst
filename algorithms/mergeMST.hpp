@@ -7,7 +7,7 @@
 
 namespace mergeMST {
 
-    inline WEdgeList getMST(int &n, WEdgeList &edges) {
+    inline WEdgeList getMST(VId &n, WEdgeList &edges) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdge> mapper;
 

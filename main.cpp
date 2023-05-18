@@ -13,7 +13,7 @@
 #define MAX_W 1000000
 
 
-std::pair<WEdgeList, VId> testMergeMST(int &n, WEdgeList &edges, hybridMST::Timer &timer) {
+std::pair<WEdgeList, VId> testMergeMST(VId &n, WEdgeList &edges, hybridMST::Timer &timer) {
     timer.start("merge", 0);
     WEdgeList mergeMst = mergeMST::getMST(n, edges);
     timer.stop("merge", 0);
@@ -28,7 +28,7 @@ std::pair<WEdgeList, VId> testMergeMST(int &n, WEdgeList &edges, hybridMST::Time
 }
 
 
-std::pair<WEdgeList, VId> testKruskal(int &n, WEdgeList &edges, hybridMST::Timer &timer) {
+std::pair<WEdgeList, VId> testKruskal(VId &n, WEdgeList &edges, hybridMST::Timer &timer) {
     timer.start("kruskal", 0);
     UnionFind uf(n);
     WEdgeList mst = kruskal::getMST(edges, uf);
@@ -42,7 +42,7 @@ std::pair<WEdgeList, VId> testKruskal(int &n, WEdgeList &edges, hybridMST::Timer
     return pair;
 }
 
-std::pair<WEdgeList, VId> testFilterKruskal(int &n, WEdgeList &edges, hybridMST::Timer &timer) {
+std::pair<WEdgeList, VId> testFilterKruskal(VId &n, WEdgeList &edges, hybridMST::Timer &timer) {
     timer.start("filter", 0);
     UnionFind uf(n);
     std::vector<WEdge> mst = filterKruskal::getMST(n, edges, uf);
@@ -86,7 +86,7 @@ int main() {
     WEdgeList allEdges = hybridMST::mpi::gatherv(distEdges.data(), distEdges.size(), 0, ctx);
 
 
-    int n = (int) pow(2, LOG_N);
+    VId n = pow(2, LOG_N);
 
 
     if (ctx.rank() == 0) {
