@@ -16,15 +16,17 @@ namespace dense_boruvka {
         for (int i = 0; i < *n; i++) {
             if (in[i].get_weight() < inout[i].get_weight()) { //save edge with min weight
                 inout[i] = in[i];
-            } else if (in[i].get_weight() == inout[i].get_weight()) { //select edge with smaller destination
+            } else if (in[i].get_weight() == inout[i].get_weight()) { //select edge with smaller indices
                 if (in[i].get_src() + in[i].get_dst() < inout[i].get_src() + inout[i].get_dst()) {
                     inout[i] = in[i];
                 }
             }
+            //TODO: benötigt?
+            /*
             if (inout[i].get_src() != i) { //swap src/dest for no ambiguity
                 inout[i].set_dst(inout[i].get_src());
                 inout[i].set_src(i);
-            }
+            }*/
         }
     }
 
@@ -38,11 +40,11 @@ namespace dense_boruvka {
         uf.clear(n);
     }
 
-    void calcMinIncident(size_t n, WEdgeOriginList &incidentLocal, WEdgeOriginList &newEdges) {
+    void calcMinIncident(size_t n, WEdgeOriginList &incidentLocal, WEdgeOriginList &edges) {
         for (int i = 0; i < n; ++i) {
             incidentLocal[i] = WEdgeOrigin(i, i, -1); //initialize "empty" entries
         }
-        for (auto &edge: newEdges) {
+        for (auto &edge: edges) {
             VId u = edge.get_src();
             VId v = edge.get_dst();
             if (edge.get_weight() < incidentLocal[u].get_weight()) {
@@ -55,46 +57,27 @@ namespace dense_boruvka {
     }
 
 
-    void removeParallelEdges(WEdgeOriginList &parallelEdges) {
-        if (parallelEdges.empty()) {
-            return;
-        }
-
-        std::sort(parallelEdges.begin(), parallelEdges.end(), kruskal::WeightOrder<WEdgeOrigin>{});
-        WEdgeOriginList edges;
-        for (auto &pE: parallelEdges) {
-            bool contains = false;
-            for (auto &e: edges) {
-                if (e.get_src() == pE.get_src() && e.get_dst() == pE.get_dst()
-                    || e.get_dst() == pE.get_src() && e.get_src() == pE.get_dst()) {
-                    contains = true;
-                    break;
-                }
-            }
-            if (!contains) {
-                edges.push_back(pE);
-            }
-        }
-        parallelEdges = edges;
-    }
 
 
-    void addMSTEdges(VId &n, WEdgeOriginList &mst, WEdgeOriginList &incident, WEdgeOriginList &newEdges) {
+    void addMSTEdges(VId &n, WEdgeOriginList &mst, WEdgeOriginList &incident, WEdgeOriginList &edges) {
         //add edges to mst
         for (int i = 0; i < n; ++i) {
             if (incident[i].get_weight() != -1) {
-                WEdgeOrigin edge = incident[i];
+                WEdgeOrigin &edge = incident[i];
                 mst.push_back(edge);
+
                 //mark edge as invalid, if it has already been added
-                if (i == incident[edge.get_dst()].get_dst()) {
+                if (i == edge.get_src() && incident[edge.get_dst()] == edge) {
                     incident[edge.get_dst()].set_weight(-1);
+                } else if (i == edge.get_dst() && incident[edge.get_src()] == edge) {
+                    incident[edge.get_src()].set_weight(-1);
                 }
             }
         }
 
         //continue with the edges that are not (yet) added to the mst
-        WEdgeOriginList newEdges2;
-        for (auto &edge: newEdges) {
+        WEdgeOriginList newEdges;
+        for (auto &edge: edges) {
             VId u = edge.get_src();
             VId v = edge.get_dst();
             bool keep = true;
@@ -102,10 +85,10 @@ namespace dense_boruvka {
                 keep = false;
             }
             if (keep) {
-                newEdges2.push_back(edge);
+                newEdges.push_back(edge);
             }
         }
-        newEdges = newEdges2;
+        edges = newEdges;
     }
 
 
@@ -139,7 +122,7 @@ namespace dense_boruvka {
     }
 
     void relabelVandE(VId &n, WEdgeOriginList &incident, std::vector<VId> &parent, std::vector<VId> &vertices,
-                      WEdgeOriginList &newEdges, WEdgeOriginList &relabeledEdges) {
+                      WEdgeOriginList &edges, WEdgeOriginList &relabeledEdges) {
         //relable vertices
         int v = 0;
         for (int i = 0; i < n; ++i) {
@@ -153,7 +136,7 @@ namespace dense_boruvka {
 
 
         //relable edges
-        for (auto &edge: newEdges) {
+        for (auto &edge: edges) {
             VId s = parent[edge.get_src()];
             VId t = parent[edge.get_dst()];
             VId w = edge.get_weight();
@@ -163,6 +146,38 @@ namespace dense_boruvka {
                 relabeledEdges.push_back(r);
             }
         }
+    }
+
+    // TODO: remove or fix
+    void removeParallelEdges(WEdgeOriginList &parallelEdges) {
+        if (parallelEdges.empty()) {
+            return;
+        }
+
+        std::sort(parallelEdges.begin(), parallelEdges.end(), kruskal::WeightOrder<WEdgeOrigin>{});
+        WEdgeOriginList edges;
+
+        //nach src, dst und dann weight sortieren
+
+        //alternativ: bei vielen Duplicaten hashen:
+        //wähle pivotgewicht sodass sample aus kanten ca. 5%, duplicate raus nehmen
+        //src,dst paare in unordered set speichern
+        //für alle größere elemente: schauen ob s,d drin ist  (aber nicht in hashmap)
+        // danach base case
+
+        for (auto &pE: parallelEdges) {
+            bool contains = false;
+            for (auto &e: edges) {
+                if (e == pE) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (!contains) {
+                edges.push_back(pE);
+            }
+        }
+        parallelEdges = edges;
     }
 
 
@@ -178,15 +193,19 @@ namespace dense_boruvka {
         std::vector<VId> vertices;
 
 
+
+
         while (n > 1) {
             //shrink arrays
             shrink(n, incidentLocal, incident, vertices, parent, uf);
 
+
             //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
-            WEdgeOriginList newEdges = filterKruskal::getMST(n, edges, uf);
+            //TODO: auswählöeen wie oft in jeder schleife
+            edges = filterKruskal::getMST(n, edges, uf);
 
             //calculate edges incident to each vertex
-            calcMinIncident(n, incidentLocal, newEdges);
+            calcMinIncident(n, incidentLocal, edges);
 
             //perform all reduce to get the lightest edges for each vertex
             hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
@@ -196,18 +215,12 @@ namespace dense_boruvka {
                           ctx.communicator());
 
 
-            addMSTEdges(n, mst, incident, newEdges);
+            addMSTEdges(n, mst, incident, edges);
 
             fillParentArray(n, incident, parent);
 
             WEdgeOriginList relabeledEdges;
-            relabelVandE(n, incident, parent, vertices, newEdges, relabeledEdges);
-
-            //removeParallelEdges(relabeledEdges);
-            uf.clear();
-            relabeledEdges = filterKruskal::getMST(n, relabeledEdges, uf);
-            //TODO: ausprobieren was schneller ist. z.b sortieren (ohne union find)
-
+            relabelVandE(n, incident, parent, vertices, edges, relabeledEdges);
             edges = relabeledEdges;
         }
 
