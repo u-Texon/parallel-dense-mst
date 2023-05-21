@@ -21,12 +21,6 @@ namespace dense_boruvka {
                     inout[i] = in[i];
                 }
             }
-            //TODO: benötigt?
-            /*
-            if (inout[i].get_src() != i) { //swap src/dest for no ambiguity
-                inout[i].set_dst(inout[i].get_src());
-                inout[i].set_src(i);
-            }*/
         }
     }
 
@@ -148,38 +142,48 @@ namespace dense_boruvka {
         }
     }
 
-    // TODO: remove or fix
+
+    template <typename EdgeType> struct SrcDstWeightOrder {
+        bool operator()(const EdgeType& l, const EdgeType& r) const {
+            return l.get_src() < r.get_src()
+                   || l.get_src() == r.get_src() && l.get_dst() < r.get_dst()
+                   || l.get_src() == r.get_src() && l.get_dst() == r.get_dst() && l.get_weight() < r.get_weight();
+        }
+    };
+
+
     void removeParallelEdges(WEdgeOriginList &parallelEdges) {
         if (parallelEdges.empty()) {
             return;
         }
 
-        std::sort(parallelEdges.begin(), parallelEdges.end(), kruskal::WeightOrder<WEdgeOrigin>{});
+        std::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
+
+
         WEdgeOriginList edges;
-
-        //nach src, dst und dann weight sortieren
-
-        //alternativ: bei vielen Duplicaten hashen:
-        //wähle pivotgewicht sodass sample aus kanten ca. 5%, duplicate raus nehmen
-        //src,dst paare in unordered set speichern
-        //für alle größere elemente: schauen ob s,d drin ist  (aber nicht in hashmap)
-        // danach base case
-
-        for (auto &pE: parallelEdges) {
-            bool contains = false;
-            for (auto &e: edges) {
-                if (e == pE) {
-                    contains = true;
-                    break;
-                }
-            }
-            if (!contains) {
-                edges.push_back(pE);
+        VId s = -1;
+        VId d = -1;
+        for (auto &e: parallelEdges) {
+            if (e.get_src() != s) {
+                edges.push_back(e);
+                s = e.get_src();
+                d = e.get_dst();
+            } else if (e.get_dst() != d) {
+                edges.push_back(e);
+                d = e.get_dst();
             }
         }
         parallelEdges = edges;
     }
 
+
+    void removeParallelEdgesHashing(WEdgeOriginList &parallelEdges) {
+        //alternativ: bei vielen Duplicaten hashen:
+        //wähle pivotgewicht sodass sample aus kanten ca. 5%, duplicate raus nehmen
+        //src,dst paare in unordered set speichern
+        //für alle größere elemente: schauen ob s,d drin ist  (aber nicht in hashmap)
+        // danach base case
+    }
 
     inline WEdgeList getMST(int &vertexCount, WEdgeOriginList &e) {
         hybridMST::mpi::MPIContext ctx;
@@ -194,15 +198,17 @@ namespace dense_boruvka {
 
 
 
+        //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
+        //TODO: auswählöeen wie oft in jeder schleife
+        edges = filterKruskal::getMST(n, edges, uf);
+
 
         while (n > 1) {
             //shrink arrays
             shrink(n, incidentLocal, incident, vertices, parent, uf);
 
 
-            //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
-            //TODO: auswählöeen wie oft in jeder schleife
-            edges = filterKruskal::getMST(n, edges, uf);
+
 
             //calculate edges incident to each vertex
             calcMinIncident(n, incidentLocal, edges);
@@ -221,6 +227,9 @@ namespace dense_boruvka {
 
             WEdgeOriginList relabeledEdges;
             relabelVandE(n, incident, parent, vertices, edges, relabeledEdges);
+
+            removeParallelEdges(relabeledEdges);
+
             edges = relabeledEdges;
         }
 
