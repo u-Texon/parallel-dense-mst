@@ -6,6 +6,7 @@
 #include "algorithms/mergeMST.hpp"
 #include "external/graphs/interface.hpp"
 #include "algorithms/dense_boruvka.hpp"
+#include "algorithms/mixedMerge.hpp"
 #include "include/mpi/gather.hpp"
 
 #define LOG_M 18
@@ -58,7 +59,7 @@ std::pair<WEdgeList, VId> testFilterKruskal(VId &n, WEdgeList &edges, hybridMST:
 }
 
 
-std::pair<WEdgeList, VId> testDenseBoruvka(int n, WEdgeList &edges, hybridMST::Timer &timer) {
+std::pair<WEdgeList, VId> testDenseBoruvka(VId &n, WEdgeList &edges, hybridMST::Timer &timer) {
 
     WEdgeOriginList newEdges;
     for (auto &edge: edges) {
@@ -74,6 +75,26 @@ std::pair<WEdgeList, VId> testDenseBoruvka(int n, WEdgeList &edges, hybridMST::T
         bWeight += edge.get_weight();
     }
     std::pair<WEdgeList, VId> pair(mst, bWeight);
+    return pair;
+}
+
+
+std::pair<WEdgeList, VId> testMixedMerge(VId &n, WEdgeList &edges, hybridMST::Timer &timer) {
+
+    WEdgeOriginList newEdges;
+    for (auto &edge: edges) {
+        newEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
+    }
+
+    timer.start("mixedMerge", 0);
+    std::vector<WEdge> mst = mixed_merge::getMST(n, newEdges);
+    timer.stop("mixedMerge", 0);
+
+    VId mmWeight = 0;
+    for (auto &edge: mst) {
+        mmWeight += edge.get_weight();
+    }
+    std::pair<WEdgeList, VId> pair(mst, mmWeight);
     return pair;
 }
 
@@ -99,6 +120,7 @@ int main() {
     auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer);
     auto [filterMST, filterWeight] = testFilterKruskal(n, allEdges, timer);
 
+    auto [mixedMergeMST, mmWeight] = testMixedMerge(n, distEdges, timer);
 
 
 
@@ -108,6 +130,13 @@ int main() {
 
 
       if (ctx.rank() == 0) { //local tests
+
+          if (kruskalWeight != mmWeight) {
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+              std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
+              std::cout << "mixedMerge found MST with weight: " << mmWeight << std::endl;
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+          }
 
           if (kruskalWeight != bWeight) {
               std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
