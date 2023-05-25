@@ -13,7 +13,7 @@ namespace mergeMST {
     template<typename Edge>
     void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n) {
         hybridMST::mpi::MPIContext ctx;
-        hybridMST::mpi::TypeMapper<WEdge> mapper;
+        hybridMST::mpi::TypeMapper<Edge> mapper;
         hybridMST::mpi::TypeMapper<VId> intMapper;
 
         VId myMSTsize = edges.size();
@@ -56,13 +56,14 @@ namespace mergeMST {
         }
     }
 
-    inline WEdgeList getMST(VId &n, WEdgeList &edges) {
+    template<typename Edge>
+    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
 
 
         // calculate local MST
         UnionFind uf(n);
-        WEdgeList mstList;
+        std::vector<Edge> mstList;
         mstList = filterKruskal::getMST(n, edges, uf);
 
 

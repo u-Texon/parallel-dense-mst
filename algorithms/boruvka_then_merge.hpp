@@ -7,7 +7,11 @@
 #include "filter_kruskal.hpp"
 
 
-namespace mixed_merge {
+
+namespace boruvka_then_merge {
+
+
+
 
     inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
@@ -25,13 +29,15 @@ namespace mixed_merge {
         WEdgeOriginList edges = filterKruskal::getMST(n, e, uf);
 
 
-        VId p = 2;
-        while (p <= ctx.size()) {
-            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst);
-            mergeMST::mergeStep(edges, p, uf, n);
+        //TODO: correct border??
+        VId border = (VId) (vertexCount / pow(2, log2(ctx.size())));
 
-            p *= 2;
+        while (n >= border) {
+            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst);
         }
+
+        edges = mergeMST::getMST(n, edges);
+
 
         if (ctx.rank() == 0) {
             for (auto edge: edges) {

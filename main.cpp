@@ -8,6 +8,8 @@
 #include "algorithms/dense_boruvka.hpp"
 #include "algorithms/mixedMerge.hpp"
 #include "include/mpi/gather.hpp"
+#include "algorithms/boruvka_then_merge.hpp"
+
 
 #define LOG_M 18
 #define LOG_N 10
@@ -98,6 +100,25 @@ std::pair<WEdgeList, VId> testMixedMerge(VId &n, WEdgeList &edges, hybridMST::Ti
     return pair;
 }
 
+std::pair<WEdgeList, VId> testBoruvkaThenMerge(VId &n, WEdgeList &edges, hybridMST::Timer &timer) {
+
+    WEdgeOriginList newEdges;
+    for (auto &edge: edges) {
+        newEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
+    }
+
+    timer.start("boruvkaThenMerge", 0);
+    std::vector<WEdge> mst = boruvka_then_merge::getMST(n, newEdges);
+    timer.stop("boruvkaThenMerge", 0);
+
+    VId btmWeight = 0;
+    for (auto &edge: mst) {
+        btmWeight += edge.get_weight();
+    }
+    std::pair<WEdgeList, VId> pair(mst, btmWeight);
+    return pair;
+}
+
 
 int main() {
     hybridMST::mpi::MPIContext ctx;
@@ -119,10 +140,8 @@ int main() {
     auto [mergeMST, mergeWeight] = testMergeMST(n, distEdges, timer);
     auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer);
     auto [filterMST, filterWeight] = testFilterKruskal(n, allEdges, timer);
-
     auto [mixedMergeMST, mmWeight] = testMixedMerge(n, distEdges, timer);
-
-
+    auto [boruvkaThenMergeMST, btmWeight] = testBoruvkaThenMerge(n, distEdges, timer);
 
 
 
@@ -130,6 +149,15 @@ int main() {
 
 
       if (ctx.rank() == 0) { //local tests
+
+          if (kruskalWeight != btmWeight) {
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+              std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
+              std::cout << "boruvka-then-merge found MST with weight: " << btmWeight << std::endl;
+              std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+          }
+
+
 
           if (kruskalWeight != mmWeight) {
               std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;

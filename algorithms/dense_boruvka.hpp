@@ -187,7 +187,7 @@ namespace dense_boruvka {
     }
 
 
-    void boruvkaSTep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident,  std::vector<VId> &vertices,
+    void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst) {
         hybridMST::mpi::MPIContext ctx;
 
@@ -248,7 +248,7 @@ namespace dense_boruvka {
 
 
         while (n > 1) {
-            boruvkaSTep(n, incidentLocal, incident, vertices, parent, uf, edges, mst);
+            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst);
         }
 
         return getOriginEdges(mst);
