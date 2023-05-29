@@ -124,14 +124,18 @@ int main() {
     hybridMST::mpi::MPIContext ctx;
     hybridMST::mpi::TypeMapper<WEdge> mapper;
     //generate graph
-    auto [distEdges, vertex_range] = graphs::get_gnm(LOG_N, LOG_M);
+    auto [distEdges, vertex_range] = graphs::get_rhg_explicit_num_edges(LOG_N, LOG_M, 10);
     WEdgeList allEdges = hybridMST::mpi::gatherv(distEdges.data(), distEdges.size(), 0, ctx);
+
+
+
 
 
     VId n = pow(2, LOG_N);
 
 
     if (ctx.rank() == 0) {
+
         std::cout << "calculations start!" << std::endl;
     }
 
