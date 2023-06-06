@@ -27,7 +27,7 @@ namespace mixed_merge {
 
         VId p = 2;
         while (p <= ctx.size()) {
-            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst);
+            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000);
             mergeMST::mergeStep(edges, p, uf, n);
 
             p *= 2;

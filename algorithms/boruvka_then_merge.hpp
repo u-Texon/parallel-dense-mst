@@ -33,7 +33,7 @@ namespace boruvka_then_merge {
         VId border = (VId) (vertexCount / pow(2, log2(ctx.size())));
 
         while (n >= border) {
-            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst);
+            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000);
         }
 
         edges = mergeMST::getMST(n, edges);

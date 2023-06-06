@@ -12,7 +12,7 @@ namespace dense_boruvka {
     /*
      * allreduce function
      */
-    void minEdges(WEdgeOrigin *in, WEdgeOrigin *inout, const int *n, MPI_Datatype *datatype) {
+    void minEdges(WEdgeOrigin *in, WEdgeOrigin *inout, const int *n, [[maybe_unused]] MPI_Datatype *datatype) {
         for (int i = 0; i < *n; i++) {
             if (in[i].get_weight() < inout[i].get_weight()) { //save edge with min weight
                 inout[i] = in[i];
@@ -49,8 +49,6 @@ namespace dense_boruvka {
             }
         }
     }
-
-
 
 
     void addMSTEdges(VId &n, WEdgeOriginList &mst, WEdgeOriginList &incident, WEdgeOriginList &edges) {
@@ -115,8 +113,8 @@ namespace dense_boruvka {
         }
     }
 
-    void relabelVandE(VId &n, WEdgeOriginList &incident, std::vector<VId> &parent, std::vector<VId> &vertices,
-                      WEdgeOriginList &edges, WEdgeOriginList &relabeledEdges) {
+    void relabel_V_E(VId &n, WEdgeOriginList &incident, std::vector<VId> &parent, std::vector<VId> &vertices,
+                     WEdgeOriginList &edges, WEdgeOriginList &relabeledEdges) {
         //relable vertices
         int v = 0;
         for (int i = 0; i < n; ++i) {
@@ -143,20 +141,29 @@ namespace dense_boruvka {
     }
 
 
-    template <typename EdgeType> struct SrcDstWeightOrder {
-        bool operator()(const EdgeType& l, const EdgeType& r) const {
+    template<typename EdgeType>
+    struct SrcDstWeightOrder {
+        bool operator()(const EdgeType &l, const EdgeType &r) const {
             return l.get_src() < r.get_src()
                    || l.get_src() == r.get_src() && l.get_dst() < r.get_dst()
                    || l.get_src() == r.get_src() && l.get_dst() == r.get_dst() && l.get_weight() < r.get_weight();
         }
     };
 
+    template<typename EdgeType>
+    struct WeightOrder {
+        bool operator()(const EdgeType &l, const EdgeType &r) const {
+            return l.get_weight() < r.get_weight();
+        }
+    };
 
     void removeParallelEdges(WEdgeOriginList &parallelEdges) {
         if (parallelEdges.empty()) {
             return;
         }
 
+
+        //TODO: use better sort algorithm
         std::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
 
 
@@ -177,24 +184,84 @@ namespace dense_boruvka {
     }
 
 
+    struct pair_hash {
+        inline std::size_t operator()(const std::pair<int, int> &v) const {
+            return v.first * 431 + v.second;
+        }
+    };
+
+
+    /**
+     *  bei vielen Duplicaten hashen:
+     *  wähle pivotgewicht sodass sample aus kanten ca. 5%, duplicate raus nehmen
+     *  src,dst paare in unordered set speichern
+     *  für alle größere elemente: schauen ob s,t drin ist  (aber nicht in hashmap)
+     *  danach base case
+     *
+     * @param parallelEdges
+     */
     void removeParallelEdgesHashing(WEdgeOriginList &parallelEdges) {
-        //TODO:
-        //alternativ: bei vielen Duplicaten hashen:
-        //wähle pivotgewicht sodass sample aus kanten ca. 5%, duplicate raus nehmen
-        //src,dst paare in unordered set speichern
-        //für alle größere elemente: schauen ob s,d drin ist  (aber nicht in hashmap)
-        // danach base case
+        WEdgeOriginList pivotEdges;
+
+
+        //estimate pivot weight that is roughly the 5% lowest of all edges
+        for (int i = 0; i < 100; ++i) {
+            pivotEdges.push_back(parallelEdges[i]);
+        }
+        std::sort(pivotEdges.begin(), pivotEdges.end(), WeightOrder<WEdgeOrigin>{});
+        VId pivot = pivotEdges[4].get_weight();
+
+        //separate light edges from heavy edges
+        std::unordered_set<std::pair<VId, VId>, pair_hash> set;
+        WEdgeOriginList smaller, bigger;
+        for (auto &edge: parallelEdges) {
+            if (edge.get_weight() <= pivot) {
+                smaller.push_back(edge);
+            } else {
+                bigger.push_back(edge);
+            }
+        }
+
+        //safe the low weight edges into a hashset
+        WEdgeOriginList edges;
+        for (auto &edge: smaller) {
+            VId s = edge.get_src();
+            VId t = edge.get_dst();
+
+            if (edge.get_src() > edge.get_dst()) {
+                s =  edge.get_dst();
+                t = edge.get_src();
+            }
+
+            if (set.find({s,t}) == set.end()) {
+                set.insert({s,t});
+                edges.push_back(edge);
+            }
+        }
+
+        //remove heavy edges
+        for (auto &edge: bigger) {
+            VId s = edge.get_src();
+            VId t = edge.get_dst();
+            if (edge.get_src() > edge.get_dst()) {
+                s =  edge.get_dst();
+                t = edge.get_src();
+            }
+            if (set.find({s,t}) != set.end()) {
+                edges.push_back(edge);
+            }
+        }
+
+        //finish with base case
+        return removeParallelEdges(edges);
     }
 
-
     void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
-                     std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst) {
+                     std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst, size_t hashBorder) {
         hybridMST::mpi::MPIContext ctx;
 
         //shrink arrays
         shrink(n, incidentLocal, incident, vertices, parent, uf);
-
-
 
         //calculate edges incident to each vertex
         calcMinIncident(n, incidentLocal, edges);
@@ -212,9 +279,17 @@ namespace dense_boruvka {
         fillParentArray(n, incident, parent);
 
         WEdgeOriginList relabeledEdges;
-        relabelVandE(n, incident, parent, vertices, edges, relabeledEdges);
+        relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
 
-        removeParallelEdges(relabeledEdges);
+
+        if (relabeledEdges.size() > hashBorder) {
+            //TODO: needs to be tested
+            removeParallelEdgesHashing(relabeledEdges);
+        } else {
+            removeParallelEdges(relabeledEdges);
+        }
+
+
 
         edges = relabeledEdges;
     }
@@ -226,7 +301,6 @@ namespace dense_boruvka {
         }
         return returnEdges;
     }
-
 
 
     inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e) {
@@ -248,7 +322,7 @@ namespace dense_boruvka {
 
 
         while (n > 1) {
-            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst);
+            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000);
         }
 
         return getOriginEdges(mst);
