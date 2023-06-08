@@ -3,6 +3,7 @@
 
 #include "../include/dataStructures/union_find.hpp"
 #include "../include/definitions.hpp"
+#include "ips4o.hpp"
 
 namespace kruskal {
 
@@ -16,7 +17,7 @@ namespace kruskal {
 
     template<typename Edge, typename Compare = WeightOrder<Edge>>
     inline std::vector<Edge> getMST(std::vector<Edge> &edges, UnionFind &uf) {
-        std::sort(edges.begin(), edges.end(), Compare{});
+        ips4o::sort(edges.begin(), edges.end(), Compare{});
         std::vector<Edge> mst_edges;
         for (auto &elem: edges) {
             if (uf.find(elem.get_src()) == uf.find(elem.get_dst())) continue;

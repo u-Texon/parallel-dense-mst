@@ -9,7 +9,7 @@
 #include "algorithms/mixedMerge.hpp"
 #include "include/mpi/gather.hpp"
 #include "algorithms/boruvka_then_merge.hpp"
-
+#include "tlx/cmdline_parser.hpp"
 
 #define LOG_M 18
 #define LOG_N 10
@@ -48,7 +48,8 @@ std::pair<WEdgeList, VId> testKruskal(VId &n, WEdgeList &edges, hybridMST::Timer
 std::pair<WEdgeList, VId> testFilterKruskal(VId &n, WEdgeList &edges, hybridMST::Timer &timer) {
     timer.start("filter", 0);
     UnionFind uf(n);
-    std::vector<WEdge> mst = filterKruskal::getMST(n, edges, uf);
+    VId c = 0;
+    std::vector<WEdge> mst = filterKruskal::getMST(n, edges, uf, c);
     timer.stop("filter", 0);
 
     VId filterWeight = 0;
@@ -126,7 +127,8 @@ int main() {
     //generate graph
     auto [distEdges, vertex_range] = graphs::get_rhg_explicit_num_edges(LOG_N, LOG_M, 10);
     WEdgeList allEdges = hybridMST::mpi::gatherv(distEdges.data(), distEdges.size(), 0, ctx);
-
+    tlx::CmdlineParser cmd;
+    cmd.set_author("David Bumm");
 
 
 

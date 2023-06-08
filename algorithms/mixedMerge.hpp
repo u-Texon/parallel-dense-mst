@@ -22,7 +22,8 @@ namespace mixed_merge {
 
         //compute local mst
         UnionFind uf(n);
-        WEdgeOriginList edges = filterKruskal::getMST(n, e, uf);
+        VId c = 0;
+        WEdgeOriginList edges = filterKruskal::getMST(n, e, uf, c);
 
 
         VId p = 2;

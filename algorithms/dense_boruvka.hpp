@@ -5,6 +5,7 @@
 #include "../include/mpi/type_handling.hpp"
 #include "filter_kruskal.hpp"
 #include "kruskal.hpp"
+#include "ips4o.hpp"
 
 namespace dense_boruvka {
 
@@ -161,10 +162,7 @@ namespace dense_boruvka {
         if (parallelEdges.empty()) {
             return;
         }
-
-
-        //TODO: use better sort algorithm
-        std::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
+        ips4o::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
 
 
         WEdgeOriginList edges;
@@ -208,7 +206,7 @@ namespace dense_boruvka {
         for (int i = 0; i < 100; ++i) {
             pivotEdges.push_back(parallelEdges[i]);
         }
-        std::sort(pivotEdges.begin(), pivotEdges.end(), WeightOrder<WEdgeOrigin>{});
+        ips4o::sort(pivotEdges.begin(), pivotEdges.end(), WeightOrder<WEdgeOrigin>{});
         VId pivot = pivotEdges[4].get_weight();
 
         //separate light edges from heavy edges
@@ -318,7 +316,8 @@ namespace dense_boruvka {
 
         //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
         //TODO: auswählen wie oft in jeder schleife
-        edges = filterKruskal::getMST(n, edges, uf);
+        VId c = 0;
+        edges = filterKruskal::getMST(n, edges, uf, c);
 
 
         while (n > 1) {

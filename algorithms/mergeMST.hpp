@@ -52,7 +52,8 @@ namespace mergeMST {
                 edges.push_back(edge);
             }
             uf.clear();
-            edges = filterKruskal::getMST(n, edges, uf);
+            VId c = 0;
+            edges = filterKruskal::getMST(n, edges, uf, c);
         }
     }
 
@@ -64,7 +65,8 @@ namespace mergeMST {
         // calculate local MST
         UnionFind uf(n);
         std::vector<Edge> mstList;
-        mstList = filterKruskal::getMST(n, edges, uf);
+        VId c = 0;
+        mstList = filterKruskal::getMST(n, edges, uf, c);
 
 
         VId p = 2;

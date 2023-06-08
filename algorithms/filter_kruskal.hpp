@@ -2,6 +2,8 @@
 
 #include "kruskal.hpp"
 
+#define maxLoops 10
+
 namespace filterKruskal {
 
     template<typename Edge>
@@ -30,7 +32,7 @@ namespace filterKruskal {
 
 
     template<typename Edge>
-    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges, UnionFind &uf) {
+    inline std::vector<Edge> getMST(VId n, std::vector<Edge> &edges, UnionFind &uf, VId &counter) {
         int t = threshold(n);
         if (edges.size() <= t) {
             return kruskal::getMST(edges, uf);
@@ -47,13 +49,18 @@ namespace filterKruskal {
         }
 
         if (bigger.empty()) { //error prevention for infinite loop
-            return kruskal::getMST(smaller, uf);
+            counter++;
+            if (counter >= maxLoops) {
+                return kruskal::getMST(smaller, uf);
+            }
+        } else {
+            counter = 0;
         }
 
         std::vector<Edge> mst;
-        mst = filterKruskal::getMST(n, smaller, uf);
+        mst = filterKruskal::getMST(n, smaller, uf, counter);
         bigger = filter(bigger, uf);
-        std::vector<Edge> bigEdges = filterKruskal::getMST(n, bigger, uf);
+        std::vector<Edge> bigEdges = filterKruskal::getMST(n, bigger, uf, counter);
         mst.insert(mst.end(), bigEdges.begin(), bigEdges.end());
 
         return mst;
