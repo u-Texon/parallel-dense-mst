@@ -5,5 +5,5 @@
 	path = external/KaDiS
 	url = https://github.com/MichaelAxtmann/KaDiS.git
 [submodule "tlx"]
-	path = external/tlx
+	path = tlx
 	url = git@github.com:tlx/tlx.git
