@@ -152,7 +152,6 @@ int main() {
 
 
 
-
       if (ctx.rank() == 0) { //local tests
 
           if (kruskalWeight != btmWeight) {
@@ -191,7 +190,6 @@ int main() {
               std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
           }
 
-
           std::cout << "calculations complete!" << std::endl;
       }
 
@@ -201,7 +199,6 @@ int main() {
           std::cout << std::endl;
       }
 
-    hybridMST::mpi::MPIContext::finalize();
 
     return 0;
 }
