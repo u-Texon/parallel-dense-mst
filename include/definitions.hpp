@@ -55,6 +55,19 @@ struct WEdgeOrigin {
 
 };
 
+
+struct Config {
+    std::string graphType = "rhg";
+    VId log_n = 10;
+    VId log_m = 18;
+    bool test = false;
+
+    friend std::ostream &operator<<(std::ostream &out, const Config &c) {
+        return out << "graph " << c.graphType << ", with log_n = " << c.log_n
+                   << " and log_m = " << c.log_m << ". run test = " << c.test;
+    }
+};
+
 bool operator==(const WEdgeOrigin& a, const WEdgeOrigin& b)
 {
     if (a.get_src() == b.get_src()) {

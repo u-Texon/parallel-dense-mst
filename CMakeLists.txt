@@ -23,7 +23,7 @@ target_link_libraries(timer PRIVATE base_target)
 
 
 add_executable(MST main.cpp)
-target_link_libraries(MST PUBLIC timer base_target graphs kadis tlx )#ips4o)
+target_link_libraries(MST PUBLIC timer base_target graphs kadis tlx)#ips4o)
 
 target_compile_features(MST PRIVATE cxx_std_17)
 
