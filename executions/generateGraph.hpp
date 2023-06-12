@@ -9,9 +9,20 @@ namespace generateGraph {
     template<typename Edge>
     std::vector<Edge> getDistEdges(Config &config) {
         //TODO: get algo from config
-        auto [distEdges, vertex_range] = graphs::get_rhg_explicit_num_edges(config.log_n, config.log_m, 10);
 
-        return distEdges;
+
+        if (config.graphType == "rhg") {
+            auto [distEdges, vertex_range] = graphs::get_rhg(config.log_n, config.log_m, 10);
+            return distEdges;
+        } else if (config.graphType == "gnm") {
+            auto [distEdges, vertex_range] = graphs::get_gnm(config.log_n, config.log_m);
+            return distEdges;
+        } else {
+            std::cout << "wrong graph type" << std::endl;
+        }
+
+
+        return {};
     }
 
     template<typename Edge>

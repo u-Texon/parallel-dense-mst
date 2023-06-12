@@ -61,6 +61,8 @@ struct Config {
     VId log_n = 10;
     VId log_m = 18;
     bool test = false;
+    bool help = false;
+    bool parseError = false;
 
     friend std::ostream &operator<<(std::ostream &out, const Config &c) {
         return out << "graph " << c.graphType << ", with log_n = " << c.log_n
