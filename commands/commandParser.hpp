@@ -16,8 +16,12 @@ namespace commandParser {
         std::cout << std::endl;
         std::cout << "Tests will run if the parameter \"t\" is provided" << std::endl;
         std::cout << std::endl;
+        std::cout << "You can select the min/maxWeight with \"min=<type>\" and \"max=<type>\"" << std::endl;
         std::cout << "You can select the graphtype with \"g=<type>\"" << std::endl;
         std::cout << "Possible Graph types are: rhg,gnm, ..." << std::endl;
+
+        std::cout << "You can select an algorithm with \"algo=<algorithm>\"" << std::endl;
+
         std::cout << std::endl;
         std::cout << "If you do not provide all arguments, the remaining configuration will start with default values"
                   << std::endl;
@@ -35,14 +39,20 @@ namespace commandParser {
             config.log_n = std::stoi(arg.substr(2, arg.length()));
         } else if (arg.substr(0, 2) == "m=") {
             config.log_m = std::stoi(arg.substr(2, arg.length()));
+        } else if (arg.substr(0, 4) == "min=") {
+            config.minWeight = std::stoi(arg.substr(4, arg.length()));
+        } else if (arg.substr(0, 4) == "max=") {
+            config.maxWeight = std::stoi(arg.substr(4, arg.length()));
         } else if (arg.substr(0, 2) == "g=") {
             config.graphType = arg.substr(2, arg.length());
+        } else if (arg.substr(0, 5) == "algo=") {
+            config.algo = arg.substr(5, arg.length());
         } else {
             if (ctx.rank() == 0) {
-                config.parseError = true;
                 std::cout << "command " << arg << " not found" << std::endl;
                 std::cout << "Use argument <help> for help" << std::endl;
             }
+            config.parseError = true;
         }
     }
 
@@ -58,7 +68,14 @@ namespace commandParser {
             }
         } else {
             for (int i = 1; i < size; ++i) {
-                parseArgument(args[i], config);
+                try {
+                    parseArgument(args[i], config);
+                } catch (const std::exception &e) {
+                    config.parseError = true;
+                    if (ctx.rank() == 0) {
+                        std::cout << "error on parsing " << args[i] << std::endl;
+                    }
+                }
             }
         }
 

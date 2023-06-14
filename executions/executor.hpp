@@ -8,12 +8,6 @@
 
 namespace executor {
 
-
-
-    WEdgeList mergeMSTAlgo(VId &n, WEdgeList &edges) {
-        return mergeMST::getMST(n, edges);
-    }
-
     void executeCommand(Config &config) {
         hybridMST::mpi::MPIContext ctx;
 
@@ -31,14 +25,28 @@ namespace executor {
 
         hybridMST::Timer timer;
 
-        auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(n, distEdges, timer, config.test);
-        auto [mergeMST, mergeWeight] = testMergeMST(n, distEdges, timer, config.test);
-        auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer, config.test);
-        auto [filterMST, filterWeight] = testFilterKruskal(n, allEdges, timer, config.test);
-        auto [mixedMergeMST, mmWeight] = testMixedMerge(n, distEdges, timer, config.test);
-        auto [boruvkaThenMergeMST, btmWeight] = testBoruvkaThenMerge(n, distEdges, timer, config.test);
+
+        if (config.algo == "kruskal") {
+            auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer, config.test);
+        } else if (config.algo == "boruvka") {
+            auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(n, distEdges, timer, config.test);
+        } else if (config.algo == "merge") {
+            auto [mergeMST, mergeWeight] = testMergeMST(n, distEdges, timer, config.test);
+        } else if (config.algo == "filter") {
+            auto [filterMST, filterWeight] = testFilterKruskal(n, allEdges, timer, config.test);
+        } else if (config.algo == "mixedMerge") {
+            auto [mixedMergeMST, mmWeight] = testMixedMerge(n, distEdges, timer, config.test);
+        } else if (config.algo == "boruvkaMerge") {
+            auto [boruvkaThenMergeMST, btmWeight] = testBoruvkaThenMerge(n, distEdges, timer, config.test);
+        } else {
+            if (ctx.rank() == 0) {
+                std::cout << "no such algorithm" << std::endl;
+            }
+            return;
+        }
 
 
+        /*
         if (config.test) {
             if (ctx.rank() == 0) { //local tests
 
@@ -83,7 +91,7 @@ namespace executor {
             if (ctx.rank() == 0) {
                 std::cout << "no test have been run" << std::endl;
             }
-        }
+        } */
 
 
         std::cout << timer.output();

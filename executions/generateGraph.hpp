@@ -11,11 +11,15 @@ namespace generateGraph {
         //TODO: get algo from config
 
 
+        graphs::WeightGeneratorConfig<VId> weights;
+        weights.min_weight = config.minWeight;
+        weights.max_weight = config.maxWeight;
+
         if (config.graphType == "rhg") {
-            auto [distEdges, vertex_range] = graphs::get_rhg(config.log_n, config.log_m, 10);
+            auto [distEdges, vertex_range] = graphs::get_rhg(config.log_n, config.log_m, 10, weights);
             return distEdges;
         } else if (config.graphType == "gnm") {
-            auto [distEdges, vertex_range] = graphs::get_gnm(config.log_n, config.log_m);
+            auto [distEdges, vertex_range] = graphs::get_gnm(config.log_n, config.log_m, weights);
             return distEdges;
         } else {
             std::cout << "wrong graph type" << std::endl;
