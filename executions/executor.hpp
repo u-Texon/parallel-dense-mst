@@ -25,16 +25,14 @@ namespace executor {
 
         hybridMST::Timer timer;
 
-        auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer, config.test);
 
-        auto [mergeMST, mergeWeight] = testMergeMST(n, distEdges, timer, config.test, config.treeFactor);
 
         if (config.algo == "kruskal") {
-
+            auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer, config.test);
         } else if (config.algo == "boruvka") {
             auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(n, distEdges, timer, config.test);
         } else if (config.algo == "merge") {
-
+            auto [mergeMST, mergeWeight] = testMergeMST(n, distEdges, timer, config.test, config.treeFactor);
         } else if (config.algo == "filter") {
             auto [filterMST, filterWeight] = testFilterKruskal(n, allEdges, timer, config.test);
         } else if (config.algo == "mixedMerge") {
