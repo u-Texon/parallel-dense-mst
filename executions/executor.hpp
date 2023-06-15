@@ -25,19 +25,22 @@ namespace executor {
 
         hybridMST::Timer timer;
 
+        auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer, config.test);
+
+        auto [mergeMST, mergeWeight] = testMergeMST(n, distEdges, timer, config.test, config.treeFactor);
 
         if (config.algo == "kruskal") {
-            auto [kruskalMST, kruskalWeight] = testKruskal(n, allEdges, timer, config.test);
+
         } else if (config.algo == "boruvka") {
             auto [denseBoruvkaMST, bWeight] = testDenseBoruvka(n, distEdges, timer, config.test);
         } else if (config.algo == "merge") {
-            auto [mergeMST, mergeWeight] = testMergeMST(n, distEdges, timer, config.test);
+
         } else if (config.algo == "filter") {
             auto [filterMST, filterWeight] = testFilterKruskal(n, allEdges, timer, config.test);
         } else if (config.algo == "mixedMerge") {
-            auto [mixedMergeMST, mmWeight] = testMixedMerge(n, distEdges, timer, config.test);
+            auto [mixedMergeMST, mmWeight] = testMixedMerge(n, distEdges, timer, config.test, config.treeFactor);
         } else if (config.algo == "boruvkaMerge") {
-            auto [boruvkaThenMergeMST, btmWeight] = testBoruvkaThenMerge(n, distEdges, timer, config.test);
+            auto [boruvkaThenMergeMST, btmWeight] = testBoruvkaThenMerge(n, distEdges, timer, config.test, config.treeFactor);
         } else {
             if (ctx.rank() == 0) {
                 std::cout << "no such algorithm" << std::endl;
@@ -46,10 +49,10 @@ namespace executor {
         }
 
 
-        /*
+
         if (config.test) {
             if (ctx.rank() == 0) { //local tests
-
+                /*
                 if (kruskalWeight != btmWeight) {
                     std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
                     std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
@@ -77,7 +80,7 @@ namespace executor {
                     std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
                     std::cout << "filter-kruskal found MST with weight: " << filterWeight << std::endl;
                     std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-                }
+                } */
                 if (kruskalWeight != mergeWeight) {
                     std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
                     std::cout << "kruskal found MST with weight: " << kruskalWeight << std::endl;
@@ -91,7 +94,7 @@ namespace executor {
             if (ctx.rank() == 0) {
                 std::cout << "no test have been run" << std::endl;
             }
-        } */
+        }
 
 
         std::cout << timer.output();

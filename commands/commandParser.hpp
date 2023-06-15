@@ -47,6 +47,12 @@ namespace commandParser {
             config.graphType = arg.substr(2, arg.length());
         } else if (arg.substr(0, 5) == "algo=") {
             config.algo = arg.substr(5, arg.length());
+        } else if (arg.substr(0, 2) == "d=") {
+            VId d = config.maxWeight = std::stoi(arg.substr(2, arg.length()));
+            if (d < 2) {
+                throw std::invalid_argument("tree factor needs to be >= 2");
+            }
+            config.treeFactor = d;
         } else {
             if (ctx.rank() == 0) {
                 std::cout << "command " << arg << " not found" << std::endl;
@@ -74,6 +80,7 @@ namespace commandParser {
                     config.parseError = true;
                     if (ctx.rank() == 0) {
                         std::cout << "error on parsing " << args[i] << std::endl;
+                        std::cout << e.what() << std::endl;
                     }
                 }
             }

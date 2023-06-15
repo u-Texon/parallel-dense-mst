@@ -9,7 +9,7 @@
 
 namespace mixed_merge {
 
-    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e) {
+    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, VId treeFactor = 2) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
         VId n = vertexCount;
@@ -29,7 +29,7 @@ namespace mixed_merge {
         VId p = 2;
         while (p <= ctx.size()) {
             dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000);
-            mergeMST::mergeStep(edges, p, uf, n);
+            mergeMST::mergeStep(edges, p, uf, n, treeFactor);
 
             p *= 2;
         }

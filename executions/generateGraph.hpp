@@ -8,8 +8,6 @@ namespace generateGraph {
 
     template<typename Edge>
     std::vector<Edge> getDistEdges(Config &config) {
-        //TODO: get algo from config
-
 
         graphs::WeightGeneratorConfig<VId> weights;
         weights.min_weight = config.minWeight;

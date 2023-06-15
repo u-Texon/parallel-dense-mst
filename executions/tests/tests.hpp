@@ -57,9 +57,9 @@ testAlgorithm(Algorithm algorithm, std::string &algoName, VId &n, WEdgeList &edg
 }
 
 
-std::pair<WEdgeList, VId> testMergeMST(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test) {
+std::pair<WEdgeList, VId> testMergeMST(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test, VId treeFactor) {
     timer.start("merge", 0);
-    WEdgeList mergeMst = mergeMST::getMST(n, edges);
+    WEdgeList mergeMst = mergeMST::getMST(n, edges, treeFactor);
     timer.stop("merge", 0);
     VId mergeWeight = 0;
     if (test) {
@@ -123,7 +123,7 @@ std::pair<WEdgeList, VId> testDenseBoruvka(VId &n, WEdgeList &edges, hybridMST::
 }
 
 
-std::pair<WEdgeList, VId> testMixedMerge(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test) {
+std::pair<WEdgeList, VId> testMixedMerge(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test, VId treeFactor) {
 
     WEdgeOriginList newEdges;
     for (auto &edge: edges) {
@@ -131,7 +131,7 @@ std::pair<WEdgeList, VId> testMixedMerge(VId &n, WEdgeList &edges, hybridMST::Ti
     }
 
     timer.start("mixedMerge", 0);
-    std::vector<WEdge> mst = mixed_merge::getMST(n, newEdges);
+    std::vector<WEdge> mst = mixed_merge::getMST(n, newEdges, treeFactor);
     timer.stop("mixedMerge", 0);
 
     VId mmWeight = 0;
@@ -143,7 +143,7 @@ std::pair<WEdgeList, VId> testMixedMerge(VId &n, WEdgeList &edges, hybridMST::Ti
     return {mst, mmWeight};
 }
 
-std::pair<WEdgeList, VId> testBoruvkaThenMerge(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test) {
+std::pair<WEdgeList, VId> testBoruvkaThenMerge(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test, VId treeFactor) {
 
     WEdgeOriginList newEdges;
     for (auto &edge: edges) {
@@ -151,7 +151,7 @@ std::pair<WEdgeList, VId> testBoruvkaThenMerge(VId &n, WEdgeList &edges, hybridM
     }
 
     timer.start("boruvkaThenMerge", 0);
-    std::vector<WEdge> mst = boruvka_then_merge::getMST(n, newEdges);
+    std::vector<WEdge> mst = boruvka_then_merge::getMST(n, newEdges, treeFactor);
     timer.stop("boruvkaThenMerge", 0);
 
     VId btmWeight = 0;

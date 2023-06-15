@@ -8,49 +8,79 @@
 namespace mergeMST {
 
 
-
-
     template<typename Edge>
-    void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n) {
+    void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n, VId treeFactor) {
         hybridMST::mpi::MPIContext ctx;
         hybridMST::mpi::TypeMapper<Edge> mapper;
         hybridMST::mpi::TypeMapper<VId> intMapper;
 
         VId myMSTsize = edges.size();
-        VId otherMSTsize = 0;
-        VId i = 0;
-        while (i < ctx.size()) {   // send local mst size to other processor
-            if (ctx.rank() == i) {
-                MPI_Status status;
-                MPI_Recv(&otherMSTsize, 1, intMapper.get_mpi_datatype(), (int) (i + p / 2), 0, ctx.communicator(), &status);
-            } else if (ctx.rank() == i + p / 2) {
-                MPI_Send(&myMSTsize, 1, intMapper.get_mpi_datatype(),(int) i, 0, ctx.communicator());
+        std::vector<VId> otherMSTsizes;
+        otherMSTsizes.resize(treeFactor - 1);
+
+        VId loopIndex = 0;
+        while (loopIndex < ctx.size()) {   // send local mst size to other processor
+            if (ctx.rank() == loopIndex) {
+                for (int j = 0; j < treeFactor - 1; ++j) {
+                    size_t senderID = loopIndex + (1 + j) * (p / treeFactor);
+                    if (senderID < ctx.size()) {
+                        MPI_Status status;
+                        MPI_Recv(&otherMSTsizes[j], 1, intMapper.get_mpi_datatype(), (int) senderID, 0,
+                                 ctx.communicator(), &status);
+                    }
+                }
+            } else {
+                for (int j = 0; j < treeFactor - 1; ++j) {
+                    if (ctx.rank() == loopIndex + (p / treeFactor) + j) {
+                        MPI_Send(&myMSTsize, 1, intMapper.get_mpi_datatype(), (int) loopIndex, 0, ctx.communicator());
+                        break;
+                    }
+                }
             }
-            i += p;
+            loopIndex += p;
         }
-        std::vector<Edge> otherMST;
-        otherMST.resize(otherMSTsize);
 
 
-        i = 0;
-        while (i < ctx.size()) {   // send local mst to other processor
-            if (ctx.rank() == i) {
-                MPI_Status status;
-                MPI_Recv(otherMST.data(), otherMSTsize, mapper.get_mpi_datatype(), i + p / 2, 0, ctx.communicator(),
-                         &status);
-                break;
-            } else if (ctx.rank() == i + p / 2) {
-                MPI_Send(edges.data(), (int) edges.size(), mapper.get_mpi_datatype(), i, 0, ctx.communicator());
-                break;
+        std::vector<std::vector<Edge>> otherMSTs;
+        otherMSTs.resize(treeFactor -1);
+
+        for (int j = 0; j < treeFactor - 1; ++j) {
+            std::vector<Edge> mst;
+            mst.resize(otherMSTsizes[j]);
+            otherMSTs[j] = mst;
+        }
+
+
+        loopIndex = 0;
+        while (loopIndex < ctx.size()) {   // send local mst to other processor
+            if (ctx.rank() == loopIndex) {
+                for (int j = 0; j < treeFactor - 1; ++j) {
+                    size_t senderID = loopIndex + (1 + j) * (p / treeFactor);
+                    if (senderID < ctx.size()) {
+                        MPI_Status status;
+                        MPI_Recv(otherMSTs[j].data(), otherMSTsizes[j], mapper.get_mpi_datatype(), (int) senderID, 0,
+                                 ctx.communicator(), &status);
+                    }
+                }
+            } else {
+                for (int j = 0; j < treeFactor - 1; ++j) {
+                    if (ctx.rank() == loopIndex + (p / treeFactor) + j) {
+                        MPI_Send(edges.data(), myMSTsize, mapper.get_mpi_datatype(), loopIndex, 0, ctx.communicator());
+                        break;
+                    }
+                }
             }
-            i += p;
+            loopIndex += p;
         }
 
         //calculate new mst
         if (ctx.rank() % p == 0) {
-            for (auto edge: otherMST) {
-                edges.push_back(edge);
+            for (auto other: otherMSTs) {
+                for (auto edge: other) {
+                    edges.push_back(edge);
+                }
             }
+
             uf.clear();
             VId c = 0;
             edges = filterKruskal::getMST(n, edges, uf, c);
@@ -58,7 +88,7 @@ namespace mergeMST {
     }
 
     template<typename Edge>
-    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges) {
+    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges, VId treeFactor = 2) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
 
 
@@ -69,14 +99,17 @@ namespace mergeMST {
         mstList = filterKruskal::getMST(n, edges, uf, c);
 
 
-        VId p = 2;
-        while (p <= ctx.size()) {
-            mergeStep(mstList, p, uf, n);
-            p *= 2;
+        VId p = treeFactor;
+
+        //TODO: correct loop condition??
+        while (p <= ctx.size() || p / treeFactor < ctx.size()) {
+            mergeStep(mstList, p, uf, n, treeFactor);
+            p *= treeFactor;
         }
+
+
         return mstList;
     }
-
 
 
 } //namespace mergeMST
