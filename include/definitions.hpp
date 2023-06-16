@@ -63,7 +63,7 @@ struct WEdgeOrigin {
 
 
 struct Config {
-    std::string graphType = "rhg";
+    std::string graphType = "gnm";
     VId log_n = 10;
     VId log_m = 18;
     VId minWeight = 1;
@@ -72,7 +72,7 @@ struct Config {
     bool test = false;
     bool help = false;
     bool parseError = false;
-    std::string algo = "kruskal";
+    std::string algo = "boruvka";
 
     friend std::ostream &operator<<(std::ostream &out, const Config &c) {
         return out << "graph " << c.graphType << ", with log_n = " << c.log_n

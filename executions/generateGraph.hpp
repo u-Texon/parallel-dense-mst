@@ -5,6 +5,12 @@
 
 namespace generateGraph {
 
+    //TODO: shuffle edges
+    // kanten random ids geben und dann:
+    //ams sort zum verteilen
+
+
+
 
     template<typename Edge>
     std::vector<Edge> getDistEdges(Config &config) {
@@ -14,12 +20,16 @@ namespace generateGraph {
         weights.max_weight = config.maxWeight;
 
         if (config.graphType == "rhg") {
-            auto [distEdges, vertex_range] = graphs::get_rhg(config.log_n, config.log_m, 10, weights);
+            auto [distEdges, vertex_range] = graphs::get_rhg(config.log_n, config.log_m, 3.0, weights);
             return distEdges;
         } else if (config.graphType == "gnm") {
             auto [distEdges, vertex_range] = graphs::get_gnm(config.log_n, config.log_m, weights);
             return distEdges;
-        } else {
+        } else if (config.graphType == "rhgNumEdges") {
+            auto [distEdges, vertex_range] = graphs::get_rhg_explicit_num_edges(config.log_n, config.log_m, 3.0, weights);
+            return distEdges;
+        }
+        else {
             std::cout << "wrong graph type" << std::endl;
         }
 
