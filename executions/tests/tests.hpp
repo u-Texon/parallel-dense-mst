@@ -11,24 +11,56 @@
 #include "../algorithms/boruvka_then_merge.hpp"
 
 
-template<typename Algorithm>
-std::pair<WEdgeList, VId>
-testAlgorithmOriginEdges(Algorithm algorithm, std::string &algoName, VId &n, WEdgeList &edges,
-                         hybridMST::Timer &timer, bool test) {
-    //TODO: maybe use this
+std::pair<WEdgeList, VId>  runAlgorithm(Config &config, VId &n, WEdgeList &allEdges,  WEdgeList &distEdges, hybridMST::Timer &timer) {
+    hybridMST::mpi::MPIContext ctx;
 
     WEdgeList mst;
-    WEdgeOriginList newEdges;
-    for (auto &edge: edges) {
-        newEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
-    }
-    timer.start(algoName, 0);
-    mst = algorithm(n, newEdges);
-    timer.stop(algoName, 0);
+    WEdgeOriginList distOriginEdges;
 
+    if (config.algo == "boruvka" || config.algo == "mixedMerge" || config.algo == "boruvkaMerge") {
+        for (auto &edge: distEdges) {
+            distOriginEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
+        }
+    }
+
+
+    if (config.algo == "kruskal") {
+        timer.start(config.algo, 0);
+        UnionFind uf(n);
+        mst = kruskal::getMST(allEdges, uf);
+        timer.stop(config.algo, 0);
+    } else if (config.algo == "filter") {
+        timer.start(config.algo, 0);
+        UnionFind uf(n);
+        VId c = 0;
+        mst = filterKruskal::getMST(n, allEdges, uf, c);
+        timer.stop(config.algo, 0);
+    } else  if (config.algo == "boruvka") {
+        timer.start(config.algo, 0);
+        mst = dense_boruvka::getMST(n, distOriginEdges);
+        timer.stop(config.algo, 0);
+    } else if (config.algo == "merge") {
+        timer.start(config.algo, 0);
+        mst = mergeMST::getMST(n, distEdges, config.treeFactor);
+        timer.stop(config.algo, 0);
+    } else if (config.algo == "mixedMerge") {
+        timer.start(config.algo, 0);
+        mst = mixed_merge::getMST(n, distOriginEdges, config.treeFactor);
+        timer.stop(config.algo, 0);
+    } else if (config.algo == "boruvkaMerge") {
+        timer.start(config.algo, 0);
+        mst = boruvka_then_merge::getMST(n, distOriginEdges, config.treeFactor);
+        timer.stop(config.algo, 0);
+    } else {
+        if (ctx.rank() == 0) {
+            std::cout << "no such algorithm" << std::endl;
+        }
+        return {};
+    }
 
     VId weight = 0;
-    if (test) {
+
+    if (config.test) {
         for (auto &edge: mst) {
             weight += edge.get_weight();
         }
@@ -36,131 +68,13 @@ testAlgorithmOriginEdges(Algorithm algorithm, std::string &algoName, VId &n, WEd
     return {mst, weight};
 }
 
-template<typename Algorithm>
-std::pair<WEdgeList, VId>
-testAlgorithm(Algorithm algorithm, std::string &algoName, VId &n, WEdgeList &edges, hybridMST::Timer &timer,
-              bool test) {
-    WEdgeList mst;
 
-    timer.start(algoName, 0);
-    mst = algorithm(n, edges);
-    timer.stop(algoName, 0);
-
-
-    VId weight = 0;
-    if (test) {
-        for (auto &edge: mst) {
-            weight += edge.get_weight();
-        }
-    }
-    return {mst, weight};
-}
-
-
-std::pair<WEdgeList, VId> testMergeMST(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test, VId treeFactor) {
-    timer.start("merge", 0);
-    WEdgeList mergeMst = mergeMST::getMST(n, edges, treeFactor);
-    timer.stop("merge", 0);
-    VId mergeWeight = 0;
-    if (test) {
-        for (auto &edge: mergeMst) {
-            mergeWeight += edge.get_weight();
-        }
-    }
-    return {mergeMst, mergeWeight};
-}
-
-
-std::pair<WEdgeList, VId> testKruskal(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test) {
-    timer.start("kruskal", 0);
+std::pair<WEdgeList, VId> runKruskal(VId &n, WEdgeList &allEdges) {
     UnionFind uf(n);
-    WEdgeList mst = kruskal::getMST(edges, uf);
-    timer.stop("kruskal", 0);
+    WEdgeList mst = kruskal::getMST(allEdges, uf);
     VId kruskalWeight = 0;
-    if (test) {
-        for (auto &edge: mst) {
-            kruskalWeight += edge.get_weight();
-        }
+    for (auto &edge: mst) {
+        kruskalWeight += edge.get_weight();
     }
     return {mst, kruskalWeight};
-}
-
-std::pair<WEdgeList, VId> testFilterKruskal(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test) {
-    timer.start("filter", 0);
-    UnionFind uf(n);
-    VId c = 0;
-    std::vector<WEdge> mst = filterKruskal::getMST(n, edges, uf, c);
-    timer.stop("filter", 0);
-
-    VId filterWeight = 0;
-    if (test) {
-        for (auto &edge: mst) {
-            filterWeight += edge.get_weight();
-        }
-    }
-    return {mst, filterWeight};
-}
-
-
-std::pair<WEdgeList, VId> testDenseBoruvka(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test) {
-
-    WEdgeOriginList newEdges;
-    for (auto &edge: edges) {
-        newEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
-    }
-
-    timer.start("denseBoruvka", 0);
-    std::vector<WEdge> mst = dense_boruvka::getMST(n, newEdges);
-    timer.stop("denseBoruvka", 0);
-
-    VId bWeight = 0;
-    if (test) {
-        for (auto &edge: mst) {
-            bWeight += edge.get_weight();
-        }
-    }
-    return {mst, bWeight};
-}
-
-
-std::pair<WEdgeList, VId> testMixedMerge(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test, VId treeFactor) {
-
-    WEdgeOriginList newEdges;
-    for (auto &edge: edges) {
-        newEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
-    }
-
-    timer.start("mixedMerge", 0);
-    std::vector<WEdge> mst = mixed_merge::getMST(n, newEdges, treeFactor);
-    timer.stop("mixedMerge", 0);
-
-    VId mmWeight = 0;
-    if (test) {
-        for (auto &edge: mst) {
-            mmWeight += edge.get_weight();
-        }
-    }
-    return {mst, mmWeight};
-}
-
-std::pair<WEdgeList, VId> testBoruvkaThenMerge(VId &n, WEdgeList &edges, hybridMST::Timer &timer, bool test, VId treeFactor) {
-
-    WEdgeOriginList newEdges;
-    for (auto &edge: edges) {
-        newEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
-    }
-
-    timer.start("boruvkaThenMerge", 0);
-    std::vector<WEdge> mst = boruvka_then_merge::getMST(n, newEdges, treeFactor);
-    timer.stop("boruvkaThenMerge", 0);
-
-    VId btmWeight = 0;
-
-    if (test) {
-        for (auto &edge: mst) {
-            btmWeight += edge.get_weight();
-        }
-    }
-
-    return {mst, btmWeight};
 }

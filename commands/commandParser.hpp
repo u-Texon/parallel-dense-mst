@@ -6,6 +6,8 @@
 
 namespace commandParser {
 
+    static std::vector<std::string> algorithms = {"boruvka", "kruskal", "filter", "mixedMerge", "merge", "boruvkaMerge"};
+
 
     void printHelpInfo() {
         //TODO: complete
@@ -28,6 +30,15 @@ namespace commandParser {
     }
 
 
+    void checkAlgoForError(const std::string& name) {
+        for (auto &algo: algorithms) {
+            if (name == algo) {
+                return;
+            }
+        }
+        throw std::invalid_argument("unknown algorithm");
+    }
+
     void parseArgument(const std::string &arg, Config &config) {
         hybridMST::mpi::MPIContext ctx;
 
@@ -47,6 +58,7 @@ namespace commandParser {
             config.graphType = arg.substr(2, arg.length());
         } else if (arg.substr(0, 5) == "algo=") {
             config.algo = arg.substr(5, arg.length());
+            checkAlgoForError(config.algo);
         } else if (arg.substr(0, 2) == "d=") {
             VId d = config.maxWeight = std::stoi(arg.substr(2, arg.length()));
             if (d < 2) {
