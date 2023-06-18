@@ -29,10 +29,6 @@ namespace generateGraph {
             auto [distEdges, vertex_range] = graphs::get_rhg_explicit_num_edges(config.log_n, config.log_m, 3.0, weights);
             return distEdges;
         }
-        else {
-            std::cout << "wrong graph type" << std::endl;
-        }
-
 
         return {};
     }

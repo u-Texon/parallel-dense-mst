@@ -1,2 +1,0 @@
-algorithm, log(m), log(n), minimum weight, maximum weight, graph-type, tree-factor, run time
-kruskal,18,10,1,254,gnm,2,RESULT  kruskal-0=12114 

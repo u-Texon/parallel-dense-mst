@@ -21,9 +21,6 @@ namespace executor {
 
     void executeCommand(Config &config) {
         hybridMST::mpi::MPIContext ctx;
-        if (ctx.rank() == 0) {
-            std::cout << "calculations start!" << std::endl;
-        }
         WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
         WEdgeList allEdges = generateGraph::getAllEdges(distEdges);
         if (ctx.rank() == 0) {
@@ -32,31 +29,21 @@ namespace executor {
 
         VId n = pow(2, config.log_n);
         hybridMST::Timer timer;
+
         auto [mst, w] = runAlgorithm(config, n, allEdges, distEdges, timer);
         if (ctx.rank() == 0) {
             if (config.test) {
                 auto [_, kruskalWeight] = runKruskal(n, allEdges);
                 checkWeights(w, kruskalWeight, config.algo);
-            } else {
-                std::cout << "no test have been run" << std::endl;
             }
         }
 
-        std::string output = timer.output();
+        std::string output = timer.output().erase(0, timer.output().find('=') + 1);
 
         if (ctx.rank() == 0) {
             std::string filePath = "out/files/";
-            writer::write_csv(filePath + config.algo, config, output);
+            writer::write_csv(filePath + config.algo + ".csv", config, output);
             std::cout << "results have been written to " << filePath << std::endl;
         }
-
-
-        std::cout << timer.output();
-        if (ctx.rank() == 0) {
-            std::cout << std::endl;
-        }
-
     }
-
-
 }
