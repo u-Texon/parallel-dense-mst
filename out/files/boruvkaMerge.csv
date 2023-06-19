@@ -1,0 +1,18 @@
+Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,run time
+boruvkaMerge,1,18,10,1,254,gnm,2,14839 
+boruvkaMerge,2,18,10,1,254,gnm,2,7328 
+boruvkaMerge,4,18,10,1,254,gnm,2,7203 
+boruvkaMerge,8,18,10,1,254,gnm,2,4242 
+boruvkaMerge,16,18,10,1,254,gnm,2,3287 
+boruvkaMerge,32,18,10,1,254,gnm,2,1966 
+boruvkaMerge,1,18,10,1,254,gnm,2,14893 
+boruvkaMerge,2,18,10,1,254,gnm,2,7304 
+boruvkaMerge,4,18,10,1,254,gnm,2,5169 
+boruvkaMerge,8,18,10,1,254,gnm,2,4963 
+boruvkaMerge,16,18,10,1,254,gnm,2,2478 
+boruvkaMerge,1,18,10,1,254,gnm,2,14759 
+boruvkaMerge,2,18,10,1,254,gnm,2,7326 
+boruvkaMerge,4,18,10,1,254,gnm,2,5524 
+boruvkaMerge,8,18,10,1,254,gnm,2,4192 
+boruvkaMerge,16,18,10,1,254,gnm,2,2610 
+boruvkaMerge,32,18,10,1,254,gnm,2,1925 

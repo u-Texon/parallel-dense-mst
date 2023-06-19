@@ -1,0 +1,19 @@
+Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,run time
+kruskal,1,18,10,1,254,gnm,2,6187 
+kruskal,2,18,10,1,254,gnm,2,6442 
+kruskal,4,18,10,1,254,gnm,2,6849 
+kruskal,8,18,10,1,254,gnm,2,10870 
+kruskal,16,18,10,1,254,gnm,2,6604 
+kruskal,32,18,10,1,254,gnm,2,12052 
+kruskal,1,18,10,1,254,gnm,2,6078 
+kruskal,2,18,10,1,254,gnm,2,6325 
+kruskal,4,18,10,1,254,gnm,2,6339 
+kruskal,8,18,10,1,254,gnm,2,6683 
+kruskal,16,18,10,1,254,gnm,2,6554 
+kruskal,32,18,10,1,254,gnm,2,7135 
+kruskal,1,18,10,1,254,gnm,2,6092 
+kruskal,2,18,10,1,254,gnm,2,6388 
+kruskal,4,18,10,1,254,gnm,2,6283 
+kruskal,8,18,10,1,254,gnm,2,6369 
+kruskal,16,18,10,1,254,gnm,2,6580 
+kruskal,32,18,10,1,254,gnm,2,11835 
