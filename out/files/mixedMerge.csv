@@ -1,0 +1,19 @@
+Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,run time
+mixedMerge,1,18,10,1,254,gnm,2,14780 
+mixedMerge,2,18,10,1,254,gnm,2,7291 
+mixedMerge,4,18,10,1,254,gnm,2,5453 
+mixedMerge,8,18,10,1,254,gnm,2,4168 
+mixedMerge,16,18,10,1,254,gnm,2,3258 
+mixedMerge,32,18,10,1,254,gnm,2,2127 
+mixedMerge,1,18,10,1,254,gnm,2,14844 
+mixedMerge,2,18,10,1,254,gnm,2,7327 
+mixedMerge,4,18,10,1,254,gnm,2,5588 
+mixedMerge,8,18,10,1,254,gnm,2,4765 
+mixedMerge,16,18,10,1,254,gnm,2,3214 
+mixedMerge,32,18,10,1,254,gnm,2,2072 
+mixedMerge,1,18,10,1,254,gnm,2,14744 
+mixedMerge,2,18,10,1,254,gnm,2,7279 
+mixedMerge,4,18,10,1,254,gnm,2,7015 
+mixedMerge,8,18,10,1,254,gnm,2,4786 
+mixedMerge,16,18,10,1,254,gnm,2,2993 
+mixedMerge,32,18,10,1,254,gnm,2,1957 
