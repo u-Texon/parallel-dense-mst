@@ -6,7 +6,8 @@
 
 namespace commandParser {
 
-    static std::vector<std::string> algorithms = {"boruvka", "kruskal", "filter", "mixedMerge", "merge", "boruvkaMerge"};
+    static std::vector<std::string> algorithms = {"boruvka", "kruskal", "filter", "mixedMerge", "merge",
+                                                  "boruvkaMerge"};
     static std::vector<std::string> graphTypes = {"rhg", "gnm", "rhgNumEdges"};
 
     void printHelpInfo() {
@@ -38,7 +39,7 @@ namespace commandParser {
                   << std::endl;
     }
 
-    void checkGraphType(const std::string& name) {
+    void checkGraphType(const std::string &name) {
         for (auto &type: graphTypes) {
             if (name == type) {
                 return;
@@ -47,7 +48,7 @@ namespace commandParser {
         throw std::invalid_argument("unknown graph-type");
     }
 
-    void checkAlgo(const std::string& name) {
+    void checkAlgo(const std::string &name) {
         for (auto &algo: algorithms) {
             if (name == algo) {
                 return;
@@ -61,6 +62,8 @@ namespace commandParser {
 
         if (arg == "help" || arg == "h" || arg == "-h") {
             config.help = true;
+        } else if (arg == "k") {
+            config.useKruskal = true;
         } else if (arg == "t") {
             config.test = true;
         } else if (arg.substr(0, 2) == "n=") {

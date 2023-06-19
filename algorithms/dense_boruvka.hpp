@@ -301,7 +301,7 @@ namespace dense_boruvka {
     }
 
 
-    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e) {
+    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, bool useKruskal) {
 
         VId n = vertexCount;
         WEdgeOriginList edges = e;
@@ -317,7 +317,13 @@ namespace dense_boruvka {
         //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
         //TODO: auswählen wie oft in jeder schleife
         VId c = 0;
-        edges = filterKruskal::getMST(n, edges, uf, c);
+
+        if (useKruskal) {
+            edges = kruskal::getMST(edges, uf);
+        } else {
+            edges = filterKruskal::getMST(n, edges, uf, c);
+        }
+
 
 
         while (n > 1) {

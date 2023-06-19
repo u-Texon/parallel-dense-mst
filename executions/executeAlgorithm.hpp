@@ -37,11 +37,11 @@ std::pair<WEdgeList, VId>  runAlgorithm(Config &config, VId &n, WEdgeList &allEd
         timer.stop(config.algo, 0);
     } else  if (config.algo == "boruvka") {
         timer.start(config.algo, 0);
-        mst = dense_boruvka::getMST(n, distOriginEdges);
+        mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal);
         timer.stop(config.algo, 0);
     } else if (config.algo == "merge") {
         timer.start(config.algo, 0);
-        mst = mergeMST::getMST(n, distEdges, config.treeFactor);
+        mst = mergeMST::getMST(n, distEdges,config.useKruskal, config.treeFactor);
         timer.stop(config.algo, 0);
     } else if (config.algo == "mixedMerge") {
         timer.start(config.algo, 0);

@@ -9,7 +9,7 @@ namespace mergeMST {
 
 
     template<typename Edge>
-    void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n, VId treeFactor) {
+    void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n,bool useKruskal, VId treeFactor) {
         hybridMST::mpi::MPIContext ctx;
         hybridMST::mpi::TypeMapper<Edge> mapper;
         hybridMST::mpi::TypeMapper<VId> intMapper;
@@ -82,13 +82,18 @@ namespace mergeMST {
             }
 
             uf.clear();
-            VId c = 0;
-            edges = filterKruskal::getMST(n, edges, uf, c);
+            if (useKruskal) {
+                edges = kruskal::getMST(edges, uf);
+            } else {
+                VId c = 0;
+                edges = filterKruskal::getMST(n, edges, uf, c);
+            }
+
         }
     }
 
     template<typename Edge>
-    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges, VId treeFactor = 2) {
+    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges, bool &useKruskal, VId treeFactor = 2) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
 
 
@@ -96,14 +101,19 @@ namespace mergeMST {
         UnionFind uf(n);
         std::vector<Edge> mstList;
         VId c = 0;
-        mstList = filterKruskal::getMST(n, edges, uf, c);
+        if (useKruskal) {
+            mstList = kruskal::getMST(edges, uf);
+        } else {
+            mstList = filterKruskal::getMST(n, edges, uf, c);
+        }
+
 
 
         VId p = treeFactor;
 
         //TODO: correct loop condition??
         while (p <= ctx.size() || p / treeFactor < ctx.size()) {
-            mergeStep(mstList, p, uf, n, treeFactor);
+            mergeStep(mstList, p, uf, n, useKruskal, treeFactor);
             p *= treeFactor;
         }
 

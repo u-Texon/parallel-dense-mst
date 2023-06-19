@@ -2,7 +2,7 @@
 
 #include "../include/definitions.hpp"
 #include "generateGraph.hpp"
-#include "tests/tests.hpp"
+#include "executeAlgorithm.hpp"
 #include "../algorithms/mergeMST.hpp"
 #include "csvWriter.hpp"
 

@@ -69,6 +69,7 @@ struct Config {
     VId minWeight = 1;
     VId maxWeight = 254;
     VId treeFactor = 2;
+    bool useKruskal = false;
     bool test = false;
     bool help = false;
     bool parseError = false;
@@ -77,7 +78,8 @@ struct Config {
     friend std::ostream &operator<<(std::ostream &out, const Config &c) {
         return out << "graph " << c.graphType << ", with log_n = " << c.log_n
                    << " and log_m = " << c.log_m << ". Edges have minWeight = " << c.minWeight << " and maxWeight = "
-                   << c.maxWeight << ". Selected algorithm is " << c.algo << ", treeFactor (or d) = " << c.treeFactor << ". Run test = " << c.test;
+                   << c.maxWeight << ". Selected algorithm is " << c.algo << ", treeFactor (or d) = " << c.treeFactor
+                   << ". Run test = " << c.test << ". use kruskal = " << c.useKruskal;
     }
 };
 
