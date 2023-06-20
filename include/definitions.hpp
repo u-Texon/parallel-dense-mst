@@ -73,6 +73,7 @@ struct Config {
     bool test = false;
     bool help = false;
     bool parseError = false;
+    bool onlyThisAlgo = false;
     std::string algo = "boruvka";
 
     friend std::ostream &operator<<(std::ostream &out, const Config &c) {

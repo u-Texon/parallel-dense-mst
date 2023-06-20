@@ -31,18 +31,23 @@ namespace executor {
         hybridMST::Timer timer;
 
         auto [mst, w] = runAlgorithm(config, n, allEdges, distEdges, timer);
-        if (ctx.rank() == 0) {
-            if (config.test) {
-                auto [_, kruskalWeight] = runKruskal(n, allEdges);
-                checkWeights(w, kruskalWeight, config.algo);
-            }
+        if (ctx.rank() == 0 && config.test) {
+            auto [_, kruskalWeight] = runKruskal(n, allEdges);
+            checkWeights(w, kruskalWeight, config.algo);
         }
 
-        std::string output = timer.output().erase(0, timer.output().find('=') + 1);
+
+
+        std::cout << timer.output();
+
+        std::string timerOutput = timer.output();
 
         if (ctx.rank() == 0) {
+            std::cout << std::endl;
+
             std::string filePath = "out/files/";
-            writer::write_csv(filePath + config.algo + ".csv", config, output);
+
+            writer::write_csv(filePath, config, timerOutput);
             std::cout << "results have been written to " << filePath << std::endl;
         }
     }

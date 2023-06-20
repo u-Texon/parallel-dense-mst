@@ -8,24 +8,88 @@
 namespace writer {
 
 
-    void write_csv(const std::string &filename, Config &config, const std::string &result) {
+    void writeBoruvkaResults(std::string &timerOutput, std::ofstream &file) {
+        std::string delimiter = " ";
+
+        std::vector<size_t> allreduce;
+        std::vector<size_t> iteration;
+        std::vector<size_t> removeParallelEdges;
+        size_t boruvka = 0;
+        size_t calcLocalMST = 0;
+        size_t init = 0;
+
+        size_t pos = 0;
+        std::string token;
+        while ((pos = timerOutput.find(delimiter)) != std::string::npos) {
+            token = timerOutput.substr(0, pos);
+
+            if (token.substr(0, strlen("allreduce")) == "allreduce") {
+                allreduce.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("boruvka")) == "boruvka") {
+                boruvka = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+            } else if (token.substr(0, strlen("calcLocalMST")) == "calcLocalMST") {
+                calcLocalMST = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+            } else if (token.substr(0, strlen("init")) == "init") {
+                init = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+            } else if (token.substr(0, strlen("iter")) == "iter") {
+                iteration.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("remove")) == "remove") {
+                removeParallelEdges.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            }
+
+            timerOutput.erase(0, pos + delimiter.length());
+        }
+
+        for (int i = 0; i < iteration.size(); ++i) {
+            file << boruvka << "," << init << "," << calcLocalMST << "," << iteration[i] << "," << allreduce[i] << ","
+                 << removeParallelEdges[i] << std::endl;
+        }
+
+    }
+
+
+    void writeResult(std::string &result, std::ofstream &file, Config &config) {
         hybridMST::mpi::MPIContext ctx;
+        file << config.algo << "," << ctx.size() << "," << config.log_m << "," << config.log_n << ","
+             << config.minWeight << ","
+             << config.maxWeight << "," << config.graphType << "," << config.treeFactor << "," << result << std::endl;
+    }
+
+    void write_csv(const std::string &filePath, Config &config, std::string &timerOutput) {
         std::ofstream file;
 
-        std::ifstream f(filename);
-        bool alreadyExists = f.good();
 
-        file.open(filename, std::ios::app);
-        if (!file.is_open()) {
-            std::cout << "!!! error on opening file " << filename << " !!!" << std::endl;
+        if (config.algo == "boruvka" && config.onlyThisAlgo) {
+            file.open(filePath + "only-" +  config.algo + ".csv");
+
+            if (!file.is_open()) {
+                std::cout << "!!! error on opening file " << filePath << " !!!" << std::endl;
+            }
+
+            file << "run time,init variables,calculate local MST,iteration,allreduce,remove parallel edges"
+                 << std::endl;
+            writeBoruvkaResults(timerOutput, file);
+        } else {
+            std::string fileName = filePath + config.algo + ".csv";
+            std::ifstream f(fileName);
+            bool alreadyExists = f.good();
+
+            file.open(fileName, std::ios::app);
+            if (!file.is_open()) {
+                std::cout << "!!! error on opening file " << fileName << " !!!" << std::endl;
+            }
+
+            std::string result = timerOutput.erase(0, timerOutput.find('=') + 1);
+            if (!alreadyExists) {
+                file
+                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,run time"
+                        << std::endl;
+            }
+            writeResult(result, file, config);
+
         }
 
 
-        if (!alreadyExists) {
-            file << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,run time\n";
-        }
-        file << config.algo << "," << ctx.size() << "," << config.log_m << "," << config.log_n << "," << config.minWeight << ","
-             << config.maxWeight << "," << config.graphType << "," << config.treeFactor << "," << result << std::endl;
         file.close();
 
     }

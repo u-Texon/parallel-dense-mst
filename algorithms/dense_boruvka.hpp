@@ -255,6 +255,52 @@ namespace dense_boruvka {
     }
 
     void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
+                     std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst, size_t hashBorder, size_t iteration, hybridMST::Timer &timer) {
+        hybridMST::mpi::MPIContext ctx;
+
+        //shrink arrays
+        shrink(n, incidentLocal, incident, vertices, parent, uf);
+
+        //calculate edges incident to each vertex
+        calcMinIncident(n, incidentLocal, edges);
+
+
+        timer.start("allreduce", iteration);
+
+        //perform all reduce to get the lightest edges for each vertex
+        hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
+        MPI_Op reduce;
+        MPI_Op_create((MPI_User_function *) minEdges, true, &reduce);
+        MPI_Allreduce(incidentLocal.data(), incident.data(), (int) n, mapper.get_mpi_datatype(), reduce,
+                      ctx.communicator());
+
+
+        timer.stop("allreduce", iteration);
+
+        addMSTEdges(n, mst, incident, edges);
+
+        fillParentArray(n, incident, parent);
+
+        WEdgeOriginList relabeledEdges;
+        relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
+
+
+        timer.start("removeParallelEdges", iteration);
+
+        if (relabeledEdges.size() > hashBorder) {
+            //TODO: needs to be tested
+            removeParallelEdgesHashing(relabeledEdges);
+        } else {
+            removeParallelEdges(relabeledEdges);
+        }
+
+        timer.stop("removeParallelEdges", iteration);
+
+        edges = relabeledEdges;
+    }
+
+
+    void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst, size_t hashBorder) {
         hybridMST::mpi::MPIContext ctx;
 
@@ -264,12 +310,15 @@ namespace dense_boruvka {
         //calculate edges incident to each vertex
         calcMinIncident(n, incidentLocal, edges);
 
+
+
         //perform all reduce to get the lightest edges for each vertex
         hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
         MPI_Op reduce;
         MPI_Op_create((MPI_User_function *) minEdges, true, &reduce);
         MPI_Allreduce(incidentLocal.data(), incident.data(), (int) n, mapper.get_mpi_datatype(), reduce,
                       ctx.communicator());
+
 
 
         addMSTEdges(n, mst, incident, edges);
@@ -287,8 +336,6 @@ namespace dense_boruvka {
             removeParallelEdges(relabeledEdges);
         }
 
-
-
         edges = relabeledEdges;
     }
 
@@ -298,6 +345,50 @@ namespace dense_boruvka {
             returnEdges.push_back(edge.toWEdge());
         }
         return returnEdges;
+    }
+
+
+    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, bool useKruskal, hybridMST::Timer &timer) {
+
+        timer.start("initVariables", 0);
+
+        VId n = vertexCount;
+        WEdgeOriginList edges = e;
+        WEdgeOriginList mst;
+        WEdgeOriginList incidentLocal;
+        WEdgeOriginList incident; //keeps the lightest incidentLocal edges. relabeledEdges.g. incidentLocal[4] is the lightest edge incidentLocal to vertex 4
+        std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
+        UnionFind uf(n);
+        std::vector<VId> vertices;
+
+        timer.stop("initVariables", 0);
+
+
+        //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
+        //TODO: auswählen wie oft in jeder schleife
+
+        timer.start("calcLocalMST", 0);
+
+        if (useKruskal) {
+            edges = kruskal::getMST(edges, uf);
+        } else {
+            VId c = 0;
+            edges = filterKruskal::getMST(n, edges, uf, c);
+        }
+        timer.stop("calcLocalMST", 0);
+
+
+        size_t iteration = 0;
+        while (n > 1) {
+            timer.start("iteration", iteration);
+            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000, iteration, timer);
+            timer.stop("iteration", iteration);
+            iteration++;
+
+        }
+
+        return getOriginEdges(mst);
+
     }
 
 
@@ -313,18 +404,16 @@ namespace dense_boruvka {
         std::vector<VId> vertices;
 
 
-
         //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
         //TODO: auswählen wie oft in jeder schleife
-        VId c = 0;
+
 
         if (useKruskal) {
             edges = kruskal::getMST(edges, uf);
         } else {
+            VId c = 0;
             edges = filterKruskal::getMST(n, edges, uf, c);
         }
-
-
 
         while (n > 1) {
             boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000);
@@ -333,6 +422,7 @@ namespace dense_boruvka {
         return getOriginEdges(mst);
 
     }
+
 
 
 } //namespace

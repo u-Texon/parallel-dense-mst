@@ -1,0 +1,4 @@
+run time,init variables,calculate local MST,iteration,allreduce,remove parallel edges
+21505,2972,17491,418,155,128
+21505,2972,17491,205,29,129
+21505,2972,17491,37,18,1

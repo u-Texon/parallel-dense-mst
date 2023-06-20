@@ -36,9 +36,18 @@ std::pair<WEdgeList, VId>  runAlgorithm(Config &config, VId &n, WEdgeList &allEd
         mst = filterKruskal::getMST(n, allEdges, uf, c);
         timer.stop(config.algo, 0);
     } else  if (config.algo == "boruvka") {
-        timer.start(config.algo, 0);
-        mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal);
-        timer.stop(config.algo, 0);
+
+        if (config.onlyThisAlgo) {
+            timer.start(config.algo, 0);
+            mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal, timer);
+            timer.stop(config.algo, 0);
+        } else {
+            timer.start(config.algo, 0);
+            mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal);
+            timer.stop(config.algo, 0);
+        }
+
+
     } else if (config.algo == "merge") {
         timer.start(config.algo, 0);
         mst = mergeMST::getMST(n, distEdges,config.useKruskal, config.treeFactor);
@@ -51,11 +60,6 @@ std::pair<WEdgeList, VId>  runAlgorithm(Config &config, VId &n, WEdgeList &allEd
         timer.start(config.algo, 0);
         mst = boruvka_then_merge::getMST(n, distOriginEdges, config.treeFactor);
         timer.stop(config.algo, 0);
-    } else {
-        if (ctx.rank() == 0) {
-            std::cout << "no such algorithm" << std::endl;
-        }
-        return {};
     }
 
     VId weight = 0;

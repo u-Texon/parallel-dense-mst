@@ -66,6 +66,8 @@ namespace commandParser {
             config.useKruskal = true;
         } else if (arg == "t") {
             config.test = true;
+        } else if (arg == "o") {
+            config.onlyThisAlgo = true;
         } else if (arg.substr(0, 2) == "n=") {
             config.log_n = std::stoi(arg.substr(2, arg.length()));
         } else if (arg.substr(0, 2) == "m=") {

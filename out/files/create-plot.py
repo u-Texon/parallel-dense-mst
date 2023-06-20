@@ -61,5 +61,5 @@ plt.xlabel('Number of Processors')
 plt.ylabel('execution time (in microseconds??)')
 plt.legend()
 
-plt.savefig('../plots/runTimes.png')
+plt.savefig('../plots/parallelRunTimes.svg')
 plt.show()
