@@ -4,23 +4,31 @@ import matplotlib.pyplot as plt
 boruvka = pd.read_csv('only-boruvka.csv')
 
 init = list(boruvka['init variables'])[0]
-runTime = list(boruvka['run time'])[0]
 localMSTtime = list(boruvka['calculate local MST'])[0]
 iterations = list(boruvka['iteration'])
 allreduce = list(boruvka['allreduce'])
 parallelEdges = list(boruvka['remove parallel edges'])
 
-data = [['total run time', runTime], ['initialize variables', init], ['calculate local MST', localMSTtime]]
+labels = ['initialize variables', 'calculate local MST']
+values = [init, localMSTtime]
 
 size = len(iterations)
 
 for i in range(size):
-    data.append(['iteration ' + str(i), iterations[i]])
-    data.append(['allreduce ' + str(i), allreduce[i]])
-    data.append(['remove parallel edges ' + str(i), parallelEdges[i]])
+    labels.append('iteration ' + str(i))
+    values.append(iterations[i])
+    labels.append('allreduce ' + str(i))
+    values.append(allreduce[i])
+    labels.append('remove parallel edges ' + str(i))
+    values.append(parallelEdges[i])
 
-df = pd.DataFrame(data, columns=["Name", "run time"])
-df.plot(x="Name", y="run time", kind="bar")
+fig, ax = plt.subplots()
+ax.pie(values, autopct='%1.1f%%')
+
+plt.legend(labels, bbox_to_anchor=(1.05, 1.0), loc='upper left')
+
+# df = pd.DataFrame(data, columns=["Name", "run time"])
+# df.plot(x="Name", y="run time", kind="bar")
 
 plt.savefig('../plots/boruvka.svg')
 plt.show()

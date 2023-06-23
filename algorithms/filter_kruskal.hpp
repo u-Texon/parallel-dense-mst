@@ -9,16 +9,17 @@ namespace filterKruskal {
     template<typename Edge>
     inline Edge pickPivot(std::vector<Edge> &edges) { //TODO:alternative: pick 3 elements
         int i = rand() % ( edges.size());
-        return edges.at(i);
+        return edges[i];
     }
 
     inline int threshold(const VId &n) {
-        int t = (int) fmax(30, (log2(n) / 2)); //TODO: is this a good threshold?
+        int t = 3 * n; //TODO: is this a good threshold?
         return t;
     }
 
     template<typename Edge>
     inline std::vector<Edge> filter(std::vector<Edge> &edges, UnionFind &uf) {
+        //TODO: remove if
         std::vector<Edge> newList;
         for (auto &edge: edges) {
             VId f1 = uf.find(edge.get_src());
@@ -40,7 +41,7 @@ namespace filterKruskal {
         Edge pivot = pickPivot(edges);
         std::vector<Edge> smaller;
         std::vector<Edge> bigger;
-        for (auto &edge: edges) {
+        for (auto &edge: edges) { //TODO: std::partition std::span
             if (edge.get_weight() <= pivot.get_weight()) {
                 smaller.push_back(edge);
             } else {
@@ -57,6 +58,8 @@ namespace filterKruskal {
             counter = 0;
         }
 
+
+        //TODO: vector der größe n und dann immer einfügen wenn kante gefunden
         std::vector<Edge> mst;
         mst = filterKruskal::getMST(n, smaller, uf, counter);
         bigger = filter(bigger, uf);
