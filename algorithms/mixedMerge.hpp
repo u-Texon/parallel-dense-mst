@@ -22,15 +22,18 @@ namespace mixed_merge {
 
         //compute local mst
         UnionFind uf(n);
-        VId c = 0;
-        WEdgeOriginList edges = filterKruskal::getMST(n, e, uf, c);
+        WEdgeOriginList edges;
+        if (useKruskal) {
+            edges = kruskal::getMST(e, uf);
+        } else {
+            edges = filterKruskal::getMST(n, e, uf);
+        }
 
 
         VId p = 2;
         while (p <= ctx.size()) {
             dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000);
-            mergeMST::mergeStep(edges, p, uf, n,useKruskal, treeFactor);
-
+            mergeMST::mergeStep(edges, p, uf, n, useKruskal, treeFactor);
             p *= 2;
         }
 

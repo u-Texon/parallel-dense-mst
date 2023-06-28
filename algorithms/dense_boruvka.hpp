@@ -10,8 +10,8 @@
 namespace dense_boruvka {
 
 
-    /*
-     * allreduce function
+    /**
+     * mpi allreduce function
      */
     void minEdges(WEdgeOrigin *in, WEdgeOrigin *inout, const int *n, [[maybe_unused]] MPI_Datatype *datatype) {
         for (int i = 0; i < *n; i++) {
@@ -69,19 +69,9 @@ namespace dense_boruvka {
         }
 
         //continue with the edges that are not (yet) added to the mst
-        WEdgeOriginList newEdges;
-        for (auto &edge: edges) {
-            VId u = edge.get_src();
-            VId v = edge.get_dst();
-            bool keep = true;
-            if (edge == incident[u] || edge == incident[v]) {
-                keep = false;
-            }
-            if (keep) {
-                newEdges.push_back(edge);
-            }
-        }
-        edges = newEdges;
+        std::remove_if(edges.begin(), edges.end(), [&](const auto &edge) {
+            return edge == incident[edge.get_src()] || edge == incident[edge.get_dst()];
+        });
     }
 
 
@@ -372,8 +362,7 @@ namespace dense_boruvka {
         if (useKruskal) {
             edges = kruskal::getMST(edges, uf);
         } else {
-            VId c = 0;
-            edges = filterKruskal::getMST(n, edges, uf, c);
+            edges = filterKruskal::getMST(n, edges, uf);
         }
         timer.stop("calcLocalMST", 0);
 
@@ -411,8 +400,7 @@ namespace dense_boruvka {
         if (useKruskal) {
             edges = kruskal::getMST(edges, uf);
         } else {
-            VId c = 0;
-            edges = filterKruskal::getMST(n, edges, uf, c);
+            edges = filterKruskal::getMST(n, edges, uf);
         }
 
         while (n > 1) {

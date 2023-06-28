@@ -32,8 +32,7 @@ std::pair<WEdgeList, VId>  runAlgorithm(Config &config, VId &n, WEdgeList &allEd
     } else if (config.algo == "filter") {
         timer.start(config.algo, 0);
         UnionFind uf(n);
-        VId c = 0;
-        mst = filterKruskal::getMST(n, allEdges, uf, c);
+        mst = filterKruskal::getMST(n, allEdges, uf);
         timer.stop(config.algo, 0);
     } else  if (config.algo == "boruvka") {
 

@@ -30,8 +30,7 @@ namespace boruvka_then_merge {
         if (useKruskal) {
              edges = kruskal::getMST(e, uf);
         } else {
-            VId c = 0;
-            edges = filterKruskal::getMST(n, e, uf, c);
+            edges = filterKruskal::getMST(n, e, uf);
         }
 
 

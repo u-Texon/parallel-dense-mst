@@ -64,7 +64,9 @@ namespace commandParser {
             config.help = true;
         } else if (arg == "k") {
             config.useKruskal = true;
-        } else if (arg == "t") {
+        } else if (arg == "s") {
+            config.shuffle = true;
+        }  else if (arg == "t") {
             config.test = true;
         } else if (arg == "o") {
             config.onlyThisAlgo = true;

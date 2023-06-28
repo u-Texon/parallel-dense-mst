@@ -1,8 +1,10 @@
 #pragma once
 
 #include "kruskal.hpp"
+#include <span>
 
-#define maxLoops 10
+
+
 #define pivotEdgeCount 10
 
 namespace filterKruskal {
@@ -15,12 +17,11 @@ namespace filterKruskal {
             w = edges[w].get_weight();
             pivotWeight += w;
         }
-        return (VId) (pivotWeight/pivotEdgeCount);
+        return (VId) (pivotWeight / pivotEdgeCount);
     }
 
-    inline int threshold(const VId &n) {
-        int t = 3 * n;
-        return t;
+    inline size_t threshold(const VId &n) {
+        return 300 * n;
     }
 
     template<typename Edge>
@@ -34,37 +35,36 @@ namespace filterKruskal {
 
 
     template<typename Edge>
-    inline std::vector<Edge> getMST(VId n, std::vector<Edge> &edges, UnionFind &uf, VId &counter) {
+    inline std::vector<Edge> getMST(VId n, std::vector<Edge> &edges, UnionFind &uf) {
         if (edges.size() <= threshold(n)) {
             return kruskal::getMST(edges, uf);
         }
         VId pivotWeight = pickPivot(edges);
 
-
-        auto middle = std::partition(edges.begin(), edges.end(), [&](const auto &edge)
-        {
+        auto middle = std::partition(edges.begin(), edges.end(), [&](const auto &edge) {
             return edge.get_weight() <= pivotWeight;
         });
+
+
+        //TODO: use span
+        //std::vector myVec{1, 2, 3, 4, 5};
+        //std::span mySpan1{myVec};
+
+
         std::vector<Edge> smaller(edges.begin(), middle);
         std::vector<Edge> bigger(middle, edges.end());
 
 
-
         if (bigger.empty()) { //error prevention for infinite loop
-            counter++;
-            if (counter >= maxLoops) {
-                return kruskal::getMST(smaller, uf);
-            }
-        } else {
-            counter = 0;
+            return kruskal::getMST(smaller, uf);
         }
 
 
         //TODO: vector der größe n und dann immer einfügen wenn kante gefunden
         std::vector<Edge> mst;
-        mst = filterKruskal::getMST(n, smaller, uf, counter);
+        mst = filterKruskal::getMST(n, smaller, uf);
         filter(bigger, uf);
-        std::vector<Edge> bigEdges = filterKruskal::getMST(n, bigger, uf, counter);
+        std::vector<Edge> bigEdges = filterKruskal::getMST(n, bigger, uf);
         mst.insert(mst.end(), bigEdges.begin(), bigEdges.end());
 
         return mst;
