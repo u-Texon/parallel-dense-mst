@@ -45,7 +45,6 @@ namespace filterKruskal {
             return edge.get_weight() <= pivotWeight;
         });
 
-
         //TODO: use span
         //std::vector myVec{1, 2, 3, 4, 5};
         //std::span mySpan1{myVec};

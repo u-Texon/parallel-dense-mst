@@ -69,6 +69,7 @@ struct Config {
     VId minWeight = 1;
     VId maxWeight = 254;
     VId treeFactor = 2;
+    VId edgesPerProc = 0;
     bool shuffle = false;
     bool useKruskal = false;
     bool test = false;

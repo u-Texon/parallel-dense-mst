@@ -8,11 +8,6 @@
 
 namespace generateGraph {
 
-    //TODO: shuffle edges
-    //kanten random ids geben und dann:
-    //ams sort zum verteilen
-
-
 
     template<typename EdgeType>
     struct ShuffleOrder {
@@ -32,7 +27,8 @@ namespace generateGraph {
         hybridMST::mpi::TypeMapper<std::pair<Edge, std::size_t>> mapper;
         std::mt19937_64 gen(ctx.rank());
 
-      //  Ams::sortLevel(mapper.get_mpi_datatype(), shuffleEdges, 2, gen, ctx.communicator(), Compare{});
+        //TODO: shuffle edges
+        // Ams::sortLevel(mapper.get_mpi_datatype(), shuffleEdges, 2, gen, ctx.communicator(), Compare{});
 
         edges.clear();
         for (auto &edge: shuffleEdges) {
@@ -51,14 +47,25 @@ namespace generateGraph {
 
         std::vector<graphs::WEdge24> distEdges;
 
+        VId numEdges = config.log_m;
+
+        if (config.edgesPerProc) {
+            numEdges = config.edgesPerProc + log2(ctx.size());
+        }
+
+
+        if (ctx.rank() == 0) {
+            std::cout << numEdges << std::endl;
+        }
+
         if (config.graphType == "rhg") {
-            auto [edges, vertex_range] = graphs::get_rhg(config.log_n, config.log_m, 3.0, weights);
+            auto [edges, vertex_range] = graphs::get_rhg(config.log_n, numEdges, 3.0, weights);
             distEdges = edges;
         } else if (config.graphType == "gnm") {
-            auto [edges, vertex_range] = graphs::get_gnm(config.log_n, config.log_m, weights);
+            auto [edges, vertex_range] = graphs::get_gnm(config.log_n, numEdges, weights);
             distEdges = edges;
         } else if (config.graphType == "rhgNumEdges") {
-            auto [edges, vertex_range] = graphs::get_rhg_explicit_num_edges(config.log_n, config.log_m, 3.0, weights);
+            auto [edges, vertex_range] = graphs::get_rhg_explicit_num_edges(config.log_n, numEdges, 3.0, weights);
             distEdges = edges;
         }
 
