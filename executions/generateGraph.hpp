@@ -12,12 +12,12 @@ namespace generateGraph {
     template<typename EdgeType>
     struct ShuffleOrder {
         bool operator()(const EdgeType &left, const EdgeType &right) const {
-            return left.randomID < right.randomID;
+            return left.second < right.second;
         }
     };
 
-    template<typename Edge, typename Compare = ShuffleOrder<Edge>>
-    void distributedShuffle(std::vector<Edge> edges) {
+    template<typename Edge>
+    void distributedShuffle(std::vector<Edge> &edges) {
         hybridMST::mpi::MPIContext ctx;
 
         std::vector<std::pair<Edge, std::size_t>> shuffleEdges;
@@ -27,13 +27,17 @@ namespace generateGraph {
         hybridMST::mpi::TypeMapper<std::pair<Edge, std::size_t>> mapper;
         std::mt19937_64 gen(ctx.rank());
 
-        //TODO: shuffle edges
-        // Ams::sortLevel(mapper.get_mpi_datatype(), shuffleEdges, 2, gen, ctx.communicator(), Compare{});
+        //TODO: get rid of the warning
+        Ams::sortLevel(mapper.get_mpi_datatype(), shuffleEdges, 2, gen, ctx.communicator(), ShuffleOrder<std::pair<Edge, std::size_t>>{});
+
+
 
         edges.clear();
         for (auto &edge: shuffleEdges) {
             edges.push_back(edge.first);
         }
+
+
 
     }
 
@@ -53,11 +57,6 @@ namespace generateGraph {
             numEdges = config.edgesPerProc + log2(ctx.size());
         }
 
-
-        if (ctx.rank() == 0) {
-            std::cout << numEdges << std::endl;
-        }
-
         if (config.graphType == "rhg") {
             auto [edges, vertex_range] = graphs::get_rhg(config.log_n, numEdges, 3.0, weights);
             distEdges = edges;
@@ -74,35 +73,6 @@ namespace generateGraph {
             distributedShuffle(distEdges);
         }
 
-        /*
-        ctx.barrier();
-        if (ctx.rank() == 0) {
-            for (auto &edge: distEdges) {
-                std::cout << "process " << ctx.rank() << " has edge " << edge << std::endl;
-            }
-        }
-
-        ctx.barrier();
-        if (ctx.rank() == 1) {
-            for (auto &edge: distEdges) {
-                std::cout << "process " << ctx.rank() << " has edge " << edge << std::endl;
-            }
-        }
-
-        ctx.barrier();
-        if (ctx.rank() == 2) {
-            for (auto &edge: distEdges) {
-                std::cout << "process " << ctx.rank() << " has edge " << edge << std::endl;
-            }
-        }
-
-        ctx.barrier();
-        if (ctx.rank() == 3) {
-            for (auto &edge: distEdges) {
-                std::cout << "process " << ctx.rank() << " has edge " << edge << std::endl;
-            }
-        }
-        */
 
         return distEdges;
     }

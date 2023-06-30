@@ -11,7 +11,8 @@
 #include "../algorithms/boruvka_then_merge.hpp"
 
 
-std::pair<WEdgeList, VId>  runAlgorithm(Config &config, VId &n, WEdgeList &allEdges,  WEdgeList &distEdges, hybridMST::Timer &timer) {
+std::pair<WEdgeList, VId>
+runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, hybridMST::Timer &timer) {
     hybridMST::mpi::MPIContext ctx;
 
     WEdgeList mst;
@@ -34,7 +35,7 @@ std::pair<WEdgeList, VId>  runAlgorithm(Config &config, VId &n, WEdgeList &allEd
         UnionFind uf(n);
         mst = filterKruskal::getMST(n, allEdges, uf);
         timer.stop(config.algo, 0);
-    } else  if (config.algo == "boruvka") {
+    } else if (config.algo == "boruvka") {
 
         if (config.onlyThisAlgo) {
             timer.start(config.algo, 0);
@@ -49,7 +50,7 @@ std::pair<WEdgeList, VId>  runAlgorithm(Config &config, VId &n, WEdgeList &allEd
 
     } else if (config.algo == "merge") {
         timer.start(config.algo, 0);
-        mst = mergeMST::getMST(n, distEdges,config.useKruskal, config.treeFactor);
+        mst = mergeMST::getMST(n, distEdges, config.useKruskal, config.treeFactor);
         timer.stop(config.algo, 0);
     } else if (config.algo == "mixedMerge") {
         timer.start(config.algo, 0);

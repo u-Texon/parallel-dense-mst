@@ -1,12 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-boruvka = pd.read_csv('boruvka.csv')
-kruskal = pd.read_csv('kruskal.csv')
-filter = pd.read_csv('filter.csv')
-boruvkaMerge = pd.read_csv('boruvkaMerge.csv')
-merge = pd.read_csv('merge.csv')
-mixedMerge = pd.read_csv('mixedMerge.csv')
+boruvka = pd.read_csv('../out/files/boruvka.csv')
+kruskal = pd.read_csv('../out/files/kruskal.csv')
+filter = pd.read_csv('../out/files/filter.csv')
+boruvkaMerge = pd.read_csv('../out/files/boruvkaMerge.csv')
+merge = pd.read_csv('../out/files/merge.csv')
+mixedMerge = pd.read_csv('../out/files/mixedMerge.csv')
 
 procs = [1, 2, 4, 8, 16, 32, 64]
 

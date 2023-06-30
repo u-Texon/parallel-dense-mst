@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-boruvka = pd.read_csv('only-boruvka.csv')
+boruvka = pd.read_csv('../out/files/only-boruvka.csv')
 
 init = list(boruvka['init variables'])[0]
 localMSTtime = list(boruvka['calculate local MST'])[0]
@@ -26,9 +26,6 @@ fig, ax = plt.subplots()
 ax.pie(values, autopct='%1.1f%%')
 
 plt.legend(labels, bbox_to_anchor=(1.05, 1.0), loc='upper left')
-
-# df = pd.DataFrame(data, columns=["Name", "run time"])
-# df.plot(x="Name", y="run time", kind="bar")
 
 plt.savefig('../plots/boruvka.svg')
 plt.show()

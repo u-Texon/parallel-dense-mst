@@ -10,7 +10,6 @@ find_package(MPI REQUIRED)
 
 add_subdirectory(external/graphs EXCLUDE_FROM_ALL)
 add_subdirectory(external/tlx EXCLUDE_FROM_ALL)
-#TODO add_subdirectory(external/ips4o EXCLUDE_FROM_ALL)
 
 
 add_library(base_target INTERFACE)
@@ -23,9 +22,9 @@ target_link_libraries(timer PRIVATE base_target)
 
 
 add_executable(MST main.cpp)
-target_link_libraries(MST PUBLIC timer base_target graphs kadis tlx)#ips4o)
+target_link_libraries(MST PUBLIC timer base_target graphs kadis tlx)
 
-target_compile_features(MST PRIVATE cxx_std_17)
+target_compile_features(MST PRIVATE cxx_std_20)
 
 
 

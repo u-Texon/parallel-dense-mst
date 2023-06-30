@@ -40,3 +40,7 @@ build/
 #vsCode
 .vscode/
 
+#my repo
+out/files
+out/plots
+
