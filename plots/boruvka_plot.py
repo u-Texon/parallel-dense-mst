@@ -27,5 +27,5 @@ ax.pie(values, autopct='%1.1f%%')
 
 plt.legend(labels, bbox_to_anchor=(1.05, 1.0), loc='upper left')
 
-plt.savefig('../plots/boruvka.svg')
+plt.savefig('../out/plots/boruvka.svg')
 plt.show()

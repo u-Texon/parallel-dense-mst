@@ -4,7 +4,8 @@
 #include "generateGraph.hpp"
 #include "executeAlgorithm.hpp"
 #include "../algorithms/mergeMST.hpp"
-#include "csvWriter.hpp"
+#include "../plots/csvWriter.hpp"
+#include <filesystem>
 
 namespace executor {
     void checkWeights(VId kruskalW, VId algoW, const std::string &algoName) {
@@ -45,7 +46,12 @@ namespace executor {
         if (ctx.rank() == 0) {
             std::cout << std::endl;
 
-            std::string filePath = "out/files/";
+
+            std::string filePath = "out/files";
+            std::filesystem::create_directories(filePath);
+            std::filesystem::create_directory("out/plots");
+            filePath += "/";
+
 
             writer::write_csv(filePath, config, timerOutput);
             std::cout << "results have been written to " << filePath << std::endl;
