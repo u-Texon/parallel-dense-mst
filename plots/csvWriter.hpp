@@ -52,8 +52,10 @@ namespace writer {
     void writeResult(std::string &result, std::ofstream &file, Config &config) {
         hybridMST::mpi::MPIContext ctx;
         file << config.algo << "," << ctx.size() << "," << config.log_m << "," << config.log_n << ","
-             << config.minWeight << ","
-             << config.maxWeight << "," << config.graphType << "," << config.treeFactor << "," << result << std::endl;
+             << config.minWeight << "," << config.maxWeight << "," << config.graphType << "," << config.treeFactor
+             << ","
+             << config.edgesPerProc << "," << config.shuffle << "," << config.useKruskal << ","
+             << result << std::endl;
     }
 
     void write_csv(const std::string &filePath, Config &config, std::string &timerOutput) {
@@ -61,7 +63,7 @@ namespace writer {
 
 
         if (config.algo == "boruvka" && config.onlyThisAlgo) {
-            file.open(filePath + "only-" +  config.algo + ".csv");
+            file.open(filePath + "only-" + config.algo + ".csv");
 
             if (!file.is_open()) {
                 std::cout << "!!! error on opening file " << filePath << " !!!" << std::endl;
@@ -83,7 +85,7 @@ namespace writer {
             std::string result = timerOutput.erase(0, timerOutput.find('=') + 1);
             if (!alreadyExists) {
                 file
-                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,run time"
+                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,run time"
                         << std::endl;
             }
             writeResult(result, file, config);
