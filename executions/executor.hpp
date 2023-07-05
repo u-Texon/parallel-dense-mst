@@ -31,10 +31,10 @@ namespace executor {
         VId n = pow(2, config.log_n);
         hybridMST::Timer timer;
 
-        auto [mst, w] = runAlgorithm(config, n, allEdges, distEdges, timer);
+        auto [mst, algoWeight] = runAlgorithm(config, n, allEdges, distEdges, timer);
         if (ctx.rank() == 0 && config.test) {
             auto [_, kruskalWeight] = runKruskal(n, allEdges);
-            checkWeights(w, kruskalWeight, config.algo);
+            checkWeights(kruskalWeight, algoWeight, config.algo);
         }
 
 

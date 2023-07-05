@@ -81,7 +81,7 @@ struct Config {
 
     friend std::ostream &operator<<(std::ostream &out, const Config &c) {
         return out << "graph " << c.graphType << ", with log_n = " << c.log_n
-                   << " and log_m = " << c.log_m << ". Edges have minWeight = " << c.minWeight << " and maxWeight = "
+                   << " and log_m = " << c.log_m << ". Edges per Processors: " << c.edgesPerProc << ". Edges have minWeight = " << c.minWeight << " and maxWeight = "
                    << c.maxWeight << ". Selected algorithm is " << c.algo << ", treeFactor (or d) = " << c.treeFactor
                    << ". Run test = " << c.test << ". use kruskal = " << c.useKruskal;
     }

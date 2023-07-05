@@ -135,7 +135,7 @@ namespace commandParser {
             return;
         } else {
             if (ctx.rank() == 0) {
-                std::cout << "starting algorithm on " << config << std::endl;
+                std::cout << "starting algorithm on " << config <<  ". number of processors: " << ctx.size() << std::endl;
             }
         }
         executor::executeCommand(config);

@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 boruvka = pd.read_csv('../out/files/boruvka.csv')
 kruskal = pd.read_csv('../out/files/kruskal.csv')
@@ -8,7 +9,11 @@ boruvkaMerge = pd.read_csv('../out/files/boruvkaMerge.csv')
 merge = pd.read_csv('../out/files/merge.csv')
 mixedMerge = pd.read_csv('../out/files/mixedMerge.csv')
 
-procs = [1, 2, 4, 8, 16, 32, 64]
+procSize = 9
+
+
+nums = np.arange(9)
+procs = 2 ** nums
 
 b_times = list(boruvka['run time'])
 k_times = list(kruskal['run time'])
@@ -26,8 +31,8 @@ bm_procs = list(boruvkaMerge['Processors'])
 
 
 def get_average(algo_procs, algo_time):
-    average = [0, 0, 0, 0, 0, 0, 0]
-    count = [0, 0, 0, 0, 0, 0, 0]
+    average = np.zeros(procSize)
+    count = np.zeros(procSize)
 
     for i in range(len(algo_procs)):
         for j in range(len(procs)):
@@ -38,7 +43,7 @@ def get_average(algo_procs, algo_time):
     for i in range(len(average)):
         if count[i] != 0:
             average[i] = average[i] / count[i]
-
+            average[i] = average[i] / 1000
     return average
 
 
@@ -49,17 +54,23 @@ m_avg = get_average(m_procs, m_times)
 mm_avg = get_average(mm_procs, mm_times)
 bm_avg = get_average(bm_procs, bm_times)
 
-plt.plot(procs, b_avg, label='denseBoruvka')
-plt.plot(procs, k_avg, label='kruskal')
-plt.plot(procs, f_avg, label='filter-kruskal')
-plt.plot(procs, m_avg, label='merge-mst')
-plt.plot(procs, mm_avg, label='boruvka-mixed-merge')
-plt.plot(procs, bm_avg, label='boruvka-then-merge')
+fig = plt.figure()
+x = fig.add_subplot()
 
-plt.title('Run times of MST algorithms')
+x.plot(nums, b_avg, label='denseBoruvka', color="blue")
+x.plot(nums, k_avg, label='kruskal', color="gray")
+x.plot(nums, f_avg, label='filter-kruskal', color="brown")
+x.plot(nums, m_avg, label='merge-mst', color="red")
+x.plot(nums, mm_avg, label='boruvka-mixed-merge', color="green")
+x.plot(nums, bm_avg, label='boruvka-then-merge', color="orange")
+
+plt.title('weak scale MST algorithms (2¹⁷ Edges per PE)')
 plt.xlabel('Number of Processors')
-plt.ylabel('execution time [microseconds]')
+plt.ylabel('execution time [milliseconds]')
 plt.legend()
 
-plt.savefig('../out/plots/strong-scale.svg')
+x.xaxis.set_ticks(nums)
+x.xaxis.set_ticklabels(procs)
+
+plt.savefig('../out/plots/weak-scale.svg')
 plt.show()

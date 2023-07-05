@@ -32,10 +32,9 @@ namespace kruskal {
     template<typename Edge>
     inline void getMST(std::span<Edge> &edges, std::vector<Edge> &mst, UnionFind &uf) {
         ips4o::sort(edges.begin(), edges.end(), WeightOrder<Edge>{});
-        std::vector<Edge> mst_edges;
         for (auto &elem: edges) {
             if (uf.find(elem.get_src()) == uf.find(elem.get_dst())) continue;
-            mst_edges.push_back(elem);
+            mst.push_back(elem);
             uf.unify(elem.get_src(), elem.get_dst());
         }
     }
