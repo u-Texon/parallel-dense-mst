@@ -87,7 +87,7 @@ namespace commandParser {
             config.algo = arg.substr(5, arg.length());
             checkAlgo(config.algo);
         } else if (arg.substr(0, 2) == "d=") {
-            VId d = config.maxWeight = std::stoi(arg.substr(2, arg.length()));
+            VId d = std::stoi(arg.substr(2, arg.length()));
             if (d < 2) {
                 throw std::invalid_argument("tree factor needs to be >= 2");
             }
