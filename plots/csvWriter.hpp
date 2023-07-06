@@ -73,7 +73,13 @@ namespace writer {
                  << std::endl;
             writeBoruvkaResults(timerOutput, file);
         } else {
-            std::string fileName = filePath + config.algo + ".csv";
+            std::string fileName = "";
+            if (config.onlyThisAlgo) {
+                fileName = filePath + "only-" + config.algo + ".csv";
+            } else {
+                fileName = filePath + config.algo + ".csv";
+            }
+
             std::ifstream f(fileName);
             bool alreadyExists = f.good();
 

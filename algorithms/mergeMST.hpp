@@ -8,8 +8,13 @@
 namespace mergeMST {
 
 
+
+    size_t log_base(double base, double value) {
+        return std::ceil(log(value) / log(base));
+    }
+
     template<typename Edge>
-    void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n,bool useKruskal, VId treeFactor) {
+    void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n,bool &useKruskal, VId &treeFactor) {
         hybridMST::mpi::MPIContext ctx;
         hybridMST::mpi::TypeMapper<Edge> mapper;
         hybridMST::mpi::TypeMapper<VId> intMapper;
@@ -27,11 +32,14 @@ namespace mergeMST {
                         MPI_Status status;
                         MPI_Recv(&otherMSTsizes[j], 1, intMapper.get_mpi_datatype(), (int) senderID, 0,
                                  ctx.communicator(), &status);
+
+
+
                     }
                 }
             } else {
                 for (int j = 0; j < treeFactor - 1; ++j) {
-                    if (ctx.rank() == loopIndex + (p / treeFactor) + j) {
+                    if (ctx.rank() == loopIndex + (1 + j) * (p / treeFactor)) {
                         MPI_Send(&myMSTsize, 1, intMapper.get_mpi_datatype(), (int) loopIndex, 0, ctx.communicator());
                         break;
                     }
@@ -64,7 +72,7 @@ namespace mergeMST {
                 }
             } else {
                 for (int j = 0; j < treeFactor - 1; ++j) {
-                    if (ctx.rank() == loopIndex + (p / treeFactor) + j) {
+                    if (ctx.rank() == loopIndex + (1 + j) * (p / treeFactor)) {
                         MPI_Send(edges.data(), myMSTsize, mapper.get_mpi_datatype(), loopIndex, 0, ctx.communicator());
                         break;
                     }
@@ -72,6 +80,8 @@ namespace mergeMST {
             }
             loopIndex += p;
         }
+
+
 
         //calculate new mst
         if (ctx.rank() % p == 0) {
@@ -89,6 +99,9 @@ namespace mergeMST {
             }
 
         }
+
+
+
     }
 
     template<typename Edge>
@@ -108,12 +121,18 @@ namespace mergeMST {
 
 
         VId p = treeFactor;
+        size_t c = 0;
+        size_t limit = log_base(treeFactor, ctx.size());
 
-        //TODO: correct loop condition??
-        while (p <= ctx.size() || p / treeFactor < ctx.size()) {
+
+        while (c < limit) {
             mergeStep(mstList, p, uf, n, useKruskal, treeFactor);
+            c++;
             p *= treeFactor;
         }
+
+
+
 
 
         return mstList;
