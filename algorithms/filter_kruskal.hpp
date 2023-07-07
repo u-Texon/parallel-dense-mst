@@ -26,7 +26,7 @@ namespace filterKruskal {
             VId w = rand() % (edges.size());
             w = edges[w].get_weight();
             pivotWeight += w;
-        }
+        } //sample holen, sortieren und mdeian zurückgeben
         return (VId) (pivotWeight / pivotEdgeCount);
     }
 
@@ -35,14 +35,14 @@ namespace filterKruskal {
     }
 
     template<typename Edge>
-    inline void filter(std::span<Edge> &edges, UnionFind &uf) {
-        std::remove_if(edges.begin(), edges.end(), [&](const auto &edge) {
+    inline auto filter(std::span<Edge> edges, UnionFind &uf) {
+        auto it = std::remove_if(edges.begin(), edges.end(), [&](const auto &edge) {
             VId f1 = uf.find(edge.get_src());
             VId f2 = uf.find(edge.get_dst());
             return f1 == f2;
         });
+        return std::span<Edge>{edges.begin(), it};
     }
-
 
     template<typename Edge>
     inline void getMST(VId n, std::span<Edge> &edges, std::vector<Edge> &mst, UnionFind &uf) {
@@ -55,47 +55,31 @@ namespace filterKruskal {
         auto middle = std::partition(edges.begin(), edges.end(), [&](const auto &edge) {
             return edge.get_weight() <= pivotWeight;
         });
-
         std::span<Edge> smaller(edges.begin(), middle);
         std::span<Edge> bigger(middle, edges.end());
-
 
         if (bigger.empty()) { //error prevention for infinite loop
             kruskal::getMST(smaller, mst, uf);
             return;
         }
         filterKruskal::getMST(n, smaller, mst, uf);
-        filter(bigger, uf);
+        bigger = filter(bigger, uf);
         filterKruskal::getMST(n, bigger, mst, uf);
     }
 
+    /**
+     *  initial call to filter kruskal
+     */
     template<typename Edge>
     inline std::vector<Edge> getMST(VId n, std::vector<Edge> &edges, UnionFind &uf) {
-        if (edges.size() <= threshold(n)) {
-            return kruskal::getMST(edges, uf);
-        }
-        VId pivotWeight = pickPivot(edges);
-
-        auto middle = std::partition(edges.begin(), edges.end(), [&](const auto &edge) {
-            return edge.get_weight() <= pivotWeight;
-        });
-
-        std::span<Edge> smaller(edges.begin(), middle);
-        std::span<Edge> bigger(middle, edges.end());
-
-
         std::vector<Edge> mst;
         mst.reserve(n);
+        std::span<Edge> e(edges.begin(), edges.end());
 
-        if (bigger.empty()) { //error prevention for infinite loop
-            kruskal::getMST(smaller, mst, uf);
-            return mst;
-        }
-        filterKruskal::getMST(n, smaller, mst, uf);
-        filter(bigger, uf);
-        filterKruskal::getMST(n, bigger, mst, uf);
-
+        filterKruskal::getMST(n, e , mst, uf);
         return mst;
     }
 
 }
+
+//TODO: mehrere iterationen und die erste weg schmeißen

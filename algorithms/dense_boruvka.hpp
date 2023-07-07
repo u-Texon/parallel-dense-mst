@@ -359,6 +359,10 @@ namespace dense_boruvka {
 
         timer.start("calcLocalMST", 0);
 
+
+        //erst inzidente kanten schicken und dann kruskal
+
+
         if (useKruskal) {
             edges = kruskal::getMST(edges, uf);
         } else {
