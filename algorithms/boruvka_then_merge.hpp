@@ -6,12 +6,7 @@
 #include "dense_boruvka.hpp"
 #include "filter_kruskal.hpp"
 
-
-
 namespace boruvka_then_merge {
-
-
-
 
     inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, bool useKruskal, VId treeFactor = 2) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
@@ -52,6 +47,4 @@ namespace boruvka_then_merge {
 
         return dense_boruvka::getOriginEdges(mst);
     }
-
-
 }

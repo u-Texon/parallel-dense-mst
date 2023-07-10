@@ -24,18 +24,22 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
         }
     }
 
-
-    if (config.algo == "kruskal") {
-        timer.start(config.algo, 0);
+    if (config.algo == "kruskal") { //run algo twice and ignore the first iteration
         UnionFind uf(n);
+        mst = kruskal::getMST(allEdges, uf);
+        uf.clear();
+        timer.start(config.algo, 0);
         mst = kruskal::getMST(allEdges, uf);
         timer.stop(config.algo, 0);
     } else if (config.algo == "filter") {
-        timer.start(config.algo, 0);
         UnionFind uf(n);
+        mst = filterKruskal::getMST(n, allEdges, uf);
+        uf.clear();
+        timer.start(config.algo, 0);
         mst = filterKruskal::getMST(n, allEdges, uf);
         timer.stop(config.algo, 0);
     } else if (config.algo == "boruvka") {
+        mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal);
         if (config.onlyThisAlgo) {
             timer.start(config.algo, 0);
             mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal, timer);
@@ -46,14 +50,17 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
             timer.stop(config.algo, 0);
         }
     } else if (config.algo == "merge") {
+        mst = mergeMST::getMST(n, distEdges, config.useKruskal, config.treeFactor);
         timer.start(config.algo, 0);
         mst = mergeMST::getMST(n, distEdges, config.useKruskal, config.treeFactor);
         timer.stop(config.algo, 0);
     } else if (config.algo == "mixedMerge") {
+        mst = mixed_merge::getMST(n, distOriginEdges, config.treeFactor);
         timer.start(config.algo, 0);
         mst = mixed_merge::getMST(n, distOriginEdges, config.treeFactor);
         timer.stop(config.algo, 0);
     } else if (config.algo == "boruvkaMerge") {
+        mst = boruvka_then_merge::getMST(n, distOriginEdges, config.treeFactor);
         timer.start(config.algo, 0);
         mst = boruvka_then_merge::getMST(n, distOriginEdges, config.treeFactor);
         timer.stop(config.algo, 0);

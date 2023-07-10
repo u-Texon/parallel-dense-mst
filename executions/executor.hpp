@@ -6,6 +6,7 @@
 #include "../algorithms/mergeMST.hpp"
 #include "../plots/csvWriter.hpp"
 #include <filesystem>
+#include "../commands/commandParser.hpp"
 
 namespace executor {
     void checkWeights(VId kruskalW, VId algoW, const std::string &algoName) {
@@ -20,16 +21,10 @@ namespace executor {
     }
 
 
-    void executeCommand(Config &config) {
+    void executeAlgorithm(Config &config, WEdgeList &distEdges,  WEdgeList &allEdges, hybridMST::Timer &timer) {
         hybridMST::mpi::MPIContext ctx;
-        WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
-        WEdgeList allEdges = generateGraph::getAllEdges(distEdges);
-        if (ctx.rank() == 0) {
-            std::cout << "graph has been generated" << std::endl;
-        }
 
         VId n = pow(2, config.log_n);
-        hybridMST::Timer timer;
 
         auto [mst, algoWeight] = runAlgorithm(config, n, allEdges, distEdges, timer);
         if (ctx.rank() == 0 && config.test) {
@@ -55,6 +50,30 @@ namespace executor {
 
             writer::write_csv(filePath, config, timerOutput);
             std::cout << "results have been written to " << filePath << std::endl;
+        }
+    }
+
+    void executeCommand(Config &config) {
+        hybridMST::mpi::MPIContext ctx;
+        WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
+        WEdgeList allEdges = generateGraph::getAllEdges(distEdges);
+        if (ctx.rank() == 0) {
+            std::cout << "graph has been generated" << std::endl;
+        }
+
+
+
+        if (config.algo == "all") {
+            std::vector<std::string> algorithms = {"boruvka", "kruskal", "filter", "mixedMerge", "merge",
+                                                   "boruvkaMerge"};
+            for (const auto& algo: algorithms) {
+                config.algo = algo;
+                hybridMST::Timer timer;
+                executeAlgorithm(config, distEdges, allEdges, timer);
+            }
+        } else {
+            hybridMST::Timer timer;
+            executeAlgorithm(config, distEdges, allEdges, timer);
         }
     }
 }

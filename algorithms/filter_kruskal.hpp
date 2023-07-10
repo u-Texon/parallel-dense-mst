@@ -9,24 +9,13 @@
 namespace filterKruskal {
 
     template<typename Edge>
-    inline VId pickPivot(std::vector<Edge> &edges) {
-        VId pivotWeight = 0;
-        for (int i = 0; i < pivotEdgeCount; ++i) {
-            VId w = rand() % (edges.size());
-            w = edges[w].get_weight();
-            pivotWeight += w;
-        }
-        return (VId) (pivotWeight / pivotEdgeCount);
-    }
-
-    template<typename Edge>
     inline VId pickPivot(std::span<Edge> &edges) {
         VId pivotWeight = 0;
         for (int i = 0; i < pivotEdgeCount; ++i) {
             VId w = rand() % (edges.size());
             w = edges[w].get_weight();
             pivotWeight += w;
-        } //sample holen, sortieren und mdeian zurückgeben
+        } //TODO: sample holen, sortieren und mdeian zurückgeben
         return (VId) (pivotWeight / pivotEdgeCount);
     }
 
@@ -82,4 +71,3 @@ namespace filterKruskal {
 
 }
 
-//TODO: mehrere iterationen und die erste weg schmeißen
