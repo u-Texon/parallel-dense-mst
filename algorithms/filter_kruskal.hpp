@@ -65,7 +65,7 @@ namespace filterKruskal {
         mst.reserve(n);
         std::span<Edge> e(edges.begin(), edges.end());
 
-        filterKruskal::getMST(n, e , mst, uf);
+        filterKruskal::getMST(n, e, mst, uf);
         return mst;
     }
 

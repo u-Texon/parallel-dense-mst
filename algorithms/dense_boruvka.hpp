@@ -291,8 +291,20 @@ namespace dense_boruvka {
 
 
     void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
-                     std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst, size_t hashBorder) {
+                     std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst, size_t hashBorder, size_t localMSTcount, bool useKruskal) {
         hybridMST::mpi::MPIContext ctx;
+
+
+
+        if (localMSTcount > 0) {
+            if (useKruskal) {
+                edges = kruskal::getMST(edges, uf);
+            } else {
+                edges = filterKruskal::getMST(n, edges, uf);
+            }
+        }
+
+
 
         //shrink arrays
         shrink(n, incidentLocal, incident, vertices, parent, uf);
@@ -385,7 +397,7 @@ namespace dense_boruvka {
     }
 
 
-    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, bool useKruskal) {
+    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, bool useKruskal, size_t localMSTcount) {
 
         VId n = vertexCount;
         WEdgeOriginList edges = e;
@@ -398,17 +410,12 @@ namespace dense_boruvka {
 
 
         //TODO: zuerst inzidente kanten schicken, für nebenläufige abarbeitung
-        //TODO: auswählen wie oft in jeder schleife
 
 
-        if (useKruskal) {
-            edges = kruskal::getMST(edges, uf);
-        } else {
-            edges = filterKruskal::getMST(n, edges, uf);
-        }
-
+        size_t counter = localMSTcount;
         while (n > 1) {
-            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000);
+            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000, counter, useKruskal);
+            counter --;
         }
 
         return getOriginEdges(mst);

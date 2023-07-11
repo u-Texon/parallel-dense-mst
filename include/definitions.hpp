@@ -71,6 +71,7 @@ struct Config {
     std::string graphType = "gnm";
     VId treeFactor = 2;
     VId edgesPerProc = 0;
+    VId localMSTcount = 1;
     bool shuffle = false;
     bool useKruskal = false;
     bool test = false;
@@ -83,7 +84,7 @@ struct Config {
         return out << "graph " << c.graphType << ", with log_n = " << c.log_n
                    << " and log_m = " << c.log_m << ". Edges per Processors: " << c.edgesPerProc << ". Edges have minWeight = " << c.minWeight << " and maxWeight = "
                    << c.maxWeight << ". Selected algorithm is " << c.algo << ", treeFactor (or d) = " << c.treeFactor
-                   << ". Run test = " << c.test << ". use kruskal = " << c.useKruskal;
+                   << ". Run test = " << c.test << ". use kruskal = " << c.useKruskal << ", localMSTcount: " << c.localMSTcount;
     }
 };
 

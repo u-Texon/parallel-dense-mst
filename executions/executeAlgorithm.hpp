@@ -39,14 +39,14 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
         mst = filterKruskal::getMST(n, allEdges, uf);
         timer.stop(config.algo, 0);
     } else if (config.algo == "boruvka") {
-        mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal);
+        mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal, config.localMSTcount);
         if (config.onlyThisAlgo) {
             timer.start(config.algo, 0);
             mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal, timer);
             timer.stop(config.algo, 0);
         } else {
             timer.start(config.algo, 0);
-            mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal);
+            mst = dense_boruvka::getMST(n, distOriginEdges, config.useKruskal, config.localMSTcount);
             timer.stop(config.algo, 0);
         }
     } else if (config.algo == "merge") {

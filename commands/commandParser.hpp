@@ -72,7 +72,9 @@ namespace commandParser {
             config.onlyThisAlgo = true;
         } else if (arg.substr(0, 2) == "p=") {
             config.edgesPerProc = std::stoi(arg.substr(2, arg.length()));
-        } else if (arg.substr(0, 2) == "n=") {
+        } else if (arg.substr(0, 2) == "l=") {
+            config.localMSTcount = std::stoi(arg.substr(2, arg.length()));
+        }  else if (arg.substr(0, 2) == "n=") {
             config.log_n = std::stoi(arg.substr(2, arg.length()));
         } else if (arg.substr(0, 2) == "m=") {
             config.log_m = std::stoi(arg.substr(2, arg.length()));
