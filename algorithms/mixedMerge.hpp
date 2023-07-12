@@ -30,18 +30,12 @@ namespace mixed_merge {
         } else {
             edges = filterKruskal::getMST(n, e, uf);
         }
-        localMSTcount --;
 
         VId p = 2;
 
-        hybridMST::Timer t;
-
+        size_t mstCount = localMSTcount;
         while (p <= ctx.size()) {
-            if (ctx.rank() == 0) {
-                std::cout << "edges: " << e.size() << std::endl;
-                std::cout<< "mst: " << mst.size() << std::endl;
-            }
-            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, localMSTcount, t,
+            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, NullTimer::getInstance(),
                                        useKruskal, hashBorder);
             mergeMST::mergeStep(edges, p, uf, n, useKruskal, treeFactor);
             p *= 2;

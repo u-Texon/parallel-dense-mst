@@ -99,10 +99,6 @@ namespace mergeMST {
             }
 
         }
-
-        std::cout << "merge finished" << std::endl;
-
-
     }
 
     template<typename Edge>

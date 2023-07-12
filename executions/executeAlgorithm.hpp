@@ -13,8 +13,6 @@
 
 std::pair<WEdgeList, VId>
 runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, hybridMST::Timer &timer) {
-    hybridMST::mpi::MPIContext ctx;
-
     WEdgeList mst;
     WEdgeOriginList distOriginEdges;
 
@@ -39,12 +37,13 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
         mst = filterKruskal::getMST(n, allEdges, uf);
         timer.stop(config.algo, 0);
     } else if (config.algo == "boruvka") {
-        mst = dense_boruvka::getMST(n, distOriginEdges,  config.localMSTcount, NullTimer::getInstance(), config.useKruskal);
         if (config.onlyThisAlgo) {
+            mst = dense_boruvka::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal);
             timer.start(config.algo, 0);
             mst = dense_boruvka::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal);
             timer.stop(config.algo, 0);
         } else {
+            mst = dense_boruvka::getMST(n, distOriginEdges,  config.localMSTcount, NullTimer::getInstance(), config.useKruskal);
             timer.start(config.algo, 0);
             mst = dense_boruvka::getMST(n, distOriginEdges,  config.localMSTcount, NullTimer::getInstance(), config.useKruskal);
             timer.stop(config.algo, 0);

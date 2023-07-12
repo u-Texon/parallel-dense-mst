@@ -235,19 +235,26 @@ namespace dense_boruvka {
 
     void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst,
-                     size_t &localMSTcount, hybridMST::Timer &timer = NullTimer::getInstance(), bool useKruskal = false, size_t hashBorder = 1000,
+                     size_t &localMSTcount, hybridMST::Timer &timer = NullTimer::getInstance(), bool useKruskal = false,
+                     size_t hashBorder = 1000,
                      size_t iteration = 0) {
 
 
+        hybridMST::mpi::MPIContext ctx;
 
-        if (localMSTcount > 0) {
+
+        /*
+        std::cout << localMSTcount << std::endl;
+        if (localMSTcount > 0) { //TODO: somehow this makes an error
             if (useKruskal) {
                 edges = kruskal::getMST(edges, uf);
             } else {
                 edges = filterKruskal::getMST(n, edges, uf);
             }
-        }
-        localMSTcount--;
+            localMSTcount--;
+        }*/
+
+
 
         shrink(n, incidentLocal, incident, vertices, parent, uf);
         calcMinIncident(n, incidentLocal, edges);
@@ -257,10 +264,18 @@ namespace dense_boruvka {
         allReduce(n, incidentLocal, incident);
         timer.stop("allreduce", iteration);
 
+        if (ctx.rank() == 0) {
+            // std::cout << "mst before: " << mst.size() << ", edges:" << edges.size()  << std::endl;
+        }
 
-        std::cout << "mst before" << mst.size() << ", edges:" << edges.size()  << std::endl;
+
         addMSTEdges(n, mst, incident, edges);
-        std::cout << "mst after" << mst.size() << ", edges:" << edges.size()  << std::endl;
+
+        if (ctx.rank() == 0) {
+            // std::cout << "mst after: " << mst.size() << ", edges:" << edges.size()  << std::endl;
+        }
+
+
         fillParentArray(n, incident, parent);
 
         WEdgeOriginList relabeledEdges;
@@ -290,7 +305,13 @@ namespace dense_boruvka {
         return returnEdges;
     }
 
-    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount,  hybridMST::Timer &timer = NullTimer::getInstance(), bool useKruskal = false, size_t hashBorder = 1000) {
+    template<typename Timer>
+    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount,
+                            Timer &timer, bool useKruskal = false,
+                            size_t hashBorder = 1000) {
+
+
+        hybridMST::mpi::MPIContext ctx;
 
         timer.start("initVariables", 0);
         VId n = vertexCount;
@@ -304,10 +325,11 @@ namespace dense_boruvka {
         timer.stop("initVariables", 0);
 
 
+        size_t mstCount = localMSTcount;
         size_t iteration = 1;
         while (n > 1) {
             timer.start("iteration", iteration);
-            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, localMSTcount, timer, useKruskal,
+            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer, useKruskal,
                         hashBorder, iteration);
             timer.stop("iteration", iteration);
             iteration++;
