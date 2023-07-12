@@ -21,16 +21,13 @@ private:
 
 
 public:
-    //NullTimer(NullTimer const &) = delete;
-    //void operator=(NullTimer const &) = delete;
-
 
     void start(const typename Key::Id &key_id, const typename Key::Count &count) {
-        std::cout << "null start" << std::endl;
+
     };
 
     void stop(const typename Key::Id &key_id, const typename Key::Count &count) {
-        std::cout << "null stop" << std::endl;
+
     };
 
 };

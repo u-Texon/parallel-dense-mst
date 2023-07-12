@@ -21,6 +21,7 @@ namespace mixed_merge {
         std::vector<VId> parent;
         std::vector<VId> vertices;
 
+        size_t mstCount = localMSTcount;
 
         //compute local mst
         UnionFind uf(n);
@@ -30,12 +31,14 @@ namespace mixed_merge {
         } else {
             edges = filterKruskal::getMST(n, e, uf);
         }
+        mstCount--;
 
         VId p = 2;
 
-        size_t mstCount = localMSTcount;
+
         while (p <= ctx.size()) {
-            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, NullTimer::getInstance(),
+            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
+                                       NullTimer::getInstance(),
                                        useKruskal, hashBorder);
             mergeMST::mergeStep(edges, p, uf, n, useKruskal, treeFactor);
             p *= 2;

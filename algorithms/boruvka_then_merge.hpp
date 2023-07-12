@@ -21,6 +21,8 @@ namespace boruvka_then_merge {
         std::vector<VId> vertices;
 
 
+        size_t mstCount = localMSTcount;
+
         //compute local mst
         UnionFind uf(n);
         WEdgeOriginList edges;
@@ -29,14 +31,15 @@ namespace boruvka_then_merge {
         } else {
             edges = filterKruskal::getMST(n, e, uf);
         }
+        mstCount--;
 
 
         VId num = mergeMST::log_base(treeFactor, ctx.size());
         VId border = (VId) (vertexCount / pow(2, num));
 
-        size_t mstCount = localMSTcount;
         while (n >= border) {
-            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, NullTimer::getInstance(),
+            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
+                                       NullTimer::getInstance(),
                                        useKruskal, hashBorder);
         }
 

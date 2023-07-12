@@ -239,24 +239,18 @@ namespace dense_boruvka {
                      size_t hashBorder = 1000,
                      size_t iteration = 0) {
 
+        shrink(n, incidentLocal, incident, vertices, parent, uf);
 
-        hybridMST::mpi::MPIContext ctx;
-
-
-        /*
-        std::cout << localMSTcount << std::endl;
-        if (localMSTcount > 0) { //TODO: somehow this makes an error
+        if (localMSTcount > 0) {
             if (useKruskal) {
                 edges = kruskal::getMST(edges, uf);
             } else {
                 edges = filterKruskal::getMST(n, edges, uf);
             }
             localMSTcount--;
-        }*/
+        }
 
 
-
-        shrink(n, incidentLocal, incident, vertices, parent, uf);
         calcMinIncident(n, incidentLocal, edges);
 
 
@@ -264,16 +258,8 @@ namespace dense_boruvka {
         allReduce(n, incidentLocal, incident);
         timer.stop("allreduce", iteration);
 
-        if (ctx.rank() == 0) {
-            // std::cout << "mst before: " << mst.size() << ", edges:" << edges.size()  << std::endl;
-        }
-
 
         addMSTEdges(n, mst, incident, edges);
-
-        if (ctx.rank() == 0) {
-            // std::cout << "mst after: " << mst.size() << ", edges:" << edges.size()  << std::endl;
-        }
 
 
         fillParentArray(n, incident, parent);
