@@ -15,8 +15,8 @@ namespace writer {
         std::vector<size_t> allreduce;
         std::vector<size_t> iteration;
         std::vector<size_t> removeParallelEdges;
+        std::vector<size_t> calcLocalMST;
         size_t boruvka = 0;
-        size_t calcLocalMST = 0;
         size_t init = 0;
 
         size_t pos = 0;
@@ -29,7 +29,7 @@ namespace writer {
             } else if (token.substr(0, strlen("boruvka")) == "boruvka") {
                 boruvka = std::stoi(token.erase(0, timerOutput.find('=') + 1));
             } else if (token.substr(0, strlen("calcLocalMST")) == "calcLocalMST") {
-                calcLocalMST = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+                calcLocalMST.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
             } else if (token.substr(0, strlen("init")) == "init") {
                 init = std::stoi(token.erase(0, timerOutput.find('=') + 1));
             } else if (token.substr(0, strlen("iter")) == "iter") {
@@ -41,8 +41,12 @@ namespace writer {
             timerOutput.erase(0, pos + delimiter.length());
         }
 
+
         for (int i = 0; i < iteration.size(); ++i) {
-            file << boruvka << "," << init << "," << calcLocalMST << "," << iteration[i] << "," << allreduce[i] << ","
+            if (i >= calcLocalMST.size()) {
+                calcLocalMST.push_back(0);
+            }
+            file << boruvka << "," << init << "," << calcLocalMST[i] << "," << iteration[i] << "," << allreduce[i] << ","
                  << removeParallelEdges[i] << std::endl;
         }
 

@@ -3,7 +3,7 @@
 #include "../include/mpi/context.hpp"
 #include "../include/definitions.hpp"
 #include "mergeMST.hpp"
-#include "dense_boruvka.hpp"
+#include "boruvka_allreduce.hpp"
 #include "filter_kruskal.hpp"
 
 namespace boruvka_then_merge {
@@ -38,9 +38,9 @@ namespace boruvka_then_merge {
         VId border = (VId) (vertexCount / pow(2, num));
 
         while (n >= border) {
-            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                       NullTimer::getInstance(),
-                                       useKruskal, hashBorder);
+            boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
+                                           NullTimer::getInstance(),
+                                           useKruskal, hashBorder);
         }
 
         edges = mergeMST::getMST(n, edges, useKruskal, treeFactor);
@@ -52,6 +52,6 @@ namespace boruvka_then_merge {
             }
         }
 
-        return dense_boruvka::getOriginEdges(mst);
+        return boruvka_allreduce::getOriginEdges(mst);
     }
 }

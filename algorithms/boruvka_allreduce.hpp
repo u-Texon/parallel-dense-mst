@@ -8,7 +8,7 @@
 #include "ips4o.hpp"
 #include "../include/util/NullTimer.hpp"
 
-namespace dense_boruvka {
+namespace boruvka_allreduce {
 
 
     /**
@@ -242,13 +242,16 @@ namespace dense_boruvka {
         shrink(n, incidentLocal, incident, vertices, parent, uf);
 
         if (localMSTcount > 0) {
+            timer.start("calcLocalMST", iteration);
             if (useKruskal) {
                 edges = kruskal::getMST(edges, uf);
             } else {
                 edges = filterKruskal::getMST(n, edges, uf);
             }
             localMSTcount--;
+            timer.stop("calcLocalMST", iteration);
         }
+
 
 
         calcMinIncident(n, incidentLocal, edges);
@@ -296,9 +299,6 @@ namespace dense_boruvka {
                             Timer &timer, bool useKruskal = false,
                             size_t hashBorder = 1000) {
 
-
-        hybridMST::mpi::MPIContext ctx;
-
         timer.start("initVariables", 0);
         VId n = vertexCount;
         WEdgeOriginList edges = e;
@@ -308,11 +308,12 @@ namespace dense_boruvka {
         std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
         UnionFind uf(n);
         std::vector<VId> vertices;
+        size_t mstCount = localMSTcount;
+        size_t iteration = 1;
         timer.stop("initVariables", 0);
 
 
-        size_t mstCount = localMSTcount;
-        size_t iteration = 1;
+
         while (n > 1) {
             timer.start("iteration", iteration);
             boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer, useKruskal,

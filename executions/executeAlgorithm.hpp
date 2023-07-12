@@ -6,7 +6,7 @@
 #include "../include/definitions.hpp"
 #include "../algorithms/filter_kruskal.hpp"
 #include "../algorithms/mergeMST.hpp"
-#include "../algorithms/dense_boruvka.hpp"
+#include "../algorithms/boruvka_allreduce.hpp"
 #include "../algorithms/mixedMerge.hpp"
 #include "../algorithms/boruvka_then_merge.hpp"
 
@@ -38,16 +38,16 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
         timer.stop(config.algo, 0);
     } else if (config.algo == "boruvka") {
         if (config.onlyThisAlgo) {
-            mst = dense_boruvka::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal);
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal);
             timer.start(config.algo, 0);
-            mst = dense_boruvka::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal);
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal);
             timer.stop(config.algo, 0);
         } else {
-            mst = dense_boruvka::getMST(n, distOriginEdges, config.localMSTcount, NullTimer::getInstance(),
-                                        config.useKruskal);
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, NullTimer::getInstance(),
+                                            config.useKruskal);
             timer.start(config.algo, 0);
-            mst = dense_boruvka::getMST(n, distOriginEdges, config.localMSTcount, NullTimer::getInstance(),
-                                        config.useKruskal);
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, NullTimer::getInstance(),
+                                            config.useKruskal);
             timer.stop(config.algo, 0);
         }
     } else if (config.algo == "merge") {
