@@ -100,6 +100,7 @@ namespace mergeMST {
 
         }
 
+        std::cout << "merge finished" << std::endl;
 
 
     }

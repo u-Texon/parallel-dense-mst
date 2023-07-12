@@ -8,7 +8,9 @@
 
 namespace boruvka_then_merge {
 
-    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, bool useKruskal, VId treeFactor = 2, size_t localMSTcount = 1) {
+    inline WEdgeList
+    getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, bool useKruskal = false, VId treeFactor = 2,
+           size_t hashBorder = 1000) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
         VId n = vertexCount;
@@ -23,7 +25,7 @@ namespace boruvka_then_merge {
         UnionFind uf(n);
         WEdgeOriginList edges;
         if (useKruskal) {
-             edges = kruskal::getMST(e, uf);
+            edges = kruskal::getMST(e, uf);
         } else {
             edges = filterKruskal::getMST(n, e, uf);
         }
@@ -33,7 +35,8 @@ namespace boruvka_then_merge {
         VId border = (VId) (vertexCount / pow(2, num));
 
         while (n >= border) {
-            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, 1000, useKruskal, localMSTcount);
+            dense_boruvka::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, localMSTcount, NullTimer::getInstance(),
+                                       useKruskal, hashBorder);
         }
 
         edges = mergeMST::getMST(n, edges, useKruskal, treeFactor);

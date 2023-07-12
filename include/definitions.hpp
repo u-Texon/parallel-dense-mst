@@ -71,7 +71,7 @@ struct Config {
     std::string graphType = "gnm";
     VId treeFactor = 2;
     VId edgesPerProc = 0;
-    VId localMSTcount = 1;
+    size_t localMSTcount = 1;
     bool shuffle = false;
     bool useKruskal = false;
     bool test = false;
@@ -98,3 +98,19 @@ bool operator==(const WEdgeOrigin &a, const WEdgeOrigin &b) {
 }
 
 using WEdgeOriginList = std::vector<WEdgeOrigin>;
+
+template<typename EdgeType>
+struct SrcDstWeightOrder {
+    bool operator()(const EdgeType &l, const EdgeType &r) const {
+        return l.get_src() < r.get_src()
+               || l.get_src() == r.get_src() && l.get_dst() < r.get_dst()
+               || l.get_src() == r.get_src() && l.get_dst() == r.get_dst() && l.get_weight() < r.get_weight();
+    }
+};
+
+template<typename EdgeType>
+struct WeightOrder {
+    bool operator()(const EdgeType &l, const EdgeType &r) const {
+        return l.get_weight() < r.get_weight();
+    }
+};
