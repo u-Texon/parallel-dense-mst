@@ -13,8 +13,8 @@ namespace mergeMST {
         return std::ceil(log(value) / log(base));
     }
 
-    template<typename Edge>
-    void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n,bool &useKruskal, VId &treeFactor) {
+    template<typename Edge, typename Timer>
+    void mergeStep(std::vector<Edge> &edges, VId &p, UnionFind &uf, VId &n,bool &useKruskal, Timer &timer, VId &treeFactor, size_t iteration = 0) {
         hybridMST::mpi::MPIContext ctx;
         hybridMST::mpi::TypeMapper<Edge> mapper;
         hybridMST::mpi::TypeMapper<VId> intMapper;
@@ -24,6 +24,7 @@ namespace mergeMST {
         otherMSTsizes.resize(treeFactor - 1);
 
         VId loopIndex = 0;
+        timer.start("sendMST", iteration);
         while (loopIndex < ctx.size()) {   // send local mst size to other processor
             if (ctx.rank() == loopIndex) {
                 for (int j = 0; j < treeFactor - 1; ++j) {
@@ -58,7 +59,6 @@ namespace mergeMST {
             otherMSTs[j] = mst;
         }
 
-
         loopIndex = 0;
         while (loopIndex < ctx.size()) {   // send local mst to other processor
             if (ctx.rank() == loopIndex) {
@@ -81,8 +81,9 @@ namespace mergeMST {
             loopIndex += p;
         }
 
+        timer.stop("sendMST", iteration);
 
-
+        timer.start("localMST", iteration);
         //calculate new mst
         if (ctx.rank() % p == 0) {
             for (auto other: otherMSTs) {
@@ -97,16 +98,17 @@ namespace mergeMST {
             } else {
                 edges = filterKruskal::getMST(n, edges, uf);
             }
-
         }
+        timer.stop("localMST", iteration);
     }
 
-    template<typename Edge>
-    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges, bool &useKruskal, VId treeFactor = 2) {
+    template<typename Edge, typename Timer>
+    inline std::vector<Edge> getMST(VId &n, std::vector<Edge> &edges, bool &useKruskal, Timer &timer, VId treeFactor = 2) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
 
 
         // calculate local MST
+        timer.start("initial-localMST", 0);
         UnionFind uf(n);
         std::vector<Edge> mstList;
         if (useKruskal) {
@@ -114,18 +116,20 @@ namespace mergeMST {
         } else {
             mstList = filterKruskal::getMST(n, edges, uf);
         }
+        timer.stop("initial-localMST", 0);
 
 
 
         VId p = treeFactor;
-        size_t c = 0;
+        size_t iteration = 0;
         size_t limit = log_base(treeFactor, ctx.size());
-
-
-        while (c < limit) {
-            mergeStep(mstList, p, uf, n, useKruskal, treeFactor);
-            c++;
+        while (iteration < limit) {
+            timer.start("iteration", iteration);
+            mergeStep(mstList, p, uf, n, useKruskal, timer, treeFactor, iteration);
+            timer.stop("iteration", iteration);
+            iteration++;
             p *= treeFactor;
+
         }
 
 

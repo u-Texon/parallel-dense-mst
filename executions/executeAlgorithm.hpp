@@ -51,10 +51,19 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
             timer.stop(config.algo, 0);
         }
     } else if (config.algo == "merge") {
-        mst = mergeMST::getMST(n, distEdges, config.useKruskal, config.treeFactor);
-        timer.start(config.algo, 0);
-        mst = mergeMST::getMST(n, distEdges, config.useKruskal, config.treeFactor);
-        timer.stop(config.algo, 0);
+        if (config.onlyThisAlgo) {
+            mst = mergeMST::getMST(n, distEdges, config.useKruskal, timer, config.treeFactor);
+            timer.start(config.algo, 0);
+            mst = mergeMST::getMST(n, distEdges, config.useKruskal, timer, config.treeFactor);
+            timer.stop(config.algo, 0);
+        } else {
+            mst = mergeMST::getMST(n, distEdges, config.useKruskal, NullTimer::getInstance(), config.treeFactor);
+            timer.start(config.algo, 0);
+            mst = mergeMST::getMST(n, distEdges, config.useKruskal, NullTimer::getInstance(), config.treeFactor);
+            timer.stop(config.algo, 0);
+        }
+
+
     } else if (config.algo == "mixedMerge") {
         //mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, config.useKruskal, config.treeFactor);
         timer.start(config.algo, 0);

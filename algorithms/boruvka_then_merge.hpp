@@ -43,7 +43,7 @@ namespace boruvka_then_merge {
                                            useKruskal, hashBorder);
         }
 
-        edges = mergeMST::getMST(n, edges, useKruskal, treeFactor);
+        edges = mergeMST::getMST(n, edges, useKruskal,NullTimer::getInstance(), treeFactor);
 
 
         if (ctx.rank() == 0) {
