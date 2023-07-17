@@ -7,6 +7,7 @@
 #include "kruskal.hpp"
 #include "ips4o.hpp"
 #include "../include/util/NullTimer.hpp"
+#include <thread>
 
 namespace boruvka_allreduce {
 
@@ -224,7 +225,7 @@ namespace boruvka_allreduce {
     }
 
 
-    void allReduce(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident) {
+    void allReduce(VId n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident) {
         hybridMST::mpi::MPIContext ctx;
         hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
         MPI_Op reduce;
@@ -233,13 +234,64 @@ namespace boruvka_allreduce {
                       ctx.communicator());
     }
 
+
+    void localMST(VId n, WEdgeOriginList &edges, bool useKruskal, size_t &localMSTcount, UnionFind &uf) {
+        if (localMSTcount > 0) {
+            if (useKruskal) {
+                edges = kruskal::getMST(edges, uf);
+            } else {
+                edges = filterKruskal::getMST(n, edges, uf);
+            }
+            localMSTcount--;
+        }
+    }
+
+
+    void
+    boruvkaStepThread(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
+                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst,
+                      size_t &localMSTcount, hybridMST::Timer &timer = NullTimer::getInstance(),
+                      bool useKruskal = false,
+                      size_t hashBorder = 1000,
+                      size_t iteration = 0) {
+
+        shrink(n, incidentLocal, incident, vertices, parent, uf);
+
+
+        calcMinIncident(n, incidentLocal, edges);
+
+
+        std::thread threadAllReduce(allReduce, n, std::ref(incidentLocal), std::ref(incident));
+        std::thread threadLocalMST(localMST, n, std::ref(edges), useKruskal, std::ref(localMSTcount), std::ref(uf));
+
+        threadAllReduce.join();
+        threadLocalMST.join();
+
+        addMSTEdges(n, mst, incident, edges);
+        fillParentArray(n, incident, parent);
+
+        WEdgeOriginList relabeledEdges;
+        relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
+
+
+        if (relabeledEdges.size() > hashBorder) {
+            removeParallelEdgesHashing(relabeledEdges);
+        } else {
+            removeParallelEdges(relabeledEdges);
+        }
+
+        edges = relabeledEdges;
+    }
+
     void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst,
                      size_t &localMSTcount, hybridMST::Timer &timer = NullTimer::getInstance(), bool useKruskal = false,
                      size_t hashBorder = 1000,
                      size_t iteration = 0) {
 
+        timer.start("shrink", iteration);
         shrink(n, incidentLocal, incident, vertices, parent, uf);
+        timer.stop("shrink", iteration);
 
         if (localMSTcount > 0) {
             timer.start("calcLocalMST", iteration);
@@ -253,8 +305,9 @@ namespace boruvka_allreduce {
         }
 
 
-
+        timer.start("calc-incident", iteration);
         calcMinIncident(n, incidentLocal, edges);
+        timer.stop("calc-incident", iteration);
 
 
         timer.start("allreduce", iteration);
@@ -262,13 +315,15 @@ namespace boruvka_allreduce {
         timer.stop("allreduce", iteration);
 
 
+        timer.start("parentArray", iteration);
         addMSTEdges(n, mst, incident, edges);
-
-
         fillParentArray(n, incident, parent);
+        timer.stop("parentArray", iteration);
 
+        timer.start("relabel", iteration);
         WEdgeOriginList relabeledEdges;
         relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
+        timer.stop("relabel", iteration);
 
 
         timer.start("removeParallelEdges", iteration);
@@ -278,7 +333,6 @@ namespace boruvka_allreduce {
         } else {
             removeParallelEdges(relabeledEdges);
         }
-
         timer.stop("removeParallelEdges", iteration);
 
         edges = relabeledEdges;
@@ -296,7 +350,7 @@ namespace boruvka_allreduce {
 
     template<typename Timer>
     inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount,
-                            Timer &timer, bool useKruskal = false,
+                            Timer &timer, bool useThreads = false, bool useKruskal = false,
                             size_t hashBorder = 1000) {
 
         timer.start("initVariables", 0);
@@ -313,11 +367,15 @@ namespace boruvka_allreduce {
         timer.stop("initVariables", 0);
 
 
-
         while (n > 1) {
             timer.start("iteration", iteration);
-            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer, useKruskal,
-                        hashBorder, iteration);
+            if (useThreads) {
+                boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer,
+                                  useKruskal, hashBorder, iteration);
+            } else {
+                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer, useKruskal,
+                            hashBorder, iteration);
+            }
             timer.stop("iteration", iteration);
             iteration++;
         }

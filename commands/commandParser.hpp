@@ -66,7 +66,9 @@ namespace commandParser {
             config.useKruskal = true;
         } else if (arg == "s") {
             config.shuffle = true;
-        }  else if (arg == "t") {
+        } else if (arg == "thread") {
+            config.boruvkaThread = true;
+        } else if (arg == "t") {
             config.test = true;
         } else if (arg == "o") {
             config.onlyThisAlgo = true;
@@ -74,7 +76,7 @@ namespace commandParser {
             config.edgesPerProc = std::stoi(arg.substr(2, arg.length()));
         } else if (arg.substr(0, 2) == "l=") {
             config.localMSTcount = std::stoi(arg.substr(2, arg.length()));
-        }  else if (arg.substr(0, 2) == "n=") {
+        } else if (arg.substr(0, 2) == "n=") {
             config.log_n = std::stoi(arg.substr(2, arg.length()));
         } else if (arg.substr(0, 2) == "m=") {
             config.log_m = std::stoi(arg.substr(2, arg.length()));
@@ -137,7 +139,8 @@ namespace commandParser {
             return;
         } else {
             if (ctx.rank() == 0) {
-                std::cout << "starting algorithm on " << config <<  ". number of processors: " << ctx.size() << std::endl;
+                std::cout << "starting algorithm on " << config << ". number of processors: " << ctx.size()
+                          << std::endl;
             }
         }
         executor::executeCommand(config);

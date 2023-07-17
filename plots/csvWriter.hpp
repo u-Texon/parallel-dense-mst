@@ -9,7 +9,6 @@
 namespace writer {
 
 
-
     void writeMergeResults(std::string &timerOutput, std::ofstream &file) {
         std::string delimiter = " ";
 
@@ -41,7 +40,8 @@ namespace writer {
 
 
         for (int i = 0; i < iteration.size(); ++i) {
-            file << runTime << "," << initialMST << "," << calcLocalMST[i] << "," << iteration[i] << "," << sendRecv[i] << std::endl;
+            file << runTime << "," << initialMST << "," << calcLocalMST[i] << "," << iteration[i] << "," << sendRecv[i]
+                 << std::endl;
         }
 
     }
@@ -54,6 +54,10 @@ namespace writer {
         std::vector<size_t> iteration;
         std::vector<size_t> removeParallelEdges;
         std::vector<size_t> calcLocalMST;
+        std::vector<size_t> shrink;
+        std::vector<size_t> parentArray;
+        std::vector<size_t> calcIncident;
+        std::vector<size_t> relabel;
         size_t boruvka = 0;
         size_t init = 0;
 
@@ -66,6 +70,14 @@ namespace writer {
                 allreduce.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
             } else if (token.substr(0, strlen("boruvka")) == "boruvka") {
                 boruvka = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+            } else if (token.substr(0, strlen("shrink")) == "shrink") {
+                shrink.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("calc-incident")) == "calc-incident") {
+                calcIncident.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("relabel")) == "relabel") {
+                relabel.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("parentArray")) == "parentArray") {
+                parentArray.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
             } else if (token.substr(0, strlen("calcLocalMST")) == "calcLocalMST") {
                 calcLocalMST.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
             } else if (token.substr(0, strlen("init")) == "init") {
@@ -84,8 +96,10 @@ namespace writer {
             if (i >= calcLocalMST.size()) {
                 calcLocalMST.push_back(0);
             }
-            file << boruvka << "," << init << "," << calcLocalMST[i] << "," << iteration[i] << "," << allreduce[i] << ","
-                 << removeParallelEdges[i] << std::endl;
+            file << boruvka << "," << init << "," << calcLocalMST[i] << "," << iteration[i] << "," << allreduce[i]
+                 << ","
+                 << removeParallelEdges[i] << "," << shrink[i] << "," << calcIncident[i] << "," << parentArray[i] << ","
+                 << relabel[i] << std::endl;
         }
 
     }
@@ -97,7 +111,7 @@ namespace writer {
              << config.minWeight << "," << config.maxWeight << "," << config.graphType << "," << config.treeFactor
              << ","
              << config.edgesPerProc << "," << config.shuffle << "," << config.useKruskal << ","
-             << result << std::endl;
+             << result << "," << config.boruvkaThread << std::endl;
     }
 
     void write_csv(const std::string &filePath, Config &config, std::string &timerOutput) {
@@ -111,8 +125,9 @@ namespace writer {
                 std::cout << "!!! error on opening file " << filePath << " !!!" << std::endl;
             }
 
-            file << "run time,init variables,calculate local MST,iteration,allreduce,remove parallel edges"
-                 << std::endl;
+            file
+                    << "run time,init variables,calculate local MST,iteration,allreduce,remove parallel edges,shrink,calc-incident,parentArray,relabel"
+                    << std::endl;
             writeBoruvkaResults(timerOutput, file);
         } else if (config.algo == "merge" && config.onlyThisAlgo) {
             file.open(filePath + "only-" + config.algo + ".csv");
@@ -143,7 +158,7 @@ namespace writer {
             std::string result = timerOutput.erase(0, timerOutput.find('=') + 1);
             if (!alreadyExists) {
                 file
-                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,run time"
+                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,run time,boruvkaThread"
                         << std::endl;
             }
             writeResult(result, file, config);

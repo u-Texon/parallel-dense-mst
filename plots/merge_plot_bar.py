@@ -21,7 +21,7 @@ plt.bar(range(1, size + 1), localMST, color="blue")
 plt.bar(range(1, size + 1), sendRecv, bottom=localMST, color="red")
 plt.bar(range(1, size + 1), rest, bottom=sendRecv + localMST, color="green")
 
-plt.legend(["calculate local MST", "send/receive MST", "rest"])
+plt.legend(["calculate initial local MST","calculate local MST", "send/receive MST", "rest"])
 
 plt.xlabel("Merge Step")
 plt.ylabel("Total Run Time [microseconds]")
