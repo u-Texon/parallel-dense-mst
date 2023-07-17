@@ -7,7 +7,7 @@
 namespace commandParser {
 
     static std::vector<std::string> algorithms = {"boruvka", "kruskal", "filter", "mixedMerge", "merge",
-                                                  "boruvkaMerge", "all"};
+                                                  "boruvkaMerge", "all", "allParallel"};
     static std::vector<std::string> graphTypes = {"rhg", "gnm", "rhgNumEdges"};
 
     void printHelpInfo() {

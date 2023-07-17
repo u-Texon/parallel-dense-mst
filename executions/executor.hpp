@@ -21,7 +21,7 @@ namespace executor {
     }
 
 
-    void executeAlgorithm(Config &config, WEdgeList &distEdges,  WEdgeList &allEdges, hybridMST::Timer &timer) {
+    void executeAlgorithm(Config &config, WEdgeList &distEdges, WEdgeList &allEdges, hybridMST::Timer &timer) {
         hybridMST::mpi::MPIContext ctx;
 
         VId n = pow(2, config.log_n);
@@ -31,7 +31,6 @@ namespace executor {
             auto [_, kruskalWeight] = runKruskal(n, allEdges);
             checkWeights(kruskalWeight, algoWeight, config.algo);
         }
-
 
 
         std::cout << timer.output();
@@ -56,17 +55,23 @@ namespace executor {
     void executeCommand(Config &config) {
         hybridMST::mpi::MPIContext ctx;
         WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
-        WEdgeList allEdges = generateGraph::getAllEdges(distEdges);
+        WEdgeList allEdges = distEdges;
+
+        if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter") {
+            allEdges = generateGraph::getAllEdges(distEdges);
+        }
         if (ctx.rank() == 0) {
             std::cout << "graph has been generated" << std::endl;
         }
 
 
-
-        if (config.algo == "all") {
-            std::vector<std::string> algorithms = {"boruvka", "kruskal", "filter", "mixedMerge", "merge",
-                                                   "boruvkaMerge"};
-            for (const auto& algo: algorithms) {
+        if (config.algo == "all" || config.algo == "allParallel") {
+            std::vector<std::string> algorithms = {"boruvka", "mixedMerge", "merge", "boruvkaMerge"};
+            if (config.algo == "all") {
+                algorithms.push_back("kruskal");
+                algorithms.push_back("filter");
+            }
+            for (const auto &algo: algorithms) {
                 config.algo = algo;
                 hybridMST::Timer timer;
                 executeAlgorithm(config, distEdges, allEdges, timer);
