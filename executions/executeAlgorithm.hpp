@@ -11,6 +11,22 @@
 #include "../algorithms/boruvka_then_merge.hpp"
 
 
+
+void makeBoxplot(Config &config, VId &n, WEdgeList &distEdges, std::vector<size_t> &numEdges,
+                 std::vector<size_t> &numVertices) {
+    WEdgeOriginList distOriginEdges;
+
+    if (config.algo == "boruvka" || config.algo == "mixedMerge" || config.algo == "boruvkaMerge") {
+        for (auto &edge: distEdges) {
+            distOriginEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
+        }
+    }
+
+    if (config.algo == "boruvka") {
+        boruvka_allreduce::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices, config.boruvkaThread, config.useKruskal);
+    }
+}
+
 std::pair<WEdgeList, VId>
 runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, hybridMST::Timer &timer) {
     WEdgeList mst;
@@ -65,7 +81,7 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
 
 
     } else if (config.algo == "mixedMerge") {
-        //mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, config.useKruskal, config.treeFactor);
+        mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, config.useKruskal, config.treeFactor);
         timer.start(config.algo, 0);
         mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, config.useKruskal, config.treeFactor);
         timer.stop(config.algo, 0);

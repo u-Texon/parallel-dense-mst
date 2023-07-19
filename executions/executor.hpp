@@ -7,6 +7,7 @@
 #include "../plots/csvWriter.hpp"
 #include <filesystem>
 #include "../commands/commandParser.hpp"
+#include "../plots/csvBoxplotWriter.hpp"
 
 namespace executor {
     void checkWeights(VId kruskalW, VId algoW, const std::string &algoName) {
@@ -25,6 +26,7 @@ namespace executor {
         hybridMST::mpi::MPIContext ctx;
 
         VId n = pow(2, config.log_n);
+
 
         auto [mst, algoWeight] = runAlgorithm(config, n, allEdges, distEdges, timer);
         if (ctx.rank() == 0 && config.test) {
@@ -57,7 +59,7 @@ namespace executor {
         WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
         WEdgeList allEdges = distEdges;
 
-        if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter") {
+        if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter" || config.test) {
             allEdges = generateGraph::getAllEdges(distEdges);
         }
         if (ctx.rank() == 0) {
@@ -65,6 +67,8 @@ namespace executor {
         }
 
 
+        std::vector<size_t> numEdges;
+        std::vector<size_t> numVertices;
         if (config.algo == "all" || config.algo == "allParallel") {
             std::vector<std::string> algorithms = {"boruvka", "mixedMerge", "merge", "boruvkaMerge"};
             if (config.algo == "all") {
@@ -74,11 +78,34 @@ namespace executor {
             for (const auto &algo: algorithms) {
                 config.algo = algo;
                 hybridMST::Timer timer;
-                executeAlgorithm(config, distEdges, allEdges, timer);
+                if (config.boxplot) {
+                    VId n  = pow(2, config.log_n);
+                    makeBoxplot(config, n, distEdges, numEdges, numVertices);
+                } else {
+                    executeAlgorithm(config, distEdges, allEdges, timer);
+                };
             }
         } else {
             hybridMST::Timer timer;
-            executeAlgorithm(config, distEdges, allEdges, timer);
+            if (config.boxplot) {
+                VId n = pow(2, config.log_n);
+                makeBoxplot(config, n, distEdges, numEdges, numVertices);
+            } else {
+                executeAlgorithm(config, distEdges, allEdges, timer);
+            }
+        }
+
+        if (config.boxplot) {
+            std::string filePath = "out/files";
+            std::filesystem::create_directories(filePath);
+            std::filesystem::create_directory("out/plots");
+            filePath += "/";
+
+            writer::writeBoxplot(filePath, config, numEdges, numVertices);
+
+            if (ctx.rank() == 0) {
+                std::cout << "results have been written to " << filePath << std::endl;
+            }
         }
     }
 }

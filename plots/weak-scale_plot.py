@@ -69,7 +69,7 @@ x.plot(nums, m_avg, label='merge-mst', color="red")
 x.plot(nums, mm_avg, label='boruvka-mixed-merge', color="green")
 x.plot(nums, bm_avg, label='boruvka-then-merge', color="orange")
 
-plt.title('weak scale MST algorithms (2¹⁷ Edges per PE)')
+plt.title('weak scale MST algorithms')
 plt.xlabel('Number of Processors')
 plt.ylabel('execution time [milliseconds]')
 plt.legend()

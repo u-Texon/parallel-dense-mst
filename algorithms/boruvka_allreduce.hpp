@@ -366,6 +366,7 @@ namespace boruvka_allreduce {
         size_t iteration = 1;
         timer.stop("initVariables", 0);
 
+        hybridMST::mpi::MPIContext ctx;
 
         while (n > 1) {
             timer.start("iteration", iteration);
@@ -383,5 +384,42 @@ namespace boruvka_allreduce {
         return getOriginEdges(mst);
 
     }
+
+    inline WEdgeList
+    getBoxplot(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
+               std::vector<size_t> &numVertices, bool useThreads = false, bool useKruskal = false,
+               size_t hashBorder = 1000) {
+
+        VId n = vertexCount;
+        WEdgeOriginList edges = e;
+        WEdgeOriginList mst;
+        WEdgeOriginList incidentLocal;
+        WEdgeOriginList incident; //keeps the lightest incidentLocal edges. relabeledEdges.g. incidentLocal[4] is the lightest edge incidentLocal to vertex 4
+        std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
+        UnionFind uf(n);
+        std::vector<VId> vertices;
+        size_t mstCount = localMSTcount;
+        size_t iteration = 1;
+
+
+        while (n > 1) {
+            numEdges.push_back(edges.size());
+            numVertices.push_back(n);
+            if (useThreads) {
+                boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
+                                  NullTimer::getInstance(),
+                                  useKruskal, hashBorder, iteration);
+            } else {
+                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
+                            NullTimer::getInstance(), useKruskal,
+                            hashBorder, iteration);
+            }
+            iteration++;
+        }
+
+        return getOriginEdges(mst);
+
+    }
+
 
 } //namespace

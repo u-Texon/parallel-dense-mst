@@ -64,6 +64,8 @@ namespace commandParser {
             config.help = true;
         } else if (arg == "k") {
             config.useKruskal = true;
+        } else if (arg == "b") {
+            config.boxplot = true;
         } else if (arg == "s") {
             config.shuffle = true;
         } else if (arg == "thread") {
