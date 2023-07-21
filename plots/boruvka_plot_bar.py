@@ -17,20 +17,24 @@ rest = []
 
 size = len(iterations)
 for i in range(size):
-    rest.append(iterations[i] - allreduce[i] - parallelEdges[i] - localMST[i] - shrink[i] - calcIncident[i] - parentArray[i] - relabel[i])
+    rest.append(
+        iterations[i] - allreduce[i] - parallelEdges[i] - localMST[i] - shrink[i] - calcIncident[i] - parentArray[i] -
+        relabel[i])
 
-
-plt.bar(range(size), shrink)
+plt.bar(range(size), shrink, color="cyan")
 plt.bar(range(size), localMST, bottom=shrink, color="blue")
-plt.bar(range(size), calcIncident, bottom=shrink + localMST)
-plt.bar(range(size), allreduce, bottom=localMST + shrink+ calcIncident, color="red")
-plt.bar(range(size), parentArray, bottom=shrink + localMST + calcIncident + allreduce)
-plt.bar(range(size), relabel, bottom=parentArray + shrink + localMST + calcIncident + allreduce)
+plt.bar(range(size), calcIncident, bottom=shrink + localMST, color="purple")
+plt.bar(range(size), allreduce, bottom=localMST + shrink + calcIncident, color="red")
+plt.bar(range(size), parentArray, bottom=shrink + localMST + calcIncident + allreduce, color="orange")
+plt.bar(range(size), relabel, bottom=parentArray + shrink + localMST + calcIncident + allreduce, color="brown")
+plt.bar(range(size), parallelEdges, bottom=parentArray + shrink + localMST + calcIncident + allreduce + relabel,
+        color="gray")
+plt.bar(range(size), rest, bottom=parallelEdges + parentArray + shrink + localMST + calcIncident + allreduce + relabel,
+        color="green")
 
-plt.bar(range(size), parallelEdges, bottom=parentArray + shrink + localMST + calcIncident + allreduce + relabel, color="orange")
-plt.bar(range(size), rest, bottom=parallelEdges + parentArray + shrink + localMST + calcIncident + allreduce + relabel ,color="green")
-
-plt.legend(["shrink old arrays", "calculate local MST", "calculate incident edges", "allreduce", "calculate parent array", "relabel" ,"remove parallel edges", "rest"])
+plt.legend(
+    ["shrink old arrays", "calculate local MST", "calculate incident edges", "allreduce", "calculate parent array",
+     "relabel", "remove parallel edges", "rest"])
 
 plt.xlabel("Boruvka Round")
 plt.ylabel("Total Run Time [microseconds]")

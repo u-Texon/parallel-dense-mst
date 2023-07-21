@@ -16,7 +16,7 @@ size = len(iterations)
 for i in range(size):
     rest.append(iterations[i] - sendRecv[i] - localMST[i])
 
-plt.bar(0, initialMST, color="brown")
+plt.bar(0, initialMST, color="orange")
 plt.bar(range(1, size + 1), localMST, color="blue")
 plt.bar(range(1, size + 1), sendRecv, bottom=localMST, color="red")
 plt.bar(range(1, size + 1), rest, bottom=sendRecv + localMST, color="green")

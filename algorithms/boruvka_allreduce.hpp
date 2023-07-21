@@ -69,10 +69,12 @@ namespace boruvka_allreduce {
                 }
             }
         }
+
         //continue with the edges that are not (yet) added to the mst
-        std::remove_if(edges.begin(), edges.end(), [&](const auto &edge) {
+        edges.erase(std::remove_if(edges.begin(), edges.end(), [&](const auto &edge) {
             return edge == incident[edge.get_src()] || edge == incident[edge.get_dst()];
-        });
+        }), edges.end());
+
     }
 
 

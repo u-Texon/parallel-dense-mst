@@ -8,8 +8,3 @@
 module load slurm_setup
 
 mpirun -np $SLURM_NTASKS ./build/MST algo=kruskal p=17 n=20 t
-mpirun -np $SLURM_NTASKS ./build/MST algo=filter p=17 n=20 t
-mpirun -np $SLURM_NTASKS ./build/MST algo=merge p=17 n=20 t
-mpirun -np $SLURM_NTASKS ./build/MST algo=boruvka p=17 n=20 t
-mpirun -np $SLURM_NTASKS ./build/MST algo=mixedMerge p=17 n=20 t
-mpirun -np $SLURM_NTASKS ./build/MST algo=boruvkaMerge p=17 n=20 t
