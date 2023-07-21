@@ -34,14 +34,12 @@ namespace mixed_merge {
         mstCount--;
 
 
-
         VId p = treeFactor;
         size_t iteration = 0;
         size_t limit = mergeMST::log_base(treeFactor, ctx.size());
         while (iteration < limit) {
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           NullTimer::getInstance(),
-                                           useKruskal, hashBorder);
+                                           NullTimer::getInstance(), useKruskal, hashBorder);
             mergeMST::mergeStep(edges, p, uf, n, useKruskal, NullTimer::getInstance(), treeFactor);
             iteration++;
             p *= treeFactor;

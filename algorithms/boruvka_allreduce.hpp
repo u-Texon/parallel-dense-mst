@@ -316,9 +316,11 @@ namespace boruvka_allreduce {
         allReduce(n, incidentLocal, incident);
         timer.stop("allreduce", iteration);
 
-
+        hybridMST::mpi::MPIContext ctx;
         timer.start("parentArray", iteration);
-        addMSTEdges(n, mst, incident, edges);
+        if (ctx.rank() == 0) {
+            addMSTEdges(n, mst, incident, edges);
+        }
         fillParentArray(n, incident, parent);
         timer.stop("parentArray", iteration);
 
@@ -367,8 +369,6 @@ namespace boruvka_allreduce {
         size_t mstCount = localMSTcount;
         size_t iteration = 1;
         timer.stop("initVariables", 0);
-
-        hybridMST::mpi::MPIContext ctx;
 
         while (n > 1) {
             timer.start("iteration", iteration);

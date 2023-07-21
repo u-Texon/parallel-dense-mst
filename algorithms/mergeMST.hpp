@@ -98,6 +98,8 @@ namespace mergeMST {
             } else {
                 edges = filterKruskal::getMST(n, edges, uf);
             }
+        } else {
+            edges.clear();
         }
         timer.stop("localMST", iteration);
     }
@@ -119,7 +121,6 @@ namespace mergeMST {
         timer.stop("initial-localMST", 0);
 
 
-
         VId p = treeFactor;
         size_t iteration = 0;
         size_t limit = log_base(treeFactor, ctx.size());
@@ -129,13 +130,7 @@ namespace mergeMST {
             timer.stop("iteration", iteration);
             iteration++;
             p *= treeFactor;
-
         }
-
-
-
-
-
         return mstList;
     }
 
