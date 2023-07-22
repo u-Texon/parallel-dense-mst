@@ -64,7 +64,7 @@ x = fig.add_subplot()
 
 #x.plot(nums, k_avg, label='kruskal', color="gray")
 #x.plot(nums, f_avg, label='filter-kruskal', color="brown")
-x.plot(nums, b_avg, label='denseBoruvka', color="blue")
+x.plot(nums, b_avg, label='Boruvka Allreduce', color="blue")
 x.plot(nums, m_avg, label='merge-mst', color="red")
 x.plot(nums, mm_avg, label='boruvka-mixed-merge', color="green")
 x.plot(nums, bm_avg, label='boruvka-then-merge', color="orange")

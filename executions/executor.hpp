@@ -72,8 +72,8 @@ namespace executor {
         if (config.algo == "all" || config.algo == "allParallel") {
             std::vector<std::string> algorithms = {"boruvka", "mixedMerge", "merge", "boruvkaMerge"};
             if (config.algo == "all") {
-                algorithms.push_back("kruskal");
-                algorithms.push_back("filter");
+                algorithms.emplace_back("kruskal");
+                algorithms.emplace_back("filter");
             }
             for (const auto &algo: algorithms) {
                 config.algo = algo;
@@ -83,7 +83,7 @@ namespace executor {
                     makeBoxplot(config, n, distEdges, numEdges, numVertices);
                 } else {
                     executeAlgorithm(config, distEdges, allEdges, timer);
-                };
+                }
             }
         } else {
             hybridMST::Timer timer;

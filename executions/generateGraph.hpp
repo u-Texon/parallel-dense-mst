@@ -66,6 +66,10 @@ namespace generateGraph {
         } else if (config.graphType == "rhgNumEdges") {
             auto [edges, vertex_range] = graphs::get_rhg_explicit_num_edges(config.log_n, numEdges, 3.0, weights);
             distEdges = edges;
+        } else if (config.graphType == "rgg2D") {
+          //  auto [edges, vertex_range] = graphs::get_rgg2D(config.log_n, numEdges, weights);
+          //  std::cout << edges.size() << std::endl;
+          //  distEdges = edges;
         }
 
 

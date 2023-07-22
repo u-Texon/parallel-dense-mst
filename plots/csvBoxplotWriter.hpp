@@ -23,7 +23,7 @@ namespace writer {
             if (!file.is_open()) {
                 std::cout << "!!! error on opening file " << fileName << " !!!" << std::endl;
             }
-            file << "Algorithm,Processor Number,Iteration,numVertices,NumEdges" << std::endl;
+            file << "Algorithm,Processor Number,Iteration,NumEdges,numVertices" << std::endl;
         }
         ctx.barrier();
 
@@ -34,10 +34,16 @@ namespace writer {
             }
         }
 
-
-        for (int i = 0; i < numVertices.size(); ++i) {
-            file << config.algo << "," << ctx.rank() << "," << i << "," << numVertices[i] << "," << numEdges[i]
-                 << std::endl;
+        if (numVertices.empty()) {
+            for (int i = 0; i < numEdges.size(); ++i) {
+                file << config.algo << "," << ctx.rank() << "," << i << "," << numEdges[i] << "," << 0
+                     << std::endl;
+            }
+        } else {
+            for (int i = 0; i < numEdges.size(); ++i) {
+                file << config.algo << "," << ctx.rank() << "," << i << "," << numEdges[i] << "," << numVertices[i]
+                     << std::endl;
+            }
         }
 
 

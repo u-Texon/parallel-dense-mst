@@ -49,7 +49,7 @@ m_avg = get_average(m_procs, m_times)
 mm_avg = get_average(mm_procs, mm_times)
 bm_avg = get_average(bm_procs, bm_times)
 
-plt.plot(procs, b_avg, label='denseBoruvka')
+plt.plot(procs, b_avg, label='Boruvka allreduce')
 plt.plot(procs, k_avg, label='kruskal')
 plt.plot(procs, f_avg, label='filter-kruskal')
 plt.plot(procs, m_avg, label='merge-mst')
