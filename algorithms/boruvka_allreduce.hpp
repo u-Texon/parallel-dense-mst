@@ -404,9 +404,9 @@ namespace boruvka_allreduce {
         size_t iteration = 1;
 
 
+        numEdges.push_back(edges.size());
+        numVertices.push_back(n);
         while (n > 1) {
-            numEdges.push_back(edges.size());
-            numVertices.push_back(n);
             if (useThreads) {
                 boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
                                   NullTimer::getInstance(),
@@ -417,7 +417,11 @@ namespace boruvka_allreduce {
                             hashBorder, iteration);
             }
             iteration++;
+            numEdges.push_back(edges.size());
+            numVertices.push_back(n);
         }
+
+
 
         return getOriginEdges(mst);
 

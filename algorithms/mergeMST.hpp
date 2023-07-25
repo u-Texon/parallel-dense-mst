@@ -141,6 +141,9 @@ namespace mergeMST {
     getBoxplot(VId &n, std::vector<Edge> &edges, std::vector<size_t> &numEdges, bool &useKruskal, VId treeFactor = 2) {
         hybridMST::mpi::MPIContext ctx;
 
+
+        numEdges.push_back(edges.size());
+
         UnionFind uf(n);
         std::vector<Edge> mstList;
         if (useKruskal) {
@@ -148,16 +151,17 @@ namespace mergeMST {
         } else {
             mstList = filterKruskal::getMST(n, edges, uf);
         }
+        numEdges.push_back(mstList.size());
 
 
         VId p = treeFactor;
         size_t iteration = 0;
         size_t limit = log_base(treeFactor, ctx.size());
         while (iteration < limit) {
-            numEdges.push_back(edges.size());
             mergeStep(mstList, p, uf, n, useKruskal, NullTimer::getInstance(), treeFactor, iteration);
             iteration++;
             p *= treeFactor;
+            numEdges.push_back(mstList.size());
         }
         return mstList;
     }

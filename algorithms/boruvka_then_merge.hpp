@@ -43,7 +43,7 @@ namespace boruvka_then_merge {
                                            useKruskal, hashBorder);
         }
 
-        edges = mergeMST::getMST(n, edges, useKruskal,NullTimer::getInstance(), treeFactor);
+        edges = mergeMST::getMST(n, edges, useKruskal, NullTimer::getInstance(), treeFactor);
 
 
         if (ctx.rank() == 0) {
@@ -57,7 +57,7 @@ namespace boruvka_then_merge {
 
     void getBoxplot(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
                     std::vector<size_t> &numVertices, bool useKruskal = false, VId treeFactor = 2,
-                size_t hashBorder = 1000) {
+                    size_t hashBorder = 1000) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
         VId n = vertexCount;
@@ -87,17 +87,17 @@ namespace boruvka_then_merge {
         VId num = mergeMST::log_base(treeFactor, ctx.size());
         VId border = (VId) (vertexCount / pow(2, num));
 
-        while (n >= border) {
-            numVertices.push_back(n);
-            numEdges.push_back(edges.size());
-            boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           NullTimer::getInstance(),
-                                           useKruskal, hashBorder);
-        }
 
         numVertices.push_back(n);
         numEdges.push_back(edges.size());
-        edges = mergeMST::getMST(n, edges, useKruskal,NullTimer::getInstance(), treeFactor);
+
+        while (n >= border) {
+            boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
+                                           NullTimer::getInstance(), useKruskal, hashBorder);
+            numVertices.push_back(n);
+            numEdges.push_back(edges.size());
+        }
+        edges = mergeMST::getBoxplot(n, edges, numEdges, useKruskal, treeFactor);
 
 
         if (ctx.rank() == 0) {

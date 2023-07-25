@@ -83,17 +83,21 @@ namespace mixed_merge {
             edges = filterKruskal::getMST(n, e, uf);
         }
         mstCount--;
+        numVertices.push_back(n);
+        numEdges.push_back(edges.size());
 
 
         VId p = treeFactor;
         size_t iteration = 0;
         size_t limit = mergeMST::log_base(treeFactor, ctx.size());
         while (iteration < limit) {
-            numVertices.push_back(n);
-            numEdges.push_back(edges.size());
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
                                            NullTimer::getInstance(), useKruskal, hashBorder);
+            numVertices.push_back(n);
+            numEdges.push_back(edges.size());
             mergeMST::mergeStep(edges, p, uf, n, useKruskal, NullTimer::getInstance(), treeFactor);
+            numVertices.push_back(n);
+            numEdges.push_back(edges.size());
             iteration++;
             p *= treeFactor;
         }

@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/boruvka_boxplot.csv')
+boruvka = pd.read_csv('../out/files/boruvkaMerge_boxplot.csv')
 
 iterations = np.array(list(boruvka['Iteration']))
 numVertices = np.array(list(boruvka['numVertices']))
@@ -24,21 +24,21 @@ for i in range(sizeIt):
         if iterations[j] == i:
             if procs[j] == 0:
                 vertices.append(numVertices[j])
-            edgesProc.append(numEdges[i])
+            edgesProc.append(numVertices[i])
     edges.append(edgesProc)
 
 p[0].boxplot(edges)
-p[0].set_title('Edges per Boruvkastep')
+p[0].set_title('Edges per BoruvkaThenMerge-step')
 p[0].set_ylabel("Edges")
 p[0].set_xlabel("Iteration")
 p[0].set_xticklabels(range(sizeIt))
 
 p[1].bar(range(sizeIt), vertices)
-p[1].set_title('Vertices per Boruvkastep')
+p[1].set_title('Vertices per BoruvkaThenMerge-step')
 p[1].set_xlabel("Iteration")
 p[1].set_ylabel("Vertices")
 p[1].xaxis.set_ticks(range(sizeIt))
 
 
-plt.savefig('../out/plots/boruvka_box.svg')
+plt.savefig('../out/plots/boruvkaMerge_box.svg')
 plt.show()

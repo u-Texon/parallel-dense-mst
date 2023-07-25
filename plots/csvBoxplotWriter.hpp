@@ -34,20 +34,21 @@ namespace writer {
             }
         }
 
-        if (numVertices.empty()) {
-            for (int i = 0; i < numEdges.size(); ++i) {
+
+        for (int i = 0; i < numEdges.size(); ++i) {
+            if (i >= numVertices.size()) {
                 file << config.algo << "," << ctx.rank() << "," << i << "," << numEdges[i] << "," << 0
                      << std::endl;
-            }
-        } else {
-            for (int i = 0; i < numEdges.size(); ++i) {
+
+            } else {
+
                 file << config.algo << "," << ctx.rank() << "," << i << "," << numEdges[i] << "," << numVertices[i]
                      << std::endl;
             }
         }
 
 
+        }
+
+
     }
-
-
-}
