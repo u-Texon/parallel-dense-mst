@@ -71,9 +71,6 @@ namespace mixed_merge {
 
         size_t mstCount = localMSTcount;
 
-        numVertices.push_back(n);
-        numEdges.push_back(e.size());
-
         //compute local mst
         UnionFind uf(n);
         WEdgeOriginList edges;

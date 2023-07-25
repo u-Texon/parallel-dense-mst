@@ -14,19 +14,26 @@ fig, p = plt.subplots(1)
 fig.tight_layout(pad=5.0)
 
 edges = []
+labels = []
 
 for i in range(sizeIt):
+    if i == 0:
+        labels.append("Start")
+    elif i == 1:
+        labels.append("Local MST")
+    else:
+        labels.append("Merge-Step " + str(i - 1))
+
     edgesProc = []
     for j in range(len(iterations)):
         if iterations[j] == i:
-            edgesProc.append(numEdges[i])
+            edgesProc.append(numEdges[j])
     edges.append(edgesProc)
 
 p.boxplot(edges)
 p.set_title('Edges per Mergestep')
 p.set_ylabel("Edges")
-p.set_xlabel("Iteration, where Iteration 0 is the initial local MST")
-p.set_xticklabels(range(sizeIt))
+p.set_xticklabels(labels)
 
 plt.savefig('../out/plots/merge_box.svg')
 plt.show()

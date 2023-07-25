@@ -12,8 +12,8 @@
 
 
 
-void makeBoxplot(Config &config, VId &n, WEdgeList &distEdges, std::vector<size_t> &numEdges,
-                 std::vector<size_t> &numVertices) {
+void runBoxplot(Config &config, VId &n, WEdgeList &distEdges, std::vector<size_t> &numEdges,
+                std::vector<size_t> &numVertices) {
     WEdgeOriginList distOriginEdges;
 
     if (config.algo == "boruvka" || config.algo == "mixedMerge" || config.algo == "boruvkaMerge") {
@@ -22,10 +22,13 @@ void makeBoxplot(Config &config, VId &n, WEdgeList &distEdges, std::vector<size_
         }
     }
 
+    numVertices.push_back(n);
+    numEdges.push_back(distEdges.size());
+
     if (config.algo == "boruvka") {
         boruvka_allreduce::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices, config.boruvkaThread, config.useKruskal);
     } else if (config.algo == "merge") {
-        mergeMST::getBoxplot(n, distEdges, numEdges, config.useKruskal, config.treeFactor);
+        mergeMST::getBoxplot(n, distEdges, numEdges, numVertices, config.useKruskal, config.treeFactor);
     } else if (config.algo == "mixedMerge") {
         mixed_merge::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices, config.useKruskal, config.treeFactor);
     } else if (config.algo == "boruvkaMerge") {

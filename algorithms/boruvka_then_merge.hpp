@@ -70,9 +70,6 @@ namespace boruvka_then_merge {
 
         size_t mstCount = localMSTcount;
 
-        numVertices.push_back(n);
-        numEdges.push_back(e.size());
-
         //compute local mst
         UnionFind uf(n);
         WEdgeOriginList edges;
@@ -97,7 +94,7 @@ namespace boruvka_then_merge {
             numVertices.push_back(n);
             numEdges.push_back(edges.size());
         }
-        edges = mergeMST::getBoxplot(n, edges, numEdges, useKruskal, treeFactor);
+        edges = mergeMST::getBoxplot(n, edges, numEdges, numVertices, useKruskal, treeFactor);
 
 
         if (ctx.rank() == 0) {

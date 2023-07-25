@@ -54,6 +54,28 @@ namespace executor {
         }
     }
 
+    void makeBoxplot(Config &config, WEdgeList &distEdges) {
+        hybridMST::mpi::MPIContext ctx;
+        std::vector<size_t> numEdges;
+        std::vector<size_t> numVertices;
+
+
+        VId n  = pow(2, config.log_n);
+        runBoxplot(config, n, distEdges, numEdges, numVertices);
+
+        std::string filePath = "out/files";
+        std::filesystem::create_directories(filePath);
+        std::filesystem::create_directory("out/plots");
+        filePath += "/";
+
+        writer::writeBoxplot(filePath, config, numEdges, numVertices);
+
+        if (ctx.rank() == 0) {
+            std::cout << "results have been written to " << filePath << std::endl;
+        }
+
+    }
+
     void executeCommand(Config &config) {
         hybridMST::mpi::MPIContext ctx;
         WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
@@ -67,8 +89,7 @@ namespace executor {
         }
 
 
-        std::vector<size_t> numEdges;
-        std::vector<size_t> numVertices;
+
         if (config.algo == "all" || config.algo == "allParallel") {
             std::vector<std::string> algorithms = {"boruvka", "mixedMerge", "merge", "boruvkaMerge"};
             if (config.algo == "all") {
@@ -79,8 +100,7 @@ namespace executor {
                 config.algo = algo;
                 hybridMST::Timer timer;
                 if (config.boxplot) {
-                    VId n  = pow(2, config.log_n);
-                    makeBoxplot(config, n, distEdges, numEdges, numVertices);
+                    makeBoxplot(config, distEdges);
                 } else {
                     executeAlgorithm(config, distEdges, allEdges, timer);
                 }
@@ -88,23 +108,9 @@ namespace executor {
         } else {
             hybridMST::Timer timer;
             if (config.boxplot) {
-                VId n = pow(2, config.log_n);
-                makeBoxplot(config, n, distEdges, numEdges, numVertices);
+                makeBoxplot(config, distEdges);
             } else {
                 executeAlgorithm(config, distEdges, allEdges, timer);
-            }
-        }
-
-        if (config.boxplot) {
-            std::string filePath = "out/files";
-            std::filesystem::create_directories(filePath);
-            std::filesystem::create_directory("out/plots");
-            filePath += "/";
-
-            writer::writeBoxplot(filePath, config, numEdges, numVertices);
-
-            if (ctx.rank() == 0) {
-                std::cout << "results have been written to " << filePath << std::endl;
             }
         }
     }
