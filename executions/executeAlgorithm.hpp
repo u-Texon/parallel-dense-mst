@@ -11,7 +11,6 @@
 #include "../algorithms/boruvka_then_merge.hpp"
 
 
-
 void runBoxplot(Config &config, VId &n, WEdgeList &distEdges, std::vector<size_t> &numEdges,
                 std::vector<size_t> &numVertices) {
     WEdgeOriginList distOriginEdges;
@@ -26,13 +25,16 @@ void runBoxplot(Config &config, VId &n, WEdgeList &distEdges, std::vector<size_t
     numEdges.push_back(distEdges.size());
 
     if (config.algo == "boruvka") {
-        boruvka_allreduce::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices, config.boruvkaThread, config.useKruskal);
+        boruvka_allreduce::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices,
+                                      config.boruvkaThread, config.useKruskal);
     } else if (config.algo == "merge") {
         mergeMST::getBoxplot(n, distEdges, numEdges, numVertices, config.useKruskal, config.treeFactor);
     } else if (config.algo == "mixedMerge") {
-        mixed_merge::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices, config.useKruskal, config.treeFactor);
+        mixed_merge::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices, config.useKruskal,
+                                config.treeFactor);
     } else if (config.algo == "boruvkaMerge") {
-        boruvka_then_merge::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices, config.useKruskal, config.treeFactor);
+        boruvka_then_merge::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices,
+                                       config.useKruskal, config.treeFactor);
     }
 }
 
@@ -40,6 +42,7 @@ std::pair<WEdgeList, VId>
 runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, hybridMST::Timer &timer) {
     WEdgeList mst;
     WEdgeOriginList distOriginEdges;
+    NullTimer nullTimer = NullTimer();
 
     if (config.algo == "boruvka" || config.algo == "mixedMerge" || config.algo == "boruvkaMerge") {
         for (auto &edge: distEdges) {
@@ -68,10 +71,10 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
             mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal);
             timer.stop(config.algo, 0);
         } else {
-            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, NullTimer::getInstance(),
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, nullTimer,
                                             config.useKruskal);
             timer.start(config.algo, 0);
-            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, NullTimer::getInstance(),
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, nullTimer,
                                             config.useKruskal);
             timer.stop(config.algo, 0);
         }
@@ -82,25 +85,48 @@ runAlgorithm(Config &config, VId &n, WEdgeList &allEdges, WEdgeList &distEdges, 
             mst = mergeMST::getMST(n, distEdges, config.useKruskal, timer, config.treeFactor);
             timer.stop(config.algo, 0);
         } else {
-            mst = mergeMST::getMST(n, distEdges, config.useKruskal, NullTimer::getInstance(), config.treeFactor);
+            mst = mergeMST::getMST(n, distEdges, config.useKruskal, nullTimer, config.treeFactor);
             timer.start(config.algo, 0);
-            mst = mergeMST::getMST(n, distEdges, config.useKruskal, NullTimer::getInstance(), config.treeFactor);
+            mst = mergeMST::getMST(n, distEdges, config.useKruskal, nullTimer, config.treeFactor);
             timer.stop(config.algo, 0);
         }
 
 
     } else if (config.algo == "mixedMerge") {
-        mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, config.useKruskal, config.treeFactor);
-        timer.start(config.algo, 0);
-        mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, config.useKruskal, config.treeFactor);
-        timer.stop(config.algo, 0);
+        if (config.onlyThisAlgo) {
+            mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal,
+                                      config.treeFactor);
+            timer.start(config.algo, 0);
+            mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal,
+                                      config.treeFactor);
+            timer.stop(config.algo, 0);
+        } else {
+            mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, nullTimer, config.useKruskal,
+                                      config.treeFactor);
+            timer.start(config.algo, 0);
+            mst = mixed_merge::getMST(n, distOriginEdges, config.localMSTcount, nullTimer, config.useKruskal,
+                                      config.treeFactor);
+            timer.stop(config.algo, 0);
+        }
+
+
     } else if (config.algo == "boruvkaMerge") {
-        mst = boruvka_then_merge::getMST(n, distOriginEdges, config.localMSTcount, config.useKruskal,
-                                         config.treeFactor);
-        timer.start(config.algo, 0);
-        mst = boruvka_then_merge::getMST(n, distOriginEdges, config.localMSTcount, config.useKruskal,
-                                         config.treeFactor);
-        timer.stop(config.algo, 0);
+        if (config.onlyThisAlgo) {
+            mst = boruvka_then_merge::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal,
+                                             config.treeFactor);
+            timer.start(config.algo, 0);
+            mst = boruvka_then_merge::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal,
+                                             config.treeFactor);
+            timer.stop(config.algo, 0);
+        } else {
+            mst = boruvka_then_merge::getMST(n, distOriginEdges, config.localMSTcount, nullTimer, config.useKruskal,
+                                             config.treeFactor);
+            timer.start(config.algo, 0);
+            mst = boruvka_then_merge::getMST(n, distOriginEdges, config.localMSTcount, nullTimer, config.useKruskal,
+                                             config.treeFactor);
+            timer.stop(config.algo, 0);
+        }
+
     }
 
     VId weight = 0;

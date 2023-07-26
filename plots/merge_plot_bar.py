@@ -12,19 +12,26 @@ sendRecv = np.array(list(merge['send/receive MST']))
 
 rest = []
 
+labels = ["initial local MST"]
+
 size = len(iterations)
 for i in range(size):
+    labels.append("Merge-Step " + str(i + 1))
     rest.append(iterations[i] - sendRecv[i] - localMST[i])
 
-plt.bar(0, initialMST, color="orange")
-plt.bar(range(1, size + 1), localMST, color="blue")
-plt.bar(range(1, size + 1), sendRecv, bottom=localMST, color="red")
-plt.bar(range(1, size + 1), rest, bottom=sendRecv + localMST, color="green")
+fig, p = plt.subplots(1)
+fig.tight_layout(pad=5.0)
 
-plt.legend(["calculate initial local MST","calculate local MST", "send/receive MST", "rest"])
+p.bar(0, initialMST, color="orange")
+p.bar(range(1, size + 1), localMST, color="blue")
+p.bar(range(1, size + 1), sendRecv, bottom=localMST, color="red")
+p.bar(range(1, size + 1), rest, bottom=sendRecv + localMST, color="green")
 
-plt.xlabel("Merge Step")
-plt.ylabel("Total Run Time [microseconds]")
+p.legend(["calculate initial local MST", "calculate local MST", "send/receive MST", "rest"])
+
+p.set_ylabel("Total Run Time [microseconds]")
+p.set_xticks(range(size + 1))
+p.set_xticklabels(labels)
 
 plt.savefig('../out/plots/merge_bar.svg')
 plt.show()

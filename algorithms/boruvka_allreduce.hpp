@@ -248,13 +248,11 @@ namespace boruvka_allreduce {
         }
     }
 
-
+    template<typename Timer>
     void
     boruvkaStepThread(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
                       std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst,
-                      size_t &localMSTcount, hybridMST::Timer &timer = NullTimer::getInstance(),
-                      bool useKruskal = false,
-                      size_t hashBorder = 1000,
+                      size_t &localMSTcount, Timer &timer, bool useKruskal = false, size_t hashBorder = 1000,
                       size_t iteration = 0) {
 
         shrink(n, incidentLocal, incident, vertices, parent, uf);
@@ -285,9 +283,10 @@ namespace boruvka_allreduce {
         edges = relabeledEdges;
     }
 
+    template<typename Timer>
     void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst,
-                     size_t &localMSTcount, hybridMST::Timer &timer = NullTimer::getInstance(), bool useKruskal = false,
+                     size_t &localMSTcount, Timer &timer, bool useKruskal = false,
                      size_t hashBorder = 1000,
                      size_t iteration = 0) {
 
@@ -403,21 +402,21 @@ namespace boruvka_allreduce {
         size_t mstCount = localMSTcount;
         size_t iteration = 1;
 
+        NullTimer nullTimer = NullTimer();
         while (n > 1) {
             if (useThreads) {
                 boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                  NullTimer::getInstance(),
+                                  nullTimer,
                                   useKruskal, hashBorder, iteration);
             } else {
                 boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                            NullTimer::getInstance(), useKruskal,
+                            nullTimer, useKruskal,
                             hashBorder, iteration);
             }
             iteration++;
             numEdges.push_back(edges.size());
             numVertices.push_back(n);
         }
-
 
 
         return getOriginEdges(mst);

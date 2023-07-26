@@ -9,8 +9,9 @@
 
 namespace mixed_merge {
 
+    template<typename Timer>
     inline WEdgeList
-    getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, bool useKruskal = false, VId treeFactor = 2,
+    getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, Timer &timer, bool useKruskal = false, VId treeFactor = 2,
            size_t hashBorder = 1000) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
@@ -39,8 +40,8 @@ namespace mixed_merge {
         size_t limit = mergeMST::log_base(treeFactor, ctx.size());
         while (iteration < limit) {
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           NullTimer::getInstance(), useKruskal, hashBorder);
-            mergeMST::mergeStep(edges, p, uf, n, useKruskal, NullTimer::getInstance(), treeFactor);
+                                           timer, useKruskal, hashBorder, iteration);
+            mergeMST::mergeStep(edges, p, uf, n, useKruskal, timer, treeFactor, iteration);
             iteration++;
             p *= treeFactor;
         }
@@ -53,6 +54,7 @@ namespace mixed_merge {
 
         return boruvka_allreduce::getOriginEdges(mst);
     }
+
 
 
     inline WEdgeList
@@ -84,15 +86,16 @@ namespace mixed_merge {
         numEdges.push_back(edges.size());
 
 
+        NullTimer nullTimer = NullTimer();
         VId p = treeFactor;
         size_t iteration = 0;
         size_t limit = mergeMST::log_base(treeFactor, ctx.size());
         while (iteration < limit) {
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           NullTimer::getInstance(), useKruskal, hashBorder);
+                                           nullTimer, useKruskal, hashBorder);
             numVertices.push_back(n);
             numEdges.push_back(edges.size());
-            mergeMST::mergeStep(edges, p, uf, n, useKruskal, NullTimer::getInstance(), treeFactor);
+            mergeMST::mergeStep(edges, p, uf, n, useKruskal, nullTimer, treeFactor);
             numVertices.push_back(n);
             numEdges.push_back(edges.size());
             iteration++;

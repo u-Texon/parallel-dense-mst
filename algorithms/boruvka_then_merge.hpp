@@ -8,9 +8,10 @@
 
 namespace boruvka_then_merge {
 
+    template<typename Timer>
     inline WEdgeList
-    getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, bool useKruskal = false, VId treeFactor = 2,
-           size_t hashBorder = 1000) {
+    getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, Timer &timer, bool useKruskal = false,
+           VId treeFactor = 2, size_t hashBorder = 1000) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
         VId n = vertexCount;
@@ -37,13 +38,13 @@ namespace boruvka_then_merge {
         VId num = mergeMST::log_base(treeFactor, ctx.size());
         VId border = (VId) (vertexCount / pow(2, num));
 
+        size_t iteration = 0;
         while (n >= border) {
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           NullTimer::getInstance(),
-                                           useKruskal, hashBorder);
+                                           timer, useKruskal, hashBorder, iteration);
         }
 
-        edges = mergeMST::getMST(n, edges, useKruskal, NullTimer::getInstance(), treeFactor);
+        edges = mergeMST::getMST(n, edges, useKruskal, timer, treeFactor);
 
 
         if (ctx.rank() == 0) {
@@ -55,6 +56,9 @@ namespace boruvka_then_merge {
         return boruvka_allreduce::getOriginEdges(mst);
     }
 
+    /**
+     * only used for creating box plots
+     */
     void getBoxplot(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
                     std::vector<size_t> &numVertices, bool useKruskal = false, VId treeFactor = 2,
                     size_t hashBorder = 1000) {
@@ -87,10 +91,12 @@ namespace boruvka_then_merge {
 
         numVertices.push_back(n);
         numEdges.push_back(edges.size());
+        NullTimer nullTimer = NullTimer();
+
 
         while (n >= border) {
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           NullTimer::getInstance(), useKruskal, hashBorder);
+                                           nullTimer, useKruskal, hashBorder);
             numVertices.push_back(n);
             numEdges.push_back(edges.size());
         }

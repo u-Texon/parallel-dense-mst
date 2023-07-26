@@ -31,7 +31,7 @@ for i in range(sizeIt):
     edges.append(edgesProc)
 
 p.boxplot(edges)
-p.set_title('Edges per Mergestep')
+p.set_title('Edges per Merge-Step')
 p.set_ylabel("Edges")
 p.set_xticklabels(labels)
 

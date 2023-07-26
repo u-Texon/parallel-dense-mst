@@ -151,11 +151,12 @@ namespace mergeMST {
         numEdges.push_back(mstList.size());
 
 
+        NullTimer nullTimer = NullTimer();
         VId p = treeFactor;
         size_t iteration = 0;
         size_t limit = log_base(treeFactor, ctx.size());
         while (iteration < limit) {
-            mergeStep(mstList, p, uf, n, useKruskal, NullTimer::getInstance(), treeFactor, iteration);
+            mergeStep(mstList, p, uf, n, useKruskal, nullTimer, treeFactor, iteration);
             iteration++;
             p *= treeFactor;
             numEdges.push_back(mstList.size());
