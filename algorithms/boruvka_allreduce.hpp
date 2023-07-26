@@ -295,14 +295,14 @@ namespace boruvka_allreduce {
         timer.stop("shrink", iteration);
 
         if (localMSTcount > 0) {
-            timer.start("calcLocalMST", iteration);
+            timer.start("b-calcLocalMST", iteration);
             if (useKruskal) {
                 edges = kruskal::getMST(edges, uf);
             } else {
                 edges = filterKruskal::getMST(n, edges, uf);
             }
             localMSTcount--;
-            timer.stop("calcLocalMST", iteration);
+            timer.stop("b-calcLocalMST", iteration);
         }
 
 
@@ -370,7 +370,7 @@ namespace boruvka_allreduce {
         timer.stop("initVariables", 0);
 
         while (n > 1) {
-            timer.start("iteration", iteration);
+            timer.start("b-iteration", iteration);
             if (useThreads) {
                 boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer,
                                   useKruskal, hashBorder, iteration);
@@ -378,7 +378,7 @@ namespace boruvka_allreduce {
                 boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer, useKruskal,
                             hashBorder, iteration);
             }
-            timer.stop("iteration", iteration);
+            timer.stop("b-iteration", iteration);
             iteration++;
         }
 

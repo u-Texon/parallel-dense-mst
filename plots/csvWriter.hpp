@@ -9,7 +9,70 @@
 namespace writer {
 
 
-    void writeMergeResults(std::string &timerOutput, std::ofstream &file) {
+    void writeBoruvkaMergeResult(std::string timerOutput, std::ofstream &file) {
+        std::string delimiter = " ";
+
+        std::vector<size_t> allreduce;
+        std::vector<size_t> iteration;
+        std::vector<size_t> removeParallelEdges;
+        std::vector<size_t> calcLocalMST;
+        std::vector<size_t> shrink;
+        std::vector<size_t> parentArray;
+        std::vector<size_t> calcIncident;
+        std::vector<size_t> relabel;
+        size_t boruvka = 0;
+        size_t init = 0;
+        size_t initialMST = 0;
+        size_t pos = 0;
+        std::string token;
+        while ((pos = timerOutput.find(delimiter)) != std::string::npos) {
+            token = timerOutput.substr(0, pos);
+
+            if (token.substr(0, strlen("allreduce")) == "allreduce") {
+                allreduce.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("boruvka")) == "boruvka") {
+                boruvka = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+            } else if (token.substr(0, strlen("b-initial-localMST")) == "b-initial-localMST") {
+                initialMST = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+            } else if (token.substr(0, strlen("shrink")) == "shrink") {
+                shrink.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("calc-incident")) == "calc-incident") {
+                calcIncident.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("relabel")) == "relabel") {
+                relabel.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("parentArray")) == "parentArray") {
+                parentArray.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("b-calcLocalMST")) == "b-calcLocalMST") {
+                calcLocalMST.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("initVariables")) == "initVariables") {
+                init = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+            } else if (token.substr(0, strlen("b-iteration")) == "b-iteration") {
+                iteration.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            } else if (token.substr(0, strlen("remove")) == "remove") {
+                removeParallelEdges.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            }
+
+            timerOutput.erase(0, pos + delimiter.length());
+        }
+
+
+       // "run time,init variables,initial local MST, calculate local MST,iteration,allreduce,remove parallel edges,shrink,calc-incident,parentArray,relabel"
+
+        for (int i = 0; i < iteration.size(); ++i) {
+            if (i >= calcLocalMST.size()) {
+                calcLocalMST.push_back(0);
+            }
+            file << boruvka << "," << init << "," << initialMST << "," << calcLocalMST[i] << "," << iteration[i] << "," << allreduce[i]
+                 << ","
+                 << removeParallelEdges[i] << "," << shrink[i] << "," << calcIncident[i] << "," << parentArray[i] << ","
+                 << relabel[i] << std::endl;
+        }
+
+
+
+    }
+
+    void writeMergeResults(std::string timerOutput, std::ofstream &file) {
         std::string delimiter = " ";
 
         std::vector<size_t> sendRecv;
@@ -47,7 +110,7 @@ namespace writer {
     }
 
 
-    void writeBoruvkaResults(std::string &timerOutput, std::ofstream &file) {
+    void writeBoruvkaResults(std::string timerOutput, std::ofstream &file) {
         std::string delimiter = " ";
 
         std::vector<size_t> allreduce;
@@ -78,11 +141,11 @@ namespace writer {
                 relabel.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
             } else if (token.substr(0, strlen("parentArray")) == "parentArray") {
                 parentArray.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
-            } else if (token.substr(0, strlen("calcLocalMST")) == "calcLocalMST") {
+            } else if (token.substr(0, strlen("b-calcLocalMST")) == "b-calcLocalMST") {
                 calcLocalMST.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
             } else if (token.substr(0, strlen("init")) == "init") {
                 init = std::stoi(token.erase(0, timerOutput.find('=') + 1));
-            } else if (token.substr(0, strlen("iter")) == "iter") {
+            } else if (token.substr(0, strlen("b-iter")) == "b-iter") {
                 iteration.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
             } else if (token.substr(0, strlen("remove")) == "remove") {
                 removeParallelEdges.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
@@ -139,6 +202,35 @@ namespace writer {
             file << "run time,calculate initial MST,calculate local MST,iteration,send/receive MST"
                  << std::endl;
             writeMergeResults(timerOutput, file);
+        } else if (config.onlyThisAlgo && (config.algo == "mixedMerge" || config.algo == "boruvkaMerge")) {
+            std::ofstream boruvkaFile;
+            boruvkaFile.open(filePath + "only-" + config.algo + "-boruvka.csv");
+
+            if (!boruvkaFile.is_open()) {
+                std::cout << "!!! error on opening file " << filePath << " !!!" << std::endl;
+            }
+
+            boruvkaFile << "run time,init variables,initial local MST, calculate local MST,iteration,allreduce,remove parallel edges,shrink,calc-incident,parentArray,relabel"
+                        << std::endl;
+            writeBoruvkaMergeResult(timerOutput, boruvkaFile);
+
+            boruvkaFile.close();
+
+
+
+            file.open(filePath + "only-" + config.algo + "-merge.csv");
+
+            if (!file.is_open()) {
+                std::cout << "!!! error on opening file " << filePath << " !!!" << std::endl;
+            }
+
+            file << "run time,calculate initial MST,calculate local MST,iteration,send/receive MST"
+                 << std::endl;
+            writeMergeResults(timerOutput, file);
+
+
+
+
         } else {
             std::string fileName = "";
             if (config.onlyThisAlgo) {
