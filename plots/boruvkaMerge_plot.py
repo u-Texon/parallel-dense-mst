@@ -50,6 +50,12 @@ sendRecv = np.array(list(merge['send/receive MST']))
 
 m_size = len(iterations)
 
+rest = []
+
+size = len(iterations)
+for i in range(size):
+    rest.append(iterations[i] - sendRecv[i] - localMST[i])
+
 p.bar(b_size + 1, initialMST, color="orange")
 p.bar(range(b_size + 2, b_size + m_size + 2), localMST, color="blue")
 p.bar(range(b_size + 2, b_size + m_size + 2), sendRecv, bottom=localMST, color="red")
@@ -70,6 +76,8 @@ for i in range(b_size + m_size + 2):
 
 p.set_xticks(range(b_size + m_size + 2))
 p.set_xticklabels(labels)
+
+p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
 
 p.legend(["initial MST", "initialize variables", "shrink arrays", "localMST", "calculate incident edges",
           "allreduce or Send/Recv", "calculate parent array", "relabel", "remove parallel edges", "rest"])
