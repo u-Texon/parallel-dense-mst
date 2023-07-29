@@ -78,6 +78,8 @@ namespace commandParser {
             config.edgesPerProc = std::stoi(arg.substr(2, arg.length()));
         } else if (arg.substr(0, 2) == "l=") {
             config.localMSTcount = std::stoi(arg.substr(2, arg.length()));
+        } else if (arg.substr(0, 2) == "r=") {
+            config.repeat = 1 + std::stoi(arg.substr(2, arg.length()));
         } else if (arg.substr(0, 2) == "n=") {
             config.log_n = std::stoi(arg.substr(2, arg.length()));
         } else if (arg.substr(0, 2) == "m=") {
@@ -130,8 +132,6 @@ namespace commandParser {
                 }
             }
         }
-
-
         if (config.parseError) {
             return;
         } else if (config.help) {

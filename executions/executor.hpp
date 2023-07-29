@@ -22,35 +22,31 @@ namespace executor {
     }
 
 
-    void executeAlgorithm(Config &config, WEdgeList &distEdges, WEdgeList &allEdges, hybridMST::Timer &timer) {
+    void executeAlgorithm(Config &config, WEdgeList &distEdges, WEdgeList &allEdges, WEdgeOriginList &distOriginEdges) {
         hybridMST::mpi::MPIContext ctx;
-
         VId n = pow(2, config.log_n);
 
+        for (int i = 0; i < config.repeat; ++i) {
+            hybridMST::Timer timer;
+            auto [mst, algoWeight] = runAlgorithm(config, n, allEdges, distEdges, distOriginEdges, timer);
+            if (ctx.rank() == 0 && config.test) {
+                auto [_, kruskalWeight] = runKruskal(n, allEdges);
+                checkWeights(kruskalWeight, algoWeight, config.algo);
+            }
+            if (i != 0) {
+                std::string timerOutput = timer.output();
+                if (ctx.rank() == 0) {
+                    std::cout << timerOutput << std::endl;
+                    std::cout << "mstWeight = " << algoWeight << std::endl;
+                    std::string filePath = "out/files";
+                    std::filesystem::create_directories(filePath);
+                    std::filesystem::create_directory("out/plots");
+                    filePath += "/";
 
-        auto [mst, algoWeight] = runAlgorithm(config, n, allEdges, distEdges, timer);
-        if (ctx.rank() == 0 && config.test) {
-            auto [_, kruskalWeight] = runKruskal(n, allEdges);
-            checkWeights(kruskalWeight, algoWeight, config.algo);
-        }
-
-
-        std::cout << timer.output();
-
-        std::string timerOutput = timer.output();
-
-        if (ctx.rank() == 0) {
-            std::cout << std::endl;
-
-
-            std::string filePath = "out/files";
-            std::filesystem::create_directories(filePath);
-            std::filesystem::create_directory("out/plots");
-            filePath += "/";
-
-
-            writer::write_csv(filePath, config, timerOutput);
-            std::cout << "results have been written to " << filePath << std::endl;
+                    writer::write_csv(filePath, config, timerOutput);
+                    std::cout << "results have been written to " << filePath << std::endl;
+                }
+            }
         }
     }
 
@@ -60,7 +56,7 @@ namespace executor {
         std::vector<size_t> numVertices;
 
 
-        VId n  = pow(2, config.log_n);
+        VId n = pow(2, config.log_n);
         runBoxplot(config, n, distEdges, numEdges, numVertices);
 
         std::string filePath = "out/files";
@@ -79,17 +75,20 @@ namespace executor {
     void executeCommand(Config &config) {
         hybridMST::mpi::MPIContext ctx;
         WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
-        WEdgeList allEdges = distEdges;
+        WEdgeList allEdges;
+        WEdgeOriginList distOriginEdges;
 
         if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter" || config.test) {
             allEdges = generateGraph::getAllEdges(distEdges);
         }
+        if (config.algo != "kruskal" && config.algo != "filter" && config.algo != "merge") {
+            for (auto &edge: distEdges) {
+                distOriginEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
+            }
+        }
         if (ctx.rank() == 0) {
             std::cout << "graph has been generated" << std::endl;
         }
-
-
-
         if (config.algo == "all" || config.algo == "allParallel") {
             std::vector<std::string> algorithms = {"boruvka", "mixedMerge", "merge", "boruvkaMerge"};
             if (config.algo == "all") {
@@ -98,19 +97,17 @@ namespace executor {
             }
             for (const auto &algo: algorithms) {
                 config.algo = algo;
-                hybridMST::Timer timer;
                 if (config.boxplot) {
                     makeBoxplot(config, distEdges);
                 } else {
-                    executeAlgorithm(config, distEdges, allEdges, timer);
+                    executeAlgorithm(config, distEdges, allEdges, distOriginEdges);
                 }
             }
         } else {
-            hybridMST::Timer timer;
             if (config.boxplot) {
                 makeBoxplot(config, distEdges);
             } else {
-                executeAlgorithm(config, distEdges, allEdges, timer);
+                executeAlgorithm(config, distEdges, allEdges, distOriginEdges);
             }
         }
     }

@@ -2,21 +2,27 @@
 
 #include "kruskal.hpp"
 #include <span>
+#include <random>
+#include <chrono>
 
 
-#define pivotEdgeCount 10
+
 
 namespace filterKruskal {
 
     template<typename Edge>
     inline VId pickPivot(std::span<Edge> &edges) {
+        std::size_t pivotEdgeCount = 50;
+        pivotEdgeCount = std::min(edges.size(), pivotEdgeCount);
+        std::mt19937 gen;
+        std::uniform_int_distribution<std::size_t> distrib(0, edges.size() - 1);
         VId pivotWeight = 0;
+        std::vector<VId> weights(pivotEdgeCount);
         for (int i = 0; i < pivotEdgeCount; ++i) {
-            VId w = rand() % (edges.size());
-            w = edges[w].get_weight();
-            pivotWeight += w;
+            weights[i] = edges[distrib(gen)].get_weight();
         } //TODO: sample holen, sortieren und mdeian zurückgeben
-        return (VId) (pivotWeight / pivotEdgeCount);
+        std::sort(weights.begin(), weights.end());
+        return weights[pivotEdgeCount / 2];
     }
 
     inline size_t threshold(const VId &n) {
@@ -40,13 +46,11 @@ namespace filterKruskal {
             return;
         }
         VId pivotWeight = pickPivot(edges);
-
         auto middle = std::partition(edges.begin(), edges.end(), [&](const auto &edge) {
             return edge.get_weight() <= pivotWeight;
         });
         std::span<Edge> smaller(edges.begin(), middle);
         std::span<Edge> bigger(middle, edges.end());
-
         if (bigger.empty()) { //error prevention for infinite loop
             kruskal::getMST(smaller, mst, uf);
             return;

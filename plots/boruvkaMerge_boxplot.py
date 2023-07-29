@@ -14,6 +14,8 @@ minVertices = np.min(numVertices)
 
 fig, p = plt.subplots(2)
 fig.tight_layout(pad=5.0)
+fig.set_figheight(8)
+fig.set_figwidth(10)
 
 vertices = []
 edges = []
@@ -33,7 +35,7 @@ for i in range(sizeIt):
                 vertices.append(numVertices[j])
                 if i >= 2:
                     if numVertices[j] == minVertices:
-                        if minCounter == 0:
+                        if minCounter < 3:
                             labels.append("Boruvka-Step " + str(bCounter))
                             bCounter += 1
                             minCounter += 1
@@ -55,12 +57,14 @@ p[0].boxplot(edges)
 p[0].set_title('Edges per BoruvkaThenMerge-step')
 p[0].set_ylabel("Edges")
 p[0].set_xticklabels(labels)
+p[0].set_xticks(p[0].get_xticks(), p[0].get_xticklabels(), rotation=45, ha='right')
 
 p[1].bar(range(sizeIt), vertices)
 p[1].set_title('Vertices per BoruvkaThenMerge-step')
 p[1].set_ylabel("Vertices")
 p[1].set_xticks([i for i in range(sizeIt)])
 p[1].set_xticklabels(labels)
+p[1].set_xticks(p[1].get_xticks(), p[1].get_xticklabels(), rotation=45, ha='right')
 
 plt.savefig('../out/plots/boruvkaMerge_box.svg')
 plt.show()

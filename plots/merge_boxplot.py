@@ -12,6 +12,9 @@ sizeIt = np.max(iterations) + 1
 
 fig, p = plt.subplots(1)
 fig.tight_layout(pad=5.0)
+fig.set_figheight(8)
+fig.set_figwidth(10)
+
 
 edges = []
 labels = []
@@ -27,13 +30,14 @@ for i in range(sizeIt):
     edgesProc = []
     for j in range(len(iterations)):
         if iterations[j] == i:
-            edgesProc.append(numEdges[j])
+            edgesProc.append(numEdges[j] / 1000)
     edges.append(edgesProc)
 
 p.boxplot(edges)
 p.set_title('Edges per Merge-Step')
-p.set_ylabel("Edges")
+p.set_ylabel("Edges * 1000")
 p.set_xticklabels(labels)
+p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
 
 plt.savefig('../out/plots/merge_box.svg')
 plt.show()

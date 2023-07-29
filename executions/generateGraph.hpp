@@ -28,17 +28,12 @@ namespace generateGraph {
         std::mt19937_64 gen(ctx.rank());
 
         //TODO: get rid of the warning
-        Ams::sortLevel(mapper.get_mpi_datatype(), shuffleEdges, 2, gen, ctx.communicator(), ShuffleOrder<std::pair<Edge, std::size_t>>{});
-
-
-
+        Ams::sortLevel(mapper.get_mpi_datatype(), shuffleEdges, 2, gen, ctx.communicator(),
+                       ShuffleOrder<std::pair<Edge, std::size_t>>{});
         edges.clear();
         for (auto &edge: shuffleEdges) {
             edges.push_back(edge.first);
         }
-
-
-
     }
 
 
@@ -67,17 +62,13 @@ namespace generateGraph {
             auto [edges, vertex_range] = graphs::get_rhg_explicit_num_edges(config.log_n, numEdges, 3.0, weights);
             distEdges = edges;
         } else if (config.graphType == "rgg2D") {
-          //  auto [edges, vertex_range] = graphs::get_rgg2D(config.log_n, numEdges, weights);
-          //  std::cout << edges.size() << std::endl;
-          //  distEdges = edges;
+            auto [edges, vertex_range] = graphs::get_rgg2D(config.log_n, static_cast<std::size_t>(numEdges), weights);
+            distEdges = edges;
         }
-
 
         if (config.shuffle) {
             distributedShuffle(distEdges);
         }
-
-
         return distEdges;
     }
 
@@ -87,6 +78,4 @@ namespace generateGraph {
         return hybridMST::mpi::gatherv(distEdges.data(), distEdges.size(), 0, ctx);
 
     }
-
-
 }

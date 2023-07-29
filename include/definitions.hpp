@@ -72,6 +72,7 @@ struct Config {
     VId treeFactor = 2;
     VId edgesPerProc = 0;
     size_t localMSTcount = 1;
+    size_t repeat = 2; //first iteration will be removed
     bool boruvkaThread = false;
     bool shuffle = false;
     bool useKruskal = false;
@@ -84,9 +85,11 @@ struct Config {
 
     friend std::ostream &operator<<(std::ostream &out, const Config &c) {
         return out << "graph " << c.graphType << ", with log_n = " << c.log_n
-                   << " and log_m = " << c.log_m << ". Edges per Processors: " << c.edgesPerProc << ". Edges have minWeight = " << c.minWeight << " and maxWeight = "
+                   << " and log_m = " << c.log_m << ". Edges per Processors: " << c.edgesPerProc
+                   << ". Edges have minWeight = " << c.minWeight << " and maxWeight = "
                    << c.maxWeight << ". Selected algorithm is " << c.algo << ", treeFactor (or d) = " << c.treeFactor
-                   << ". Run test = " << c.test << ". use kruskal = " << c.useKruskal << ", localMSTcount: " << c.localMSTcount << ". boruvkaThread: " << c.boruvkaThread;
+                   << ". Run test = " << c.test << ". use kruskal = " << c.useKruskal << ", localMSTcount: "
+                   << c.localMSTcount << ". boruvkaThread: " << c.boruvkaThread  << ". repeat: " << c.repeat;
     }
 };
 

@@ -14,6 +14,8 @@ minVertices = np.min(numVertices)
 
 fig, p = plt.subplots(2)
 fig.tight_layout(pad=5.0)
+fig.set_figheight(8)
+fig.set_figwidth(10)
 
 vertices = []
 edges = []
@@ -45,12 +47,14 @@ p[0].boxplot(edges)
 p[0].set_title('Edges per BoruvkaMixedMerge-step')
 p[0].set_ylabel("Edges")
 p[0].set_xticklabels(labels)
+p[0].set_xticks(p[0].get_xticks(), p[0].get_xticklabels(), rotation=45, ha='right')
 
 p[1].bar(range(sizeIt), vertices)
 p[1].set_title('Vertices per BoruvkaMixedMerge-step')
 p[1].set_ylabel("Vertices")
 p[1].set_xticks([i for i in range(sizeIt)])
 p[1].set_xticklabels(labels)
+p[1].set_xticks(p[1].get_xticks(), p[1].get_xticklabels(), rotation=45, ha='right')
 
-plt.savefig('../out/plots/mixeMerge_box.svg')
+plt.savefig('../out/plots/mixedMerge_box.svg')
 plt.show()
