@@ -33,82 +33,85 @@ namespace executor {
                 auto [_, kruskalWeight] = runKruskal(n, allEdges);
                 checkWeights(kruskalWeight, algoWeight, config.algo);
             }
-            if (i != 0) {
-                std::string timerOutput = timer.output();
-                if (ctx.rank() == 0) {
-                    std::cout << timerOutput << std::endl;
-                    std::cout << "mstWeight = " << algoWeight << std::endl;
-                    std::string filePath = "out/files";
-                    std::filesystem::create_directories(filePath);
-                    std::filesystem::create_directory("out/plots");
-                    filePath += "/";
+            std::string timerOutput = timer.output();
+            if (ctx.rank() == 0) {
+                std::cout << "in iteration " << i << ":" << std::endl;
+                std::cout << "mstWeight = " << algoWeight << std::endl;
+                std::cout << timerOutput << std::endl;
 
-                    writer::write_csv(filePath, config, timerOutput);
-                    std::cout << "results have been written to " << filePath << std::endl;
-                }
+            }
+            if (i != 0 && ctx.rank() == 0) {
+                std::string filePath = "out/files";
+                std::filesystem::create_directories(filePath);
+                std::filesystem::create_directory("out/plots");
+                filePath += "/";
+
+                writer::write_csv(filePath, config, timerOutput);
+                std::cout << "results have been written to " << filePath << std::endl;
             }
         }
     }
 
-    void makeBoxplot(Config &config, WEdgeList &distEdges) {
-        hybridMST::mpi::MPIContext ctx;
-        std::vector<size_t> numEdges;
-        std::vector<size_t> numVertices;
+void makeBoxplot(Config &config, WEdgeList &distEdges) {
+    hybridMST::mpi::MPIContext ctx;
+    std::vector<size_t> numEdges;
+    std::vector<size_t> numVertices;
 
 
-        VId n = pow(2, config.log_n);
-        runBoxplot(config, n, distEdges, numEdges, numVertices);
+    VId n = pow(2, config.log_n);
+    runBoxplot(config, n, distEdges, numEdges, numVertices);
 
-        std::string filePath = "out/files";
-        std::filesystem::create_directories(filePath);
-        std::filesystem::create_directory("out/plots");
-        filePath += "/";
+    std::string filePath = "out/files";
+    std::filesystem::create_directories(filePath);
+    std::filesystem::create_directory("out/plots");
+    filePath += "/";
 
-        writer::writeBoxplot(filePath, config, numEdges, numVertices);
+    writer::writeBoxplot(filePath, config, numEdges, numVertices);
 
-        if (ctx.rank() == 0) {
-            std::cout << "results have been written to " << filePath << std::endl;
-        }
-
+    if (ctx.rank() == 0) {
+        std::cout << "results have been written to " << filePath << std::endl;
     }
 
-    void executeCommand(Config &config) {
-        hybridMST::mpi::MPIContext ctx;
-        WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
-        WEdgeList allEdges;
-        WEdgeOriginList distOriginEdges;
+}
 
-        if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter" || config.test) {
-            allEdges = generateGraph::getAllEdges(distEdges);
+void executeCommand(Config &config) {
+    hybridMST::mpi::MPIContext ctx;
+    WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
+    WEdgeList allEdges;
+    WEdgeOriginList distOriginEdges;
+
+    if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter" || config.test) {
+        allEdges = generateGraph::getAllEdges(distEdges);
+    }
+    if (config.algo != "kruskal" && config.algo != "filter" && config.algo != "merge") {
+        for (auto &edge: distEdges) {
+            distOriginEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
         }
-        if (config.algo != "kruskal" && config.algo != "filter" && config.algo != "merge") {
-            for (auto &edge: distEdges) {
-                distOriginEdges.push_back(WEdgeOrigin(edge.get_src(), edge.get_dst(), edge.get_weight()));
-            }
+    }
+    if (ctx.rank() == 0) {
+        std::cout << "graph has been generated" << std::endl;
+    }
+    if (config.algo == "all" || config.algo == "allParallel") {
+        std::vector<std::string> algorithms = {"boruvka", "mixedMerge", "merge", "boruvkaMerge"};
+        if (config.algo == "all") {
+            algorithms.emplace_back("kruskal");
+            algorithms.emplace_back("filter");
         }
-        if (ctx.rank() == 0) {
-            std::cout << "graph has been generated" << std::endl;
-        }
-        if (config.algo == "all" || config.algo == "allParallel") {
-            std::vector<std::string> algorithms = {"boruvka", "mixedMerge", "merge", "boruvkaMerge"};
-            if (config.algo == "all") {
-                algorithms.emplace_back("kruskal");
-                algorithms.emplace_back("filter");
-            }
-            for (const auto &algo: algorithms) {
-                config.algo = algo;
-                if (config.boxplot) {
-                    makeBoxplot(config, distEdges);
-                } else {
-                    executeAlgorithm(config, distEdges, allEdges, distOriginEdges);
-                }
-            }
-        } else {
+        for (const auto &algo: algorithms) {
+            config.algo = algo;
             if (config.boxplot) {
                 makeBoxplot(config, distEdges);
             } else {
                 executeAlgorithm(config, distEdges, allEdges, distOriginEdges);
             }
         }
+    } else {
+        if (config.boxplot) {
+            makeBoxplot(config, distEdges);
+        } else {
+            executeAlgorithm(config, distEdges, allEdges, distOriginEdges);
+        }
     }
+}
+
 }
