@@ -26,11 +26,11 @@ fig.tight_layout(pad=5.0)
 fig.set_figheight(8)
 fig.set_figwidth(10)
 
-p.bar(range(size), shrink, color="cyan")
+p.bar(range(size), shrink, color="orange")
 p.bar(range(size), localMST, bottom=shrink, color="blue")
 p.bar(range(size), calcIncident, bottom=shrink + localMST, color="purple")
 p.bar(range(size), allreduce, bottom=localMST + shrink + calcIncident, color="red")
-p.bar(range(size), parentArray, bottom=shrink + localMST + calcIncident + allreduce, color="orange")
+p.bar(range(size), parentArray, bottom=shrink + localMST + calcIncident + allreduce, color="cyan")
 p.bar(range(size), relabel, bottom=parentArray + shrink + localMST + calcIncident + allreduce, color="brown")
 p.bar(range(size), parallelEdges, bottom=parentArray + shrink + localMST + calcIncident + allreduce + relabel,
       color="gray")

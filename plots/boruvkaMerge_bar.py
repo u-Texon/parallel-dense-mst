@@ -26,14 +26,16 @@ for i in range(b_size):
 
 fig, p = plt.subplots(1)
 fig.tight_layout(pad=5.0)
+fig.set_figheight(8)
+fig.set_figwidth(10)
 
 p.bar(0, initialMST, color="orange")
 p.bar(0, initVariables, bottom=initialMST)
 p.bar(range(1, b_size + 1), shrink, color="cyan")
-p.bar(range(1, b_size + 1), localMST, bottom=shrink, color="blue")
+p.bar(range(1, b_size + 1), localMST, bottom=shrink, color="orange")
 p.bar(range(1, b_size + 1), calcIncident, bottom=shrink + localMST, color="purple")
 p.bar(range(1, b_size + 1), allreduce, bottom=localMST + shrink + calcIncident, color="red")
-p.bar(range(1, b_size + 1), parentArray, bottom=shrink + localMST + calcIncident + allreduce, color="orange")
+p.bar(range(1, b_size + 1), parentArray, bottom=shrink + localMST + calcIncident + allreduce, color="blue")
 p.bar(range(1, b_size + 1), relabel, bottom=parentArray + shrink + localMST + calcIncident + allreduce, color="brown")
 p.bar(range(1, b_size + 1), parallelEdges, bottom=parentArray + shrink + localMST + calcIncident + allreduce + relabel,
       color="gray")
