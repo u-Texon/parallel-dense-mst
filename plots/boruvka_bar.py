@@ -21,23 +21,31 @@ for i in range(size):
         iterations[i] - allreduce[i] - parallelEdges[i] - localMST[i] - shrink[i] - calcIncident[i] - parentArray[i] -
         relabel[i])
 
-plt.bar(range(size), shrink, color="cyan")
-plt.bar(range(size), localMST, bottom=shrink, color="blue")
-plt.bar(range(size), calcIncident, bottom=shrink + localMST, color="purple")
-plt.bar(range(size), allreduce, bottom=localMST + shrink + calcIncident, color="red")
-plt.bar(range(size), parentArray, bottom=shrink + localMST + calcIncident + allreduce, color="orange")
-plt.bar(range(size), relabel, bottom=parentArray + shrink + localMST + calcIncident + allreduce, color="brown")
-plt.bar(range(size), parallelEdges, bottom=parentArray + shrink + localMST + calcIncident + allreduce + relabel,
-        color="gray")
-plt.bar(range(size), rest, bottom=parallelEdges + parentArray + shrink + localMST + calcIncident + allreduce + relabel,
-        color="green")
+fig, p = plt.subplots(1)
+fig.tight_layout(pad=5.0)
+fig.set_figheight(8)
+fig.set_figwidth(10)
 
-plt.legend(
+p.bar(range(size), shrink, color="cyan")
+p.bar(range(size), localMST, bottom=shrink, color="blue")
+p.bar(range(size), calcIncident, bottom=shrink + localMST, color="purple")
+p.bar(range(size), allreduce, bottom=localMST + shrink + calcIncident, color="red")
+p.bar(range(size), parentArray, bottom=shrink + localMST + calcIncident + allreduce, color="orange")
+p.bar(range(size), relabel, bottom=parentArray + shrink + localMST + calcIncident + allreduce, color="brown")
+p.bar(range(size), parallelEdges, bottom=parentArray + shrink + localMST + calcIncident + allreduce + relabel,
+      color="gray")
+p.bar(range(size), rest, bottom=parallelEdges + parentArray + shrink + localMST + calcIncident + allreduce + relabel,
+      color="green")
+
+p.legend(
     ["shrink old arrays", "calculate local MST", "calculate incident edges", "allreduce", "calculate parent array",
      "relabel", "remove parallel edges", "rest"])
 
-plt.xlabel("Boruvka Round")
-plt.ylabel("Total Run Time [microseconds]")
+
+p.set_xticks(range(size))
+p.set_xticklabels(range(1,size +1))
+p.set_xlabel("Boruvka Round")
+p.set_ylabel("Total Run Time [microseconds]")
 
 plt.savefig('../out/plots/boruvka_bar.svg')
 plt.show()

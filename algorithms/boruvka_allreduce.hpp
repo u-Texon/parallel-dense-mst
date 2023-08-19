@@ -274,11 +274,14 @@ namespace boruvka_allreduce {
         relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
 
 
+
+        removeParallelEdges(relabeledEdges);
+        /*
         if (relabeledEdges.size() > hashBorder) {
             removeParallelEdgesHashing(relabeledEdges);
         } else {
-            removeParallelEdges(relabeledEdges);
-        }
+
+        } */
 
         edges = relabeledEdges;
     }

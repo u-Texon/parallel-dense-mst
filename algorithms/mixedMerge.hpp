@@ -13,6 +13,8 @@ namespace mixed_merge {
     inline WEdgeList
     getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, Timer &timer, bool useKruskal = false, VId treeFactor = 2,
            size_t hashBorder = 1000) {
+
+        timer.start("initVariables", 0);
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
         hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
         VId n = vertexCount;
@@ -21,27 +23,33 @@ namespace mixed_merge {
         WEdgeOriginList incident;
         std::vector<VId> parent;
         std::vector<VId> vertices;
-
         size_t mstCount = localMSTcount;
-
-        //compute local mst
         UnionFind uf(n);
         WEdgeOriginList edges;
+
+        timer.stop("initVariables", 0);
+
+        timer.start("mm-initial-localMST", 0);
         if (useKruskal) {
             edges = kruskal::getMST(e, uf);
         } else {
             edges = filterKruskal::getMST(n, e, uf);
         }
         mstCount--;
-
+        timer.stop("mm-initial-localMST", 0);
 
         VId p = treeFactor;
         size_t iteration = 0;
         size_t limit = mergeMST::log_base(treeFactor, ctx.size());
         while (iteration < limit) {
+            timer.start("b-iteration", iteration);
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
                                            timer, useKruskal, hashBorder, iteration);
+            timer.stop("b-iteration", iteration);
+
+            timer.start("iteration", iteration);
             mergeMST::mergeStep(edges, p, uf, n, useKruskal, timer, treeFactor, iteration);
+            timer.stop("iteration", iteration);
             iteration++;
             p *= treeFactor;
         }

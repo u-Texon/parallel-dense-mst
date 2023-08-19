@@ -32,6 +32,7 @@ p.legend(["calculate initial local MST", "calculate local MST", "send/receive MS
 p.set_ylabel("Total Run Time [microseconds]")
 p.set_xticks(range(size + 1))
 p.set_xticklabels(labels)
+p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
 
 plt.savefig('../out/plots/merge_bar.svg')
 plt.show()

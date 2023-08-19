@@ -11,7 +11,7 @@
 #include "../algorithms/boruvka_then_merge.hpp"
 
 
-void runBoxplot(Config &config, VId &n, WEdgeList distEdges, std::vector<size_t> &numEdges,
+void runBoxplot(Config &config, VId n, WEdgeList distEdges, std::vector<size_t> &numEdges,
                 std::vector<size_t> &numVertices) {
     WEdgeOriginList distOriginEdges;
 
@@ -112,7 +112,7 @@ runAlgorithm(Config &config, VId n, WEdgeList allEdges, WEdgeList distEdges, WEd
 }
 
 
-std::pair<WEdgeList, VId> runKruskal(VId &n, WEdgeList allEdges) {
+std::pair<WEdgeList, VId> runKruskal(VId n, WEdgeList allEdges) {
     UnionFind uf(n);
     WEdgeList mst = kruskal::getMST(allEdges, uf);
     VId kruskalWeight = 0;
