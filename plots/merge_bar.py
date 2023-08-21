@@ -21,6 +21,9 @@ for i in range(size):
 
 fig, p = plt.subplots(1)
 fig.tight_layout(pad=5.0)
+fig.set_figheight(8)
+fig.set_figwidth(10)
+
 
 p.bar(0, initialMST, color="orange")
 p.bar(range(1, size + 1), localMST, color="blue")
@@ -33,6 +36,7 @@ p.set_ylabel("Total Run Time [microseconds]")
 p.set_xticks(range(size + 1))
 p.set_xticklabels(labels)
 p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
+p.set_ylim(bottom=0)
 
 plt.savefig('../out/plots/merge_bar.svg')
 plt.show()

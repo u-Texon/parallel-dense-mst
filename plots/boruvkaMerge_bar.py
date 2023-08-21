@@ -78,7 +78,7 @@ for i in range(b_size + m_size + 2):
 
 p.set_xticks(range(b_size + m_size + 2))
 p.set_xticklabels(labels)
-
+p.set_ylim(bottom=0)
 p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
 
 p.legend(["initial MST", "initialize variables", "shrink arrays", "localMST", "calculate incident edges",

@@ -29,6 +29,10 @@ graph = boruvka['graph-type'][0]
 numEdges = boruvka['edges per processor'][0]
 baseCase = boruvka['kruskal as base case'][0]
 shuffled = boruvka['edges are shuffled'][0]
+p = boruvka['edges per processor']
+
+
+
 
 if shuffled == 1:
     graph = graph + " shuffled"
@@ -81,5 +85,11 @@ x.xaxis.set_ticks(nums)
 x.xaxis.set_ticklabels(procs)
 x.set_ylim(bottom=0)
 
-plt.savefig('../out/plots/weak-scale-parallel.svg')
+
+plotName = '../out/plots/weak-scale-parallel.svg'
+
+if p == 0:
+    plotName = '../out/plots/strong-scale-parallel.svg'
+
+plt.savefig(plotName)
 plt.show()
