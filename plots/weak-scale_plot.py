@@ -7,7 +7,7 @@ boruvkaMerge = pd.read_csv('../out/files/boruvkaMerge.csv')
 merge = pd.read_csv('../out/files/merge.csv')
 mixedMerge = pd.read_csv('../out/files/mixedMerge.csv')
 
-procSize = 12
+procSize = 11
 
 nums = np.arange(procSize)
 procs = 2 ** nums
@@ -26,13 +26,10 @@ numVertices = boruvka['log(n)'][0]
 minWeight = boruvka['minimum weight'][0]
 maxWeight = boruvka['maximum weight'][0]
 graph = boruvka['graph-type'][0]
-numEdges = boruvka['edges per processor'][0]
 baseCase = boruvka['kruskal as base case'][0]
 shuffled = boruvka['edges are shuffled'][0]
-p = boruvka['edges per processor']
-
-
-
+p = boruvka['edges per processor'][0]
+edgeCount = boruvka['log(m)'][0]
 
 if shuffled == 1:
     graph = graph + " shuffled"
@@ -64,32 +61,60 @@ m_avg = get_average(m_procs, m_times)
 mm_avg = get_average(mm_procs, mm_times)
 bm_avg = get_average(bm_procs, bm_times)
 
-fig = plt.figure()
-x = fig.add_subplot()
+fig, x = plt.subplots(2)
 fig.set_figheight(8)
 fig.set_figwidth(10)
 
-x.plot(nums, b_avg, label='boruvka-allreduce', color="blue")
-x.plot(nums, m_avg, label='merge-local-mst', color="red")
-x.plot(nums, mm_avg, label='boruvka-mixed-merge', color="green")
-x.plot(nums, bm_avg, label='boruvka-then-merge', color="orange")
-
-title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
-    numEdges) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
-plt.title(title)
-plt.xlabel('Number of Processors')
-plt.ylabel('execution time [milliseconds]')
-plt.legend()
-
-x.xaxis.set_ticks(nums)
-x.xaxis.set_ticklabels(procs)
-x.set_ylim(bottom=0)
-
+x[0].plot(nums, b_avg, label='boruvka-allreduce', color="blue")
+x[0].plot(nums, m_avg, label='merge-local-mst', color="red")
+x[0].plot(nums, mm_avg, label='boruvka-mixed-merge', color="green")
+x[0].plot(nums, bm_avg, label='boruvka-then-merge', color="orange")
+x[0].set_ylabel('execution time [milliseconds]')
 
 plotName = '../out/plots/weak-scale-parallel.svg'
+title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
+    p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
 
 if p == 0:
     plotName = '../out/plots/strong-scale-parallel.svg'
+    title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", log(m): " + str(
+        edgeCount) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
+
+x[0].set_title(title)
+x[0].set_xlabel('Number of Processors')
+x[0].legend()
+x[0].xaxis.set_ticks(nums)
+x[0].xaxis.set_ticklabels(procs)
+x[0].set_ylim(bottom=0)
+
+b1 = b_avg[0]
+m1 = m_avg[0]
+mm1 = mm_avg[0]
+bm1 = bm_avg[0]
+
+for i in range(procSize):
+    b_avg[i] = (b1 / b_avg[i] - 1) / pow(2, i)
+    m_avg[i] = (m1 / m_avg[i] - 1) / pow(2, i)
+    mm_avg[i] = (mm1 / mm_avg[i] - 1) / pow(2, i)
+    bm_avg[i] = (bm1 / bm_avg[i] - 1) / pow(2, i)
+
+print(b_avg)
+
+x[1].plot(nums, label='optimal-Speedup', color="red")
+x[1].plot(nums, b_avg, label='boruvka-allreduce', color="blue")
+x[1].plot(nums, m_avg, label='merge-local-mst', color="brown")
+x[1].plot(nums, mm_avg, label='boruvka-mixed-merge', color="green")
+x[1].plot(nums, bm_avg, label='boruvka-then-merge', color="orange")
+
+x[1].set_ylabel('Speedup')
+x[1].set_xlabel('Number of Processors')
+x[1].yaxis.set_ticks(nums)
+x[1].yaxis.set_ticklabels(procs)
+
+x[1].xaxis.set_ticks(nums)
+x[1].xaxis.set_ticklabels(procs)
+
+x[1].legend()
 
 plt.savefig(plotName)
 plt.show()

@@ -361,7 +361,6 @@ namespace boruvka_allreduce {
 
         timer.start("initVariables", 0);
         VId n = vertexCount;
-        WEdgeOriginList edges = e;
         WEdgeOriginList mst;
         WEdgeOriginList incidentLocal;
         WEdgeOriginList incident; //keeps the lightest incidentLocal edges. relabeledEdges.g. incidentLocal[4] is the lightest edge incidentLocal to vertex 4
@@ -375,10 +374,10 @@ namespace boruvka_allreduce {
         while (n > 1) {
             timer.start("b-iteration", iteration);
             if (useThreads) {
-                boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer,
+                boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, timer,
                                   useKruskal, hashBorder, iteration);
             } else {
-                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount, timer, useKruskal,
+                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, timer, useKruskal,
                             hashBorder, iteration);
             }
             timer.stop("b-iteration", iteration);
