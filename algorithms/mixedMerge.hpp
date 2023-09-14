@@ -35,7 +35,10 @@ namespace mixed_merge {
         } else {
             edges = filterKruskal::getMST(n, e, uf);
         }
-        mstCount--;
+        if (mstCount > 0) {
+            mstCount--;
+        }
+
         timer.stop("mm-initial-localMST", 0);
 
         VId p = treeFactor;

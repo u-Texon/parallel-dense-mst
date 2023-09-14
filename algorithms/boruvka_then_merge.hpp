@@ -33,7 +33,9 @@ namespace boruvka_then_merge {
         } else {
             edges = filterKruskal::getMST(n, e, uf);
         }
-        mstCount--;
+        if (mstCount > 0) {
+            mstCount--;
+        }
         timer.stop("b-initial-localMST", 0);
 
         VId num = mergeMST::log_base(treeFactor, ctx.size());

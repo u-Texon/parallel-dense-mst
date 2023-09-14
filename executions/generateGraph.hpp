@@ -37,6 +37,28 @@ namespace generateGraph {
     }
 
 
+    std::vector<WEdge>
+    generatePairGraph(size_t log_n, size_t log_m, graphs::WeightGeneratorConfig<Weight> weightConfig) {
+        std::vector<WEdge> edges;
+        double n = pow(log_n, 2);
+
+        for (int weight = 1; weight < log_n + 1; ++weight) {
+            double s = 0;
+            size_t i = 0;
+            while (i < n / pow(2, weight)) {
+
+                WEdge newEdge(s, s + (pow(2, weight) / 2), weight);
+                std::cout << newEdge << std::endl;
+                edges.push_back(newEdge);
+                s += pow(2, weight);
+                i++;
+            }
+        }
+
+        //TODO: generate some more edges to complete the graph
+        return edges;
+    }
+
     template<typename Edge>
     std::vector<Edge> getDistEdges(Config &config) {
         hybridMST::mpi::MPIContext ctx;
@@ -64,6 +86,8 @@ namespace generateGraph {
         } else if (config.graphType == "rgg2D") {
             auto [edges, vertex_range] = graphs::get_rgg2D(config.log_n, static_cast<std::size_t>(numEdges), weights);
             distEdges = edges;
+        } else if (config.graphType == "pair") {
+            distEdges = generatePairGraph(config.log_n, config.log_m, weights);
         }
 
         if (config.shuffle) {

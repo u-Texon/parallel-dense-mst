@@ -13,6 +13,8 @@ sizeIt = np.max(iterations) + 1
 
 fig, p = plt.subplots(2)
 fig.tight_layout(pad=5.0)
+fig.set_figheight(8)
+fig.set_figwidth(10)
 
 vertices = []
 edges = []

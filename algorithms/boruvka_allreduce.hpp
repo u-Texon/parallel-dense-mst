@@ -256,8 +256,6 @@ namespace boruvka_allreduce {
                       size_t iteration = 0) {
 
         shrink(n, incidentLocal, incident, vertices, parent, uf);
-
-
         calcMinIncident(n, incidentLocal, edges);
 
 
@@ -267,12 +265,11 @@ namespace boruvka_allreduce {
         threadAllReduce.join();
         threadLocalMST.join();
 
-        addMSTEdges(n, mst, incident, edges);
+        addMSTEdges(n, mst, incident, edges); //TODO: maybe use threads here too
         fillParentArray(n, incident, parent);
 
         WEdgeOriginList relabeledEdges;
         relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
-
 
 
         removeParallelEdges(relabeledEdges);
@@ -333,12 +330,14 @@ namespace boruvka_allreduce {
 
 
         timer.start("removeParallelEdges", iteration);
+
+        removeParallelEdges(relabeledEdges);
+        /*
         if (relabeledEdges.size() > hashBorder) {
-            //TODO: needs to be tested
             removeParallelEdgesHashing(relabeledEdges);
         } else {
-            removeParallelEdges(relabeledEdges);
-        }
+
+        } */
         timer.stop("removeParallelEdges", iteration);
 
         edges = relabeledEdges;
@@ -389,7 +388,7 @@ namespace boruvka_allreduce {
     }
 
     inline WEdgeList
-    getBoxplot(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
+    getBoxplot(VId &vertexCount, WEdgeOriginList &e, size_t localMSTcount, std::vector<size_t> &numEdges,
                std::vector<size_t> &numVertices, bool useThreads = false, bool useKruskal = false,
                size_t hashBorder = 1000) {
 
@@ -401,19 +400,16 @@ namespace boruvka_allreduce {
         std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
         UnionFind uf(n);
         std::vector<VId> vertices;
-        size_t mstCount = localMSTcount;
         size_t iteration = 1;
 
         NullTimer nullTimer = NullTimer();
         while (n > 1) {
             if (useThreads) {
-                boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                  nullTimer,
-                                  useKruskal, hashBorder, iteration);
+                boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, localMSTcount,
+                                  nullTimer, useKruskal, hashBorder, iteration);
             } else {
-                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                            nullTimer, useKruskal,
-                            hashBorder, iteration);
+                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, localMSTcount,
+                            nullTimer, useKruskal, hashBorder, iteration);
             }
             iteration++;
             numEdges.push_back(edges.size());

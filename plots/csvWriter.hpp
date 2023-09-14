@@ -159,7 +159,6 @@ namespace writer {
         }
 
 
-
         for (int i = 0; i < iteration.size(); ++i) {
             file << runTime << "," << initialMST << "," << calcLocalMST[i] << "," << iteration[i] << "," << sendRecv[i]
                  << std::endl;
@@ -294,7 +293,11 @@ namespace writer {
             if (config.onlyThisAlgo) {
                 fileName = filePath + "only-" + config.algo + ".csv";
             } else {
-                fileName = filePath + config.algo + ".csv";
+                if (config.boruvkaThread) {
+                    fileName = filePath + config.algo + "-thread" + ".csv";
+                } else {
+                    fileName = filePath + config.algo + ".csv";
+                }
             }
 
             std::ifstream f(fileName);

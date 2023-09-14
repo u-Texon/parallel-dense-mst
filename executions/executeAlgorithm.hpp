@@ -57,11 +57,12 @@ runAlgorithm(Config &config, VId n, WEdgeList allEdges, WEdgeList distEdges, WEd
     } else if (config.algo == "boruvka") {
         if (config.onlyThisAlgo) {
             timer.start(config.algo, 0);
-            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, timer, config.useKruskal);
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, timer, config.boruvkaThread,
+                                            config.useKruskal);
             timer.stop(config.algo, 0);
         } else {
             timer.start(config.algo, 0);
-            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, nullTimer,
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, nullTimer, config.boruvkaThread,
                                             config.useKruskal);
             timer.stop(config.algo, 0);
         }
