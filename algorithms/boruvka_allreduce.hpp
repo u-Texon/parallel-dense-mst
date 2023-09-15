@@ -260,9 +260,9 @@ namespace boruvka_allreduce {
 
 
         std::thread threadAllReduce(allReduce, n, std::ref(incidentLocal), std::ref(incident));
-        std::thread threadLocalMST(localMST, n, std::ref(edges), useKruskal, std::ref(localMSTcount), std::ref(uf));
-
         threadAllReduce.join();
+
+        std::thread threadLocalMST(localMST, n, std::ref(edges), useKruskal, std::ref(localMSTcount), std::ref(uf));
         threadLocalMST.join();
 
         addMSTEdges(n, mst, incident, edges); //TODO: maybe use threads here too
@@ -383,7 +383,7 @@ namespace boruvka_allreduce {
             iteration++;
         }
 
-        std::cout << "it took " << iteration - 1 << " boruvka steps." << std::endl;
+       // std::cout << "it took " << iteration - 1 << " boruvka steps." << std::endl;
 
         return getOriginEdges(mst);
 
