@@ -383,6 +383,8 @@ namespace boruvka_allreduce {
             iteration++;
         }
 
+        std::cout << "it took " << iteration - 1 << " boruvka steps." << std::endl;
+
         return getOriginEdges(mst);
 
     }

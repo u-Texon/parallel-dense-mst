@@ -2,7 +2,6 @@
 
 #include "../external/graphs/interface.hpp"
 #include "../include/mpi/gather.hpp"
-
 #include "AmsSort/AmsSort.hpp"
 
 
@@ -39,23 +38,57 @@ namespace generateGraph {
 
     std::vector<WEdge>
     generatePairGraph(size_t log_n, size_t log_m, graphs::WeightGeneratorConfig<Weight> weightConfig) {
+        hybridMST::mpi::MPIContext ctx;
         std::vector<WEdge> edges;
-        double n = pow(log_n, 2);
-
-        for (int weight = 1; weight < log_n + 1; ++weight) {
-            double s = 0;
-            size_t i = 0;
-            while (i < n / pow(2, weight)) {
-
-                WEdge newEdge(s, s + (pow(2, weight) / 2), weight);
-                std::cout << newEdge << std::endl;
-                edges.push_back(newEdge);
-                s += pow(2, weight);
-                i++;
+        auto n = (size_t) pow(2, (double) log_n);
+        if (ctx.rank() == 0) {
+            for (int weight = 1; weight < log_n + 1; ++weight) {
+                size_t s = 0;
+                size_t i = 0;
+                while (i < n / (std::size_t) pow(2, weight)) {
+                    size_t t = s + (std::size_t) (pow(2, weight) / 2);
+                    WEdge newEdge(s, t, weight);
+                    WEdge reversedEdge(t, s, weight);
+                    // std::cout << newEdge << std::endl;
+                    edges.push_back(newEdge);
+                    edges.push_back(reversedEdge);
+                    s += (std::size_t) pow(2, weight);
+                    i++;
+                }
             }
+            //add one more edge so that the amount equals n
+            WEdge newEdge(0, 2, log_n + 2);
+            WEdge reversedEdge(2, 0, log_n + 2);
+            edges.push_back(newEdge);
+            edges.push_back(reversedEdge);
+
+            auto rng = std::default_random_engine{};
+            std::shuffle(edges.begin(), edges.end(), rng);
+            std::cout << "edgecount: " << edges.size() << std::endl;
         }
 
+        int edgesPerProc = n / ctx.size();
+        std::vector<WEdge> scatteredEdges;
+        scatteredEdges.resize(edgesPerProc);
+        hybridMST::mpi::TypeMapper<WEdge> mapper;
+
+        MPI_Scatter(edges.data(), edgesPerProc, mapper.get_mpi_datatype(), scatteredEdges.data(), edgesPerProc, mapper.get_mpi_datatype(), 0, ctx.communicator());
+        /*
+        ctx.barrier();
+        for (int i = 0; i < ctx.size(); ++i) {
+            if (ctx.rank() == i) {
+                for(auto e: scatteredEdges) {
+                    std::cout << ctx.rank() << " has " << e << std::endl;
+                }
+            }
+            ctx.barrier();
+        }*/
+
+
         //TODO: generate some more edges to complete the graph
+        weightConfig.min_weight = log_n + 3;
+
+
         return edges;
     }
 
