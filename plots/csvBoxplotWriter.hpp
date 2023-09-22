@@ -13,13 +13,12 @@ namespace writer {
                       std::vector<size_t> &numVertices) {
 
         hybridMST::mpi::MPIContext ctx;
-
-        std::string fileName = filePath + config.algo + "_boxplot" + ".csv";
+        std::string fileName = filePath + config.algo + "_boxplot-" + std::to_string(ctx.size()) + ".csv";
 
         std::ofstream file;
         if (ctx.rank() == 0) {
             std::filesystem::remove(fileName);
-            file.open(fileName, std::ios::app);
+            file.open(fileName);
             if (!file.is_open()) {
                 std::cout << "!!! error on opening file " << fileName << " !!!" << std::endl;
             }

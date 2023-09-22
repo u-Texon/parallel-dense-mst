@@ -1,0 +1,9 @@
+
+MST:13071 terminated with signal 11 at PC=7f5a883c79bd SP=7ffd83f733c8.  Backtrace:
+/lib/x86_64-linux-gnu/libc.so.6(+0x19d9bd)[0x7f5a883c79bd]
+./build/MST(+0x12805d)[0x55d4de6fc05d]
+./build/MST(+0x21bce)[0x55d4de5f5bce]
+./build/MST(+0x14f2c)[0x55d4de5e8f2c]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7f5a88253d90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7f5a88253e40]
+./build/MST(+0x15fc5)[0x55d4de5e9fc5]

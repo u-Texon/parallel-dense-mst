@@ -107,7 +107,7 @@ namespace mergeMST {
 
     template<typename Edge, typename Timer>
     inline std::vector<Edge>
-    getMST(VId &n, std::vector<Edge> &edges, bool &useKruskal, Timer &timer, VId treeFactor = 2) {
+    getMST(VId &n, std::vector<Edge> &edges, bool &useKruskal, std::vector<size_t> &numEdges, std::vector<size_t> &numVertices, Timer &timer, VId treeFactor = 2) {
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
 
 
@@ -121,6 +121,8 @@ namespace mergeMST {
             mstList = filterKruskal::getMST(n, edges, uf);
         }
         timer.stop("initial-localMST", 0);
+        numVertices.push_back(n);
+        numEdges.push_back(mstList.size());
 
 
         VId p = treeFactor;
@@ -130,40 +132,11 @@ namespace mergeMST {
             timer.start("iteration", iteration);
             mergeStep(mstList, p, uf, n, useKruskal, timer, treeFactor, iteration);
             timer.stop("iteration", iteration);
-            iteration++;
-            p *= treeFactor;
-        }
-        return mstList;
-    }
-
-    template<typename Edge>
-    inline std::vector<Edge>
-    getBoxplot(VId &n, std::vector<Edge> &edges, std::vector<size_t> &numEdges, std::vector<size_t> &numVertices, bool &useKruskal, VId treeFactor = 2) {
-        hybridMST::mpi::MPIContext ctx;
-        UnionFind uf(n);
-        std::vector<Edge> mstList;
-        if (useKruskal) {
-            mstList = kruskal::getMST(edges, uf);
-        } else {
-            mstList = filterKruskal::getMST(n, edges, uf);
-        }
-        numVertices.push_back(n);
-        numEdges.push_back(mstList.size());
-
-
-        NullTimer nullTimer = NullTimer();
-        VId p = treeFactor;
-        size_t iteration = 0;
-        size_t limit = log_base(treeFactor, ctx.size());
-        while (iteration < limit) {
-            mergeStep(mstList, p, uf, n, useKruskal, nullTimer, treeFactor, iteration);
-            iteration++;
-            p *= treeFactor;
             numEdges.push_back(mstList.size());
             numVertices.push_back(n);
+            iteration++;
+            p *= treeFactor;
         }
         return mstList;
     }
-
-
 } //namespace mergeMST

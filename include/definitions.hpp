@@ -80,8 +80,6 @@ struct Config {
     bool help = false;
     bool parseError = false;
     bool onlyThisAlgo = false;
-    bool boxplot = false;
-
 
     friend std::ostream &operator<<(std::ostream &out, const Config &c) {
         return out << "graph " << c.graphType << ", with log_n = " << c.log_n
