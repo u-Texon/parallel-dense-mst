@@ -64,11 +64,11 @@ struct WEdgeOrigin {
 
 struct Config {
     std::string algo = "boruvka";
-    VId log_n = 10;
-    VId log_m = 18;
+    VId log_n = 4;
+    VId log_m = 6;
     VId minWeight = 1;
     VId maxWeight = 10000;
-    std::string graphType = "gnm";
+    std::string graphType = "pair";
     VId treeFactor = 2;
     VId edgesPerProc = 0;
     size_t localMSTcount = 1;

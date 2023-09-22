@@ -333,14 +333,11 @@ namespace boruvka_allreduce {
 
 
         timer.start("removeParallelEdges", iteration);
-
-        removeParallelEdges(relabeledEdges);
-        /*
         if (relabeledEdges.size() > hashBorder) {
             removeParallelEdgesHashing(relabeledEdges);
         } else {
-
-        } */
+            removeParallelEdges(relabeledEdges);
+        }
         timer.stop("removeParallelEdges", iteration);
 
         edges = relabeledEdges;

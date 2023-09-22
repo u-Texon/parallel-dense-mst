@@ -42,18 +42,27 @@ namespace generateGraph {
         std::vector<WEdge> edges;
         auto n = (size_t) pow(2, (double) log_n);
 
-        for (int weight = 1; weight < log_n + 1; ++weight) { //nur prozess 0
-            size_t s = 0;
-            size_t i = 0;
-            while (i < n / (std::size_t) pow(2, weight)) {
-                size_t t = s + (std::size_t) (pow(2, weight) / 2);
-                WEdge newEdge(s, t, weight);
-                WEdge reversedEdge(t, s, weight);
-                edges.push_back(newEdge);
-                edges.push_back(reversedEdge);
-                s += (std::size_t) pow(2, weight);
-                i++;
+        if (ctx.rank() == 0) {
+            for (int weight = 1; weight < log_n + 1; ++weight) { //nur prozess 0
+                size_t s = 0;
+                size_t i = 0;
+                while (i < n / (std::size_t) pow(2, weight)) {
+                    size_t t = s + (std::size_t) (pow(2, weight) / 2);
+                    WEdge newEdge(s, t, weight);
+                    WEdge reversedEdge(t, s, weight);
+                    edges.push_back(newEdge);
+                    edges.push_back(reversedEdge);
+                    s += (std::size_t) pow(2, weight);
+                    i++;
+                }
             }
+
+
+            //add one more edge, so size equals n
+            WEdge newEdge(1, 2, weightConfig.max_weight);
+            WEdge reversedEdge(2, 1, weightConfig.max_weight);
+            edges.push_back(newEdge);
+            edges.push_back(reversedEdge);
         }
 
         weightConfig.min_weight = log_n + 2;
@@ -61,42 +70,30 @@ namespace generateGraph {
         randomEdges.erase(std::remove_if(randomEdges.begin(), randomEdges.end(), [&](const auto &edge) {
             size_t s = edge.src;
             size_t t = edge.dst;
-            if (edge.src < edge.dst) {
+            if (edge.src > edge.dst) {
                 s = edge.dst;
                 t = edge.src;
             }
-            size_t dist = s - t;
-            if (s % (dist * 2) == 0) { //s can only be one of those
-                for (int weight = 1; weight < log_n + 1; ++weight) {
-                    size_t power = pow(2, weight);
-                    if (dist == power) {
-                        //distance between s and t has to be 2^x
-                        return true;
-                    }
+            size_t dist = t - s;
+            for (int i = 0; i < log_n; ++i) {
+                size_t power = pow(2, i);
+                if (dist == power) { //distance between s and t has to be a power of 2
+                    return s % (dist * 2) == 0; //source can only be one of those
                 }
             }
             return false;
-            /*
-            for (auto e: edges) {
-                if (edge.src == e.src && e.dst == edge.dst) {
-                    return true;
-                }
-            }
-            return false;
-             */
         }), randomEdges.end());
 
 
         auto rng = std::default_random_engine{};
         std::shuffle(edges.begin(), edges.end(), rng);
-        int edgesPerProc = edges.size() / ctx.size();
+        int edgesPerProc = (2 * n) / ctx.size();
         std::vector<WEdge> scatteredEdges;
         scatteredEdges.resize(edgesPerProc);
         hybridMST::mpi::TypeMapper<WEdge> mapper;
 
         MPI_Scatter(edges.data(), edgesPerProc, mapper.get_mpi_datatype(), scatteredEdges.data(), edgesPerProc,
                     mapper.get_mpi_datatype(), 0, ctx.communicator());
-
 
         scatteredEdges.insert(scatteredEdges.end(), randomEdges.begin(), randomEdges.end());
         return scatteredEdges;

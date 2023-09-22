@@ -40,7 +40,7 @@ namespace executor {
             }
             std::string timerOutput = timer.output();
             if (ctx.rank() == 0) {
-                std::cout << "in iteration " << i << ":" << std::endl;
+                std::cout << "in iteration " << i << ":" << algoWeight << std::endl;
                 std::cout << timerOutput << std::endl;
                 if (mstWeight == 0) {
                     mstWeight = algoWeight;
@@ -78,9 +78,6 @@ namespace executor {
 
         if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter" || config.test) {
             allEdges = generateGraph::getAllEdges(distEdges);
-            if (ctx.rank() == 0) {
-                std::cout << allEdges.size() << std::endl;
-            }
         }
         if (config.algo != "kruskal" && config.algo != "filter" && config.algo != "merge") {
             for (auto &edge: distEdges) {
