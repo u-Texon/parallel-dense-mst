@@ -88,4 +88,3 @@ x.xaxis.set_ticklabels(procs)
 x.set_ylim(bottom=0)
 
 plt.savefig(plotName)
-plt.show()

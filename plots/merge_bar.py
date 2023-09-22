@@ -39,4 +39,3 @@ p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
 p.set_ylim(bottom=0)
 
 plt.savefig('../out/plots/merge_bar.svg')
-plt.show()

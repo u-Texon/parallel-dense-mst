@@ -11,7 +11,7 @@
 #include "../algorithms/boruvka_then_merge.hpp"
 
 
-void runBoxplot(Config &config, VId n, WEdgeList distEdges, std::vector<size_t> &numEdges,
+void runBoxplot(Config config, VId n, WEdgeList distEdges, std::vector<size_t> &numEdges,
                 std::vector<size_t> &numVertices) {
     WEdgeOriginList distOriginEdges;
 
@@ -26,7 +26,7 @@ void runBoxplot(Config &config, VId n, WEdgeList distEdges, std::vector<size_t> 
 
     if (config.algo == "boruvka") {
         boruvka_allreduce::getBoxplot(n, distOriginEdges, config.localMSTcount, numEdges, numVertices,
-                                      config.boruvkaThread, config.useKruskal);
+                                      config.boruvkaThreadCount, config.useKruskal);
     } else if (config.algo == "merge") {
         mergeMST::getBoxplot(n, distEdges, numEdges, numVertices, config.useKruskal, config.treeFactor);
     } else if (config.algo == "mixedMerge") {
@@ -39,7 +39,7 @@ void runBoxplot(Config &config, VId n, WEdgeList distEdges, std::vector<size_t> 
 }
 
 std::pair<WEdgeList, VId>
-runAlgorithm(Config &config, VId n, WEdgeList allEdges, WEdgeList distEdges, WEdgeOriginList distOriginEdges,
+runAlgorithm(Config config, VId n, WEdgeList allEdges, WEdgeList distEdges, WEdgeOriginList distOriginEdges,
              hybridMST::Timer &timer) {
     WEdgeList mst;
     NullTimer nullTimer = NullTimer();
@@ -57,12 +57,12 @@ runAlgorithm(Config &config, VId n, WEdgeList allEdges, WEdgeList distEdges, WEd
     } else if (config.algo == "boruvka") {
         if (config.onlyThisAlgo) {
             timer.start(config.algo, 0);
-            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, timer, config.boruvkaThread,
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, timer, config.boruvkaThreadCount,
                                             config.useKruskal);
             timer.stop(config.algo, 0);
         } else {
             timer.start(config.algo, 0);
-            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, nullTimer, config.boruvkaThread,
+            mst = boruvka_allreduce::getMST(n, distOriginEdges, config.localMSTcount, nullTimer, config.boruvkaThreadCount,
                                             config.useKruskal);
             timer.stop(config.algo, 0);
         }

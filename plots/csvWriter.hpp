@@ -231,7 +231,7 @@ namespace writer {
              << config.minWeight << "," << config.maxWeight << "," << config.graphType << "," << config.treeFactor
              << ","
              << config.edgesPerProc << "," << config.shuffle << "," << config.useKruskal << ","
-             << result << "," << config.boruvkaThread << std::endl;
+             << result << "," << config.boruvkaThreadCount << "," << config.localMSTcount << std::endl;
     }
 
     void write_csv(const std::string &filePath, Config &config, std::string &timerOutput) {
@@ -293,7 +293,7 @@ namespace writer {
             if (config.onlyThisAlgo) {
                 fileName = filePath + "only-" + config.algo + ".csv";
             } else {
-                if (config.boruvkaThread) {
+                if (config.boruvkaThreadCount) {
                     fileName = filePath + config.algo + "-thread" + ".csv";
                 } else {
                     fileName = filePath + config.algo + ".csv";
@@ -311,7 +311,7 @@ namespace writer {
             std::string result = timerOutput.erase(0, timerOutput.find('=') + 1);
             if (!alreadyExists) {
                 mergeFile
-                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,run time,boruvkaThread"
+                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,run time,boruvkaThread,localMSTcount"
                         << std::endl;
             }
             writeResult(result, mergeFile, config);

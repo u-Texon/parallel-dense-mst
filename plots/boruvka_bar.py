@@ -49,4 +49,3 @@ p.set_ylabel("Total Run Time [microseconds]")
 p.set_ylim(bottom=0)
 
 plt.savefig('../out/plots/boruvka_bar.svg')
-plt.show()

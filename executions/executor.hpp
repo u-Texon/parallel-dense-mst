@@ -82,6 +82,9 @@ void executeCommand(Config &config) {
 
     if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter" || config.test) {
         allEdges = generateGraph::getAllEdges(distEdges);
+        if (ctx.rank() == 0) {
+            std::cout << allEdges.size() << std::endl;
+        }
     }
     if (config.algo != "kruskal" && config.algo != "filter" && config.algo != "merge") {
         for (auto &edge: distEdges) {

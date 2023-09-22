@@ -259,14 +259,17 @@ namespace boruvka_allreduce {
         calcMinIncident(n, incidentLocal, edges);
 
 
-        std::thread threadAllReduce(allReduce, n, std::ref(incidentLocal), std::ref(incident));
+        std::thread threadAllReduce(allReduce, std::ref(n), std::ref(incidentLocal), std::ref(incident));
+        std::thread threadLocalMST(localMST, std::ref(n), std::ref(edges), useKruskal, std::ref(localMSTcount),
+                                   std::ref(uf));
         threadAllReduce.join();
-
-        std::thread threadLocalMST(localMST, n, std::ref(edges), useKruskal, std::ref(localMSTcount), std::ref(uf));
         threadLocalMST.join();
 
-        addMSTEdges(n, mst, incident, edges); //TODO: maybe use threads here too
-        fillParentArray(n, incident, parent);
+
+        std::thread threadAddMST(addMSTEdges, std::ref(n), std::ref(mst), std::ref(incident), std::ref(edges));
+        std::thread threadParentArray(fillParentArray, std::ref(n), std::ref(incident), std::ref(parent));
+        threadAddMST.join();
+        threadParentArray.join();
 
         WEdgeOriginList relabeledEdges;
         relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
@@ -354,9 +357,9 @@ namespace boruvka_allreduce {
     }
 
     template<typename Timer>
-    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount,
-                            Timer &timer, bool useThreads = false, bool useKruskal = false,
-                            size_t hashBorder = 1000) {
+    inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
+                            std::vector<size_t> &numVertices, Timer &timer, size_t &boruvkaThreadCount,
+                            bool useKruskal = false, size_t hashBorder = 1000) {
 
         timer.start("initVariables", 0);
         VId n = vertexCount;
@@ -372,56 +375,20 @@ namespace boruvka_allreduce {
 
         while (n > 1) {
             timer.start("b-iteration", iteration);
-            if (useThreads) {
+            if (boruvkaThreadCount > 0) {
                 boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, timer,
                                   useKruskal, hashBorder, iteration);
+                boruvkaThreadCount--;
             } else {
                 boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, timer, useKruskal,
                             hashBorder, iteration);
             }
             timer.stop("b-iteration", iteration);
             iteration++;
-        }
-
-       // std::cout << "it took " << iteration - 1 << " boruvka steps." << std::endl;
-
-        return getOriginEdges(mst);
-
-    }
-
-    inline WEdgeList
-    getBoxplot(VId &vertexCount, WEdgeOriginList &e, size_t localMSTcount, std::vector<size_t> &numEdges,
-               std::vector<size_t> &numVertices, bool useThreads = false, bool useKruskal = false,
-               size_t hashBorder = 1000) {
-
-        VId n = vertexCount;
-        WEdgeOriginList edges = e;
-        WEdgeOriginList mst;
-        WEdgeOriginList incidentLocal;
-        WEdgeOriginList incident; //keeps the lightest incidentLocal edges. relabeledEdges.g. incidentLocal[4] is the lightest edge incidentLocal to vertex 4
-        std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
-        UnionFind uf(n);
-        std::vector<VId> vertices;
-        size_t iteration = 1;
-
-        NullTimer nullTimer = NullTimer();
-        while (n > 1) {
-            if (useThreads) {
-                boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, edges, mst, localMSTcount,
-                                  nullTimer, useKruskal, hashBorder, iteration);
-            } else {
-                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, localMSTcount,
-                            nullTimer, useKruskal, hashBorder, iteration);
-            }
-            iteration++;
-            numEdges.push_back(edges.size());
+            numEdges.push_back(e.size());
             numVertices.push_back(n);
         }
-
-
         return getOriginEdges(mst);
-
     }
-
 
 } //namespace

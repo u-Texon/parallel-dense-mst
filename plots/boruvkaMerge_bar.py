@@ -85,4 +85,3 @@ p.legend(["initial MST", "initialize variables", "shrink arrays", "localMST", "c
           "allreduce or Send/Recv", "calculate parent array", "relabel", "remove parallel edges", "rest"])
 
 plt.savefig('../out/plots/boruvkaMerge_bar.svg')
-plt.show()

@@ -67,9 +67,9 @@ namespace commandParser {
         } else if (arg == "b") {
             config.boxplot = true;
         } else if (arg == "s") {
-            config.shuffle = true;
-        } else if (arg == "thread") {
-            config.boruvkaThread = true;
+            config.shuffle = false;
+        } else if (arg.substr(0, 2) == "b=") {
+            config.boruvkaThreadCount = std::stoi(arg.substr(2, arg.length()));
         } else if (arg == "t") {
             config.test = true;
         } else if (arg == "o") {

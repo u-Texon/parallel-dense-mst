@@ -73,8 +73,8 @@ struct Config {
     VId edgesPerProc = 0;
     size_t localMSTcount = 1;
     size_t repeat = 2; //first iteration will be removed
-    bool boruvkaThread = false;
-    bool shuffle = false;
+    size_t boruvkaThreadCount = 0;
+    bool shuffle = true;
     bool useKruskal = false;
     bool test = false;
     bool help = false;
@@ -89,7 +89,7 @@ struct Config {
                    << ". Edges have minWeight = " << c.minWeight << " and maxWeight = "
                    << c.maxWeight << ". Selected algorithm is " << c.algo << ", treeFactor (or d) = " << c.treeFactor
                    << ". Run test = " << c.test << ". use kruskal = " << c.useKruskal << ", localMSTcount: "
-                   << c.localMSTcount << ". boruvkaThread: " << c.boruvkaThread  << ". repeat: " << c.repeat;
+                   << c.localMSTcount << ". boruvkaThread: " << c.boruvkaThreadCount  << ". repeat: " << c.repeat;
     }
 };
 

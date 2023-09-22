@@ -24,6 +24,8 @@ baseCase = boruvka['kruskal as base case'][0]
 shuffled = boruvka['edges are shuffled'][0]
 p = boruvka['edges per processor'][0]
 edgeCount = boruvka['log(m)'][0]
+localMSTcount = boruvka['localMSTcount'][0]
+threadCount = boruvkaThread['boruvkaThread'][0]
 
 if shuffled == 1:
     graph = graph + " shuffled"
@@ -62,13 +64,18 @@ x.plot(nums, bt_avg, label='boruvka with message overlap', color="red")
 x.set_ylabel('execution time [milliseconds]')
 
 plotName = '../out/plots/weak-scale-boruvkaThread.svg'
-title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
-    p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
+
+title = "Graph: " + str(graph) + ", log(n): " + str(numVertices)
 
 if p == 0:
     plotName = '../out/plots/strong-scale-boruvkaThread.svg'
-    title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", log(m): " + str(
-        edgeCount) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
+    title += ", log(m): " + str(edgeCount)
+else:
+    title += ", Edges per PE: " + str(p)
+
+title += ", Weights: [" + str(minWeight) + "," + str(
+    maxWeight) + "]\n" + " base case is " + baseCase + ". localMST=" + str(
+    localMSTcount) + ", boruvkaThreadCount=" + str(threadCount)
 
 x.set_title(title)
 x.set_xlabel('Number of Processors')

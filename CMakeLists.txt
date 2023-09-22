@@ -26,6 +26,8 @@ target_link_libraries(MST PUBLIC timer base_target graphs kadis tlx)
 
 target_compile_features(MST PRIVATE cxx_std_20)
 
+target_compile_options(MST PRIVATE -O3 -march=native)
+
 
 
 

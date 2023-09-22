@@ -42,7 +42,7 @@ namespace generateGraph {
         std::vector<WEdge> edges;
         auto n = (size_t) pow(2, (double) log_n);
 
-        for (int weight = 1; weight < log_n + 1; ++weight) {
+        for (int weight = 1; weight < log_n + 1; ++weight) { //nur prozess 0
             size_t s = 0;
             size_t i = 0;
             while (i < n / (std::size_t) pow(2, weight)) {
@@ -55,21 +55,35 @@ namespace generateGraph {
                 i++;
             }
         }
-        //add one more edge so that the amount equals n
-        WEdge newEdge(0, 2, log_n + 2);
-        WEdge reversedEdge(2, 0, log_n + 2);
-        edges.push_back(newEdge);
-        edges.push_back(reversedEdge);
 
-        weightConfig.min_weight = log_n + 3;
-        auto [randomEdges, vertex_range] = graphs::get_gnm(log_n, log_m - 1, weightConfig);
+        weightConfig.min_weight = log_n + 2;
+        auto [randomEdges, _] = graphs::get_gnm(log_n, log_m, weightConfig);
         randomEdges.erase(std::remove_if(randomEdges.begin(), randomEdges.end(), [&](const auto &edge) {
+            size_t s = edge.src;
+            size_t t = edge.dst;
+            if (edge.src < edge.dst) {
+                s = edge.dst;
+                t = edge.src;
+            }
+            size_t dist = s - t;
+            if (s % (dist * 2) == 0) { //s can only be one of those
+                for (int weight = 1; weight < log_n + 1; ++weight) {
+                    size_t power = pow(2, weight);
+                    if (dist == power) {
+                        //distance between s and t has to be 2^x
+                        return true;
+                    }
+                }
+            }
+            return false;
+            /*
             for (auto e: edges) {
                 if (edge.src == e.src && e.dst == edge.dst) {
                     return true;
                 }
             }
             return false;
+             */
         }), randomEdges.end());
 
 
@@ -84,7 +98,7 @@ namespace generateGraph {
                     mapper.get_mpi_datatype(), 0, ctx.communicator());
 
 
-       scatteredEdges.insert(scatteredEdges.end(), randomEdges.begin(), randomEdges.end());
+        scatteredEdges.insert(scatteredEdges.end(), randomEdges.begin(), randomEdges.end());
         return scatteredEdges;
     }
 
