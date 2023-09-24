@@ -8,8 +8,15 @@
 
 namespace writer {
 
+    void writeResult(std::ofstream &file, Config &config) {
+        hybridMST::mpi::MPIContext ctx;
+        file << config.algo << "," << ctx.size() << "," << config.log_m << "," << config.log_n << ","
+             << config.minWeight << "," << config.maxWeight << "," << config.graphType << "," << config.treeFactor
+             << "," << config.edgesPerProc << "," << config.shuffle << "," << config.useKruskal
+             << "," << config.boruvkaOverlapCount << "," << config.localMSTcount;
+    }
 
-    void writeMixedMergeResult(std::string timerOutput, std::ofstream &file) {
+    void writeMixedMergeResult(std::string timerOutput, std::ofstream &file, Config &config) {
         std::string delimiter = " ";
 
         std::vector<size_t> allreduce;
@@ -64,14 +71,19 @@ namespace writer {
                  << allreduce[i]
                  << ","
                  << removeParallelEdges[i] << "," << shrink[i] << "," << calcIncident[i] << "," << parentArray[i] << ","
-                 << relabel[i] << std::endl;
+                 << relabel[i];
+            if (i == 0) {
+                file << ",";
+                writeResult(file, config);
+            }
+            file << std::endl;
         }
 
 
     }
 
 
-    void writeBoruvkaMergeResult(std::string timerOutput, std::ofstream &file) {
+    void writeBoruvkaMergeResult(std::string timerOutput, std::ofstream &file, Config &config) {
         std::string delimiter = " ";
 
         std::vector<size_t> allreduce;
@@ -125,13 +137,18 @@ namespace writer {
                  << allreduce[i]
                  << ","
                  << removeParallelEdges[i] << "," << shrink[i] << "," << calcIncident[i] << "," << parentArray[i] << ","
-                 << relabel[i] << std::endl;
+                 << relabel[i];
+            if (i == 0) {
+                file << ",";
+                writeResult(file, config);
+            }
+            file << std::endl;
         }
 
 
     }
 
-    void writeMergeResults(std::string timerOutput, std::ofstream &file) {
+    void writeMergeResults(std::string timerOutput, std::ofstream &file, Config &config) {
         std::string delimiter = " ";
         std::vector<size_t> sendRecv;
         std::vector<size_t> iteration;
@@ -160,14 +177,18 @@ namespace writer {
 
 
         for (int i = 0; i < iteration.size(); ++i) {
-            file << runTime << "," << initialMST << "," << calcLocalMST[i] << "," << iteration[i] << "," << sendRecv[i]
-                 << std::endl;
+            file << runTime << "," << initialMST << "," << calcLocalMST[i] << "," << iteration[i] << "," << sendRecv[i];
+            if (i == 0) {
+                file << ",";
+                writeResult(file, config);
+            }
+            file << std::endl;
         }
 
     }
 
 
-    void writeBoruvkaResults(std::string timerOutput, std::ofstream &file) {
+    void writeBoruvkaResults(std::string timerOutput, std::ofstream &file, Config &config) {
         std::string delimiter = " ";
 
         std::vector<size_t> allreduce;
@@ -217,48 +238,39 @@ namespace writer {
                 calcLocalMST.push_back(0);
             }
             file << boruvka << "," << init << "," << calcLocalMST[i] << "," << iteration[i] << "," << allreduce[i]
-                 << ","
-                 << removeParallelEdges[i] << "," << shrink[i] << "," << calcIncident[i] << "," << parentArray[i] << ","
-                 << relabel[i] << std::endl;
+                 << "," << removeParallelEdges[i] << "," << shrink[i] << "," << calcIncident[i] << "," << parentArray[i]
+                 << "," << relabel[i];
+            if (i == 0) {
+                file << ",";
+                writeResult(file, config);
+            }
+            file << std::endl;
         }
 
     }
 
 
-    void writeResult(std::string &result, std::ofstream &file, Config &config) {
-        hybridMST::mpi::MPIContext ctx;
-        file << config.algo << "," << ctx.size() << "," << config.log_m << "," << config.log_n << ","
-             << config.minWeight << "," << config.maxWeight << "," << config.graphType << "," << config.treeFactor
-             << ","
-             << config.edgesPerProc << "," << config.shuffle << "," << config.useKruskal << ","
-             << result << "," << config.boruvkaThreadCount << "," << config.localMSTcount << std::endl;
-    }
-
     void write_csv(const std::string &filePath, Config &config, std::string &timerOutput) {
-        std::ofstream mergeFile;
-
-
+        std::ofstream file;
         if (config.algo == "boruvka" && config.onlyThisAlgo) {
-            mergeFile.open(filePath + "only-" + config.algo + ".csv");
-
-            if (!mergeFile.is_open()) {
+            file.open(filePath + "only-" + config.algo + ".csv");
+            if (!file.is_open()) {
                 std::cout << "!!! error on opening mergeFile " << filePath << " !!!" << std::endl;
             }
-
-            mergeFile
-                    << "run time,init variables,calculate local MST,iteration,allreduce,remove parallel edges,shrink,calc-incident,parentArray,relabel"
+            file
+                    << "run time,init variables,calculate local MST,iteration,allreduce,remove parallel edges,shrink,calc-incident,parentArray,relabel,"
+                    << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,boruvkaThread,localMSTcount"
                     << std::endl;
-            writeBoruvkaResults(timerOutput, mergeFile);
+            writeBoruvkaResults(timerOutput, file, config);
         } else if (config.algo == "merge" && config.onlyThisAlgo) {
-            mergeFile.open(filePath + "only-" + config.algo + ".csv");
-
-            if (!mergeFile.is_open()) {
+            file.open(filePath + "only-" + config.algo + ".csv");
+            if (!file.is_open()) {
                 std::cout << "!!! error on opening mergeFile " << filePath << " !!!" << std::endl;
             }
-
-            mergeFile << "run time,calculate initial MST,calculate local MST,iteration,send/receive MST"
-                      << std::endl;
-            writeMergeResults(timerOutput, mergeFile);
+            file << "run time,calculate initial MST,calculate local MST,iteration,send/receive MST,"
+                 << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,boruvkaThread,localMSTcount"
+                 << std::endl;
+            writeMergeResults(timerOutput, file, config);
         } else if (config.onlyThisAlgo && (config.algo == "mixedMerge" || config.algo == "boruvkaMerge")) {
             std::ofstream boruvkaFile;
             boruvkaFile.open(filePath + "only-" + config.algo + "-boruvka.csv");
@@ -268,32 +280,35 @@ namespace writer {
             }
 
             boruvkaFile
-                    << "run time,init variables,initial local MST, calculate local MST,iteration,allreduce,remove parallel edges,shrink,calc-incident,parentArray,relabel"
+                    << "run time,init variables,initial local MST, calculate local MST,iteration,allreduce,remove parallel edges,shrink,calc-incident,parentArray,relabel,"
+                    << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,boruvkaThread,localMSTcount"
                     << std::endl;
+
             if (config.algo == "mixedMerge") {
-                writeMixedMergeResult(timerOutput, boruvkaFile);
+                writeMixedMergeResult(timerOutput, boruvkaFile, config);
             } else {
-                writeBoruvkaMergeResult(timerOutput, boruvkaFile);
+                writeBoruvkaMergeResult(timerOutput, boruvkaFile, config);
             }
             boruvkaFile.close();
 
 
-            mergeFile.open(filePath + "only-" + config.algo + "-merge.csv");
-            if (!mergeFile.is_open()) {
+            file.open(filePath + "only-" + config.algo + "-merge.csv");
+            if (!file.is_open()) {
                 std::cout << "!!! error on opening mergeFile " << filePath << " !!!" << std::endl;
             }
 
-            mergeFile << "run time,calculate initial MST,calculate local MST,iteration,send/receive MST"
-                      << std::endl;
-
-            writeMergeResults(timerOutput, mergeFile);
+            file
+                    << "run time,calculate initial MST,calculate local MST,iteration,send/receive MST,"
+                    << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,boruvkaThread,localMSTcount"
+                    << std::endl;
+            writeMergeResults(timerOutput, file, config);
 
         } else {
             std::string fileName = "";
             if (config.onlyThisAlgo) {
                 fileName = filePath + "only-" + config.algo + ".csv";
             } else {
-                if (config.boruvkaThreadCount) {
+                if (config.boruvkaOverlapCount) {
                     fileName = filePath + config.algo + "-thread" + ".csv";
                 } else {
                     fileName = filePath + config.algo + ".csv";
@@ -303,25 +318,20 @@ namespace writer {
             std::ifstream f(fileName);
             bool alreadyExists = f.good();
 
-            mergeFile.open(fileName, std::ios::app);
-            if (!mergeFile.is_open()) {
+            file.open(fileName, std::ios::app);
+            if (!file.is_open()) {
                 std::cout << "!!! error on opening mergeFile " << fileName << " !!!" << std::endl;
             }
 
             std::string result = timerOutput.erase(0, timerOutput.find('=') + 1);
             if (!alreadyExists) {
-                mergeFile
-                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,run time,boruvkaThread,localMSTcount"
+                file
+                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,boruvkaThread,localMSTcount,run time"
                         << std::endl;
             }
-            writeResult(result, mergeFile, config);
-
+            writeResult(file, config);
+            file << "," << result << std::endl;
         }
-
-
-        mergeFile.close();
-
+        file.close();
     }
-
-
 }

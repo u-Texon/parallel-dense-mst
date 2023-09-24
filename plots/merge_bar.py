@@ -38,4 +38,27 @@ p.set_xticklabels(labels)
 p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
 p.set_ylim(bottom=0)
 
+
+numVertices = merge['log(n)'][0]
+minWeight = merge['minimum weight'][0]
+maxWeight = merge['maximum weight'][0]
+graph = merge['graph-type'][0]
+baseCase = merge['kruskal as base case'][0]
+shuffled = merge['edges are shuffled'][0]
+p = merge['edges per processor'][0]
+edgeCount = merge['log(m)'][0]
+
+if shuffled == 1:
+    graph = graph + " shuffled"
+if baseCase == 0:
+    baseCase = "filter-kruskal"
+else:
+    baseCase = "kruskal"
+
+title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
+        p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]\n" + " base case is " + baseCase
+
+plt.title(title)
+
+
 plt.savefig('../out/plots/merge_bar.svg')

@@ -84,4 +84,25 @@ p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
 p.legend(["initial MST", "initialize variables", "shrink arrays", "localMST", "calculate incident edges",
           "allreduce or Send/Recv", "calculate parent array", "relabel", "remove parallel edges", "rest"])
 
+numVertices = boruvka['log(n)'][0]
+minWeight = boruvka['minimum weight'][0]
+maxWeight = boruvka['maximum weight'][0]
+graph = boruvka['graph-type'][0]
+baseCase = boruvka['kruskal as base case'][0]
+shuffled = boruvka['edges are shuffled'][0]
+p = boruvka['edges per processor'][0]
+edgeCount = boruvka['log(m)'][0]
+
+if shuffled == 1:
+    graph = graph + " shuffled"
+if baseCase == 0:
+    baseCase = "filter-kruskal"
+else:
+    baseCase = "kruskal"
+
+title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
+    p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]\n" + " base case is " + baseCase
+
+plt.title(title)
+
 plt.savefig('../out/plots/boruvkaMerge_bar.svg')

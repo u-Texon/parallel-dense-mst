@@ -47,8 +47,9 @@ namespace mixed_merge {
         size_t limit = mergeMST::log_base(treeFactor, ctx.size());
         while (iteration < limit) {
             timer.start("b-iteration", iteration);
+            size_t overlapCount = 0;
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           timer, useKruskal, hashBorder, iteration);
+                                           overlapCount, timer, useKruskal, hashBorder, iteration);
             timer.stop("b-iteration", iteration);
             numVertices.push_back(n);
             numEdges.push_back(edges.size());

@@ -64,16 +64,16 @@ struct WEdgeOrigin {
 
 struct Config {
     std::string algo = "boruvka";
-    VId log_n = 4;
-    VId log_m = 6;
+    VId log_n = 13;
+    VId log_m = 20;
     VId minWeight = 1;
     VId maxWeight = 10000;
-    std::string graphType = "pair";
+    std::string graphType = "gnm";
     VId treeFactor = 2;
     VId edgesPerProc = 0;
     size_t localMSTcount = 1;
     size_t repeat = 2; //first iteration will be removed
-    size_t boruvkaThreadCount = 0;
+    size_t boruvkaOverlapCount = 0;
     bool shuffle = true;
     bool useKruskal = false;
     bool test = false;
@@ -87,7 +87,7 @@ struct Config {
                    << ". Edges have minWeight = " << c.minWeight << " and maxWeight = "
                    << c.maxWeight << ". Selected algorithm is " << c.algo << ", treeFactor (or d) = " << c.treeFactor
                    << ". Run test = " << c.test << ". use kruskal = " << c.useKruskal << ", localMSTcount: "
-                   << c.localMSTcount << ". boruvkaThread: " << c.boruvkaThreadCount  << ". repeat: " << c.repeat;
+                   << c.localMSTcount << ". boruvkaThread: " << c.boruvkaOverlapCount << ". repeat: " << c.repeat;
     }
 };
 

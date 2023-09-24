@@ -48,4 +48,27 @@ p.set_xlabel("Boruvka Round")
 p.set_ylabel("Total Run Time [microseconds]")
 p.set_ylim(bottom=0)
 
+
+numVertices = boruvka['log(n)'][0]
+minWeight = boruvka['minimum weight'][0]
+maxWeight = boruvka['maximum weight'][0]
+graph = boruvka['graph-type'][0]
+baseCase = boruvka['kruskal as base case'][0]
+shuffled = boruvka['edges are shuffled'][0]
+p = boruvka['edges per processor'][0]
+edgeCount = boruvka['log(m)'][0]
+
+if shuffled == 1:
+    graph = graph + " shuffled"
+if baseCase == 0:
+    baseCase = "filter-kruskal"
+else:
+    baseCase = "kruskal"
+
+
+title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
+    p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]\n" + " base case is " + baseCase
+
+plt.title(title)
+
 plt.savefig('../out/plots/boruvka_bar.svg')

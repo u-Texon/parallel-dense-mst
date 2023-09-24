@@ -48,8 +48,9 @@ namespace boruvka_then_merge {
         size_t iteration = 0;
         while (n >= border) {
             timer.start("b-iteration", iteration);
+            size_t overlapCount = 0;
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           timer, useKruskal, hashBorder, iteration);
+                                           overlapCount, timer, useKruskal, hashBorder, iteration);
             timer.stop("b-iteration", iteration);
             numVertices.push_back(n);
             numEdges.push_back(edges.size());

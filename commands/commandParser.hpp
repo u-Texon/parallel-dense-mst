@@ -66,11 +66,11 @@ namespace commandParser {
             config.useKruskal = true;
         } else if (arg == "s") {
             config.shuffle = false;
-        } else if (arg.substr(0, 2) == "b=") {
-            config.boruvkaThreadCount = std::stoi(arg.substr(2, arg.length()));
+        } else if (arg.substr(0, 2) == "o=") {
+            config.boruvkaOverlapCount = std::stoi(arg.substr(2, arg.length()));
         } else if (arg == "t") {
             config.test = true;
-        } else if (arg == "o") {
+        } else if (arg == "only") {
             config.onlyThisAlgo = true;
         } else if (arg.substr(0, 2) == "p=") {
             config.edgesPerProc = std::stoi(arg.substr(2, arg.length()));

@@ -237,59 +237,18 @@ namespace boruvka_allreduce {
     }
 
 
-    void localMST(VId n, WEdgeOriginList &edges, bool useKruskal, size_t &localMSTcount, UnionFind &uf) {
-        if (localMSTcount > 0) {
-            if (useKruskal) {
-                edges = kruskal::getMST(edges, uf);
-            } else {
-                edges = filterKruskal::getMST(n, edges, uf);
-            }
-            localMSTcount--;
-        }
-    }
-
-    template<typename Timer>
-    void
-    boruvkaStepThread(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
-                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst,
-                      size_t &localMSTcount, Timer &timer, bool useKruskal = false, size_t hashBorder = 1000,
-                      size_t iteration = 0) {
-
-        shrink(n, incidentLocal, incident, vertices, parent, uf);
-        calcMinIncident(n, incidentLocal, edges);
-
-
-        std::thread threadAllReduce(allReduce, std::ref(n), std::ref(incidentLocal), std::ref(incident));
-        std::thread threadLocalMST(localMST, std::ref(n), std::ref(edges), useKruskal, std::ref(localMSTcount),
-                                   std::ref(uf));
-        threadAllReduce.join();
-        threadLocalMST.join();
-
-
-        std::thread threadAddMST(addMSTEdges, std::ref(n), std::ref(mst), std::ref(incident), std::ref(edges));
-        std::thread threadParentArray(fillParentArray, std::ref(n), std::ref(incident), std::ref(parent));
-        threadAddMST.join();
-        threadParentArray.join();
-
-        WEdgeOriginList relabeledEdges;
-        relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
-
-
-        removeParallelEdges(relabeledEdges);
-        /*
-        if (relabeledEdges.size() > hashBorder) {
-            removeParallelEdgesHashing(relabeledEdges);
+    void localMST(VId n, WEdgeOriginList &edges, bool useKruskal, UnionFind &uf) {
+        if (useKruskal) {
+            edges = kruskal::getMST(edges, uf);
         } else {
-
-        } */
-
-        edges = relabeledEdges;
+            edges = filterKruskal::getMST(n, edges, uf);
+        }
     }
 
     template<typename Timer>
     void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst,
-                     size_t &localMSTcount, Timer &timer, bool useKruskal = false,
+                     size_t &localMSTcount, size_t &overlapCount, Timer &timer, bool useKruskal = false,
                      size_t hashBorder = 1000,
                      size_t iteration = 0) {
 
@@ -297,26 +256,33 @@ namespace boruvka_allreduce {
         shrink(n, incidentLocal, incident, vertices, parent, uf);
         timer.stop("shrink", iteration);
 
-        if (localMSTcount > 0) {
-            timer.start("b-calcLocalMST", iteration);
-            if (useKruskal) {
-                edges = kruskal::getMST(edges, uf);
-            } else {
-                edges = filterKruskal::getMST(n, edges, uf);
+        if (overlapCount > 0) { //message overlap
+            timer.start("calc-incident", iteration);
+            calcMinIncident(n, incidentLocal, edges);
+            timer.stop("calc-incident", iteration);
+
+            timer.start("overlap", iteration);
+            std::thread threadAllReduce(allReduce, std::ref(n), std::ref(incidentLocal), std::ref(incident));
+            std::thread threadLocalMST(localMST, std::ref(n), std::ref(edges), useKruskal, std::ref(uf));
+            threadAllReduce.join();
+            threadLocalMST.join();
+            overlapCount--;
+            timer.stop("overlap", iteration);
+        } else {
+            if (localMSTcount > 0) {
+                timer.start("b-calcLocalMST", iteration);
+                localMST(n, edges, useKruskal, uf);
+                localMSTcount--;
+                timer.stop("b-calcLocalMST", iteration);
             }
-            localMSTcount--;
-            timer.stop("b-calcLocalMST", iteration);
+            timer.start("calc-incident", iteration);
+            calcMinIncident(n, incidentLocal, edges);
+            timer.stop("calc-incident", iteration);
+
+            timer.start("allreduce", iteration);
+            allReduce(n, incidentLocal, incident);
+            timer.stop("allreduce", iteration);
         }
-
-
-        timer.start("calc-incident", iteration);
-        calcMinIncident(n, incidentLocal, edges);
-        timer.stop("calc-incident", iteration);
-
-
-        timer.start("allreduce", iteration);
-        allReduce(n, incidentLocal, incident);
-        timer.stop("allreduce", iteration);
 
         hybridMST::mpi::MPIContext ctx;
         timer.start("parentArray", iteration);
@@ -339,10 +305,7 @@ namespace boruvka_allreduce {
             removeParallelEdges(relabeledEdges);
         }
         timer.stop("removeParallelEdges", iteration);
-
         edges = relabeledEdges;
-
-
     }
 
     WEdgeList getOriginEdges(WEdgeOriginList &mst) {
@@ -355,7 +318,7 @@ namespace boruvka_allreduce {
 
     template<typename Timer>
     inline WEdgeList getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
-                            std::vector<size_t> &numVertices, Timer &timer, size_t &boruvkaThreadCount,
+                            std::vector<size_t> &numVertices, Timer &timer, size_t &overlapCount,
                             bool useKruskal = false, size_t hashBorder = 1000) {
 
         timer.start("initVariables", 0);
@@ -372,14 +335,8 @@ namespace boruvka_allreduce {
 
         while (n > 1) {
             timer.start("b-iteration", iteration);
-            if (boruvkaThreadCount > 0) {
-                boruvkaStepThread(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, timer,
-                                  useKruskal, hashBorder, iteration);
-                boruvkaThreadCount--;
-            } else {
-                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, timer, useKruskal,
-                            hashBorder, iteration);
-            }
+            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, overlapCount, timer,
+                        useKruskal, hashBorder, iteration);
             timer.stop("b-iteration", iteration);
             iteration++;
             numEdges.push_back(e.size());
