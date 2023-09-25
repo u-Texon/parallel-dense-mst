@@ -54,13 +54,15 @@ namespace executor {
                 }
 
             }
-            if (i != 0) {
+            if (i== 0) {
                 std::string filePath = "out/files";
                 std::filesystem::create_directories(filePath);
                 std::filesystem::create_directory("out/plots");
                 filePath += "/";
 
                 writer::writeBoxplot(filePath, config, numEdges, numVertices);
+            } else {
+                std::string filePath = "out/files/";
                 if (ctx.rank() == 0) {
                     writer::write_csv(filePath, config, timerOutput);
                     std::cout << "results have been written to " << filePath << std::endl;

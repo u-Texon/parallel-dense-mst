@@ -252,8 +252,9 @@ namespace writer {
 
     void write_csv(const std::string &filePath, Config &config, std::string &timerOutput) {
         std::ofstream file;
+        hybridMST::mpi::MPIContext ctx;
         if (config.algo == "boruvka" && config.onlyThisAlgo) {
-            file.open(filePath + "only-" + config.algo + ".csv");
+            file.open(filePath + "only-" + config.algo + "-" + std::to_string(ctx.size()) + ".csv");
             if (!file.is_open()) {
                 std::cout << "!!! error on opening mergeFile " << filePath << " !!!" << std::endl;
             }
@@ -263,7 +264,7 @@ namespace writer {
                     << std::endl;
             writeBoruvkaResults(timerOutput, file, config);
         } else if (config.algo == "merge" && config.onlyThisAlgo) {
-            file.open(filePath + "only-" + config.algo + ".csv");
+            file.open(filePath + "only-" + config.algo + "-" + std::to_string(ctx.size()) + ".csv");
             if (!file.is_open()) {
                 std::cout << "!!! error on opening mergeFile " << filePath << " !!!" << std::endl;
             }
@@ -273,7 +274,7 @@ namespace writer {
             writeMergeResults(timerOutput, file, config);
         } else if (config.onlyThisAlgo && (config.algo == "mixedMerge" || config.algo == "boruvkaMerge")) {
             std::ofstream boruvkaFile;
-            boruvkaFile.open(filePath + "only-" + config.algo + "-boruvka.csv");
+            boruvkaFile.open(filePath + "only-" + config.algo + "-boruvka-" + std::to_string(ctx.size()) + ".csv");
 
             if (!boruvkaFile.is_open()) {
                 std::cout << "!!! error on opening mergeFile " << filePath << " !!!" << std::endl;
@@ -292,7 +293,7 @@ namespace writer {
             boruvkaFile.close();
 
 
-            file.open(filePath + "only-" + config.algo + "-merge.csv");
+            file.open(filePath + "only-" + config.algo + "-merge-" + std::to_string(ctx.size()) + ".csv");
             if (!file.is_open()) {
                 std::cout << "!!! error on opening mergeFile " << filePath << " !!!" << std::endl;
             }
@@ -305,15 +306,12 @@ namespace writer {
 
         } else {
             std::string fileName = "";
-            if (config.onlyThisAlgo) {
-                fileName = filePath + "only-" + config.algo + ".csv";
+            if (config.boruvkaOverlapCount) {
+                fileName = filePath + config.algo + "-thread" + ".csv";
             } else {
-                if (config.boruvkaOverlapCount) {
-                    fileName = filePath + config.algo + "-thread" + ".csv";
-                } else {
-                    fileName = filePath + config.algo + ".csv";
-                }
+                fileName = filePath + config.algo + ".csv";
             }
+
 
             std::ifstream f(fileName);
             bool alreadyExists = f.good();
