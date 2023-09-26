@@ -134,11 +134,11 @@ namespace boruvka_allreduce {
 
 
     void removeParallelEdges(WEdgeOriginList &parallelEdges) {
-        if (parallelEdges.empty()) {
-            return;
-        }
         ips4o::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
+        auto last = std::unique(parallelEdges.begin(), parallelEdges.end());
+        parallelEdges.erase(last, parallelEdges.end());
 
+        /*
         WEdgeOriginList edges;
         VId s = -1;
         VId d = -1;
@@ -153,12 +153,13 @@ namespace boruvka_allreduce {
             }
         }
         parallelEdges = edges;
+         */
     }
 
 
     struct pair_hash {
-        inline std::size_t operator()(const std::pair<int, int> &v) const {
-            return v.first * 431 + v.second;
+        inline std::size_t operator()(const std::pair<VId, VId> &v) const {
+            return (v.first * 19) * (v.second * 13);
         }
     };
 
@@ -172,42 +173,55 @@ namespace boruvka_allreduce {
      * @param parallelEdges
      */
     void removeParallelEdgesHashing(WEdgeOriginList &parallelEdges) {
-        WEdgeOriginList pivotEdges;
-
         //estimate pivot weight that is roughly the 5% lowest of all edges
-        for (int i = 0; i < 100; ++i) {
-            pivotEdges.push_back(parallelEdges[i]);
-        }
-        ips4o::sort(pivotEdges.begin(), pivotEdges.end(), WeightOrder<WEdgeOrigin>{});
-        VId pivot = pivotEdges[4].get_weight();
+        ips4o::sort(parallelEdges.begin(), parallelEdges.begin() + 100, WeightOrder<WEdgeOrigin>{});
+        VId pivot = parallelEdges[4].get_weight();
 
         //separate light edges from heavy edges
+        auto middle = std::partition(parallelEdges.begin(), parallelEdges.end(), [&](const auto &edge) {
+            return edge.get_weight() <= pivot;
+        });
+        std::vector<WEdgeOrigin> smaller(parallelEdges.begin(), middle);
+        std::vector<WEdgeOrigin> bigger(middle, parallelEdges.end());
+
+        std::cout << "smaller: " << smaller.size() << std::endl;
+        std::cout << "bigger: " << bigger.size() << std::endl;
+
+        removeParallelEdges(smaller);
         std::unordered_set<std::pair<VId, VId>, pair_hash> set;
-        WEdgeOriginList smaller, bigger;
-        for (auto &edge: parallelEdges) {
-            if (edge.get_weight() <= pivot) {
-                smaller.push_back(edge);
+        for (auto &edge: smaller) {
+            if (edge.src > edge.dst) {
+                set.insert({edge.dst, edge.src});
             } else {
-                bigger.push_back(edge);
+                set.insert({edge.src, edge.dst});
             }
         }
 
-        //safe the low weight edges into a hashset
-        WEdgeOriginList edges;
+
+        WEdgeOriginList edges(smaller.begin(), smaller.end());
+
+
+
+        /*
         for (auto &edge: smaller) {
             VId s = edge.get_src();
             VId t = edge.get_dst();
-
             if (edge.get_src() > edge.get_dst()) {
                 s = edge.get_dst();
                 t = edge.get_src();
             }
 
-            if (set.find({s, t}) == set.end()) {
+            auto elem = set.find({s, t});
+            if (elem == set.end()) {
                 set.insert({s, t});
                 edges.push_back(edge);
+            } else {  //collision
+                if (elem->first != s || elem->second != t) {
+                    edges.push_back(edge);
+                }
             }
-        }
+        }*/
+        std::cout << "edges after smaller: " << edges.size() << std::endl;
 
         //remove heavy edges
         for (auto &edge: bigger) {
@@ -217,13 +231,21 @@ namespace boruvka_allreduce {
                 s = edge.get_dst();
                 t = edge.get_src();
             }
-            if (set.find({s, t}) != set.end()) {
+            auto elem = set.find({s, t});
+            if (elem == set.end()) {
                 edges.push_back(edge);
+            } else {
+                if (elem->first != s || elem->second != t) { //collision
+                    edges.push_back(edge);
+                }
             }
         }
+        std::cout << "edges after bigger: " << edges.size() << std::endl;
+
 
         //finish with base case
-        return removeParallelEdges(edges);
+        removeParallelEdges(edges);
+        parallelEdges = edges;
     }
 
 
@@ -298,13 +320,20 @@ namespace boruvka_allreduce {
         timer.stop("relabel", iteration);
 
 
+        std::cout << "before: " << relabeledEdges.size() << std::endl;
+
         timer.start("removeParallelEdges", iteration);
+        //removeParallelEdges(relabeledEdges);
+
         if (relabeledEdges.size() > hashBorder) {
             removeParallelEdgesHashing(relabeledEdges);
         } else {
             removeParallelEdges(relabeledEdges);
         }
         timer.stop("removeParallelEdges", iteration);
+
+        std::cout << "after: " << relabeledEdges.size() << std::endl;
+
         edges = relabeledEdges;
     }
 
