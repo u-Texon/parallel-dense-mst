@@ -28,7 +28,7 @@ namespace executor {
         VId n = pow(2, config.log_n);
 
 
-        for (int i = 0; i < config.repeat; ++i) {
+        for (size_t i = 0; i < config.repeat; ++i) {
             std::vector<size_t> numEdges;
             std::vector<size_t> numVertices;
             hybridMST::Timer timer;
@@ -64,7 +64,7 @@ namespace executor {
             } else {
                 std::string filePath = "out/files/";
                 if (ctx.rank() == 0) {
-                    writer::write_csv(filePath, config, timerOutput);
+                    writer::write_csv(filePath, config, timerOutput, i);
                     std::cout << "results have been written to " << filePath << std::endl;
                 }
             }

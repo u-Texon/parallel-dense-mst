@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-merge = pd.read_csv('../out/files/only-merge.csv')
+merge = pd.read_csv('../out/files/only-merge-proc2048-iter2.csv')
 
 initialMST = np.array(list(merge['calculate initial MST'])[0])
 localMST = np.array(list(merge['calculate local MST']))

@@ -127,7 +127,7 @@ namespace generateGraph {
             auto [edges, vertex_range] = graphs::get_rgg2D(config.log_n, static_cast<std::size_t>(numEdges), weights);
             distEdges = edges;
         } else if (config.graphType == "pair") {
-            distEdges = generatePairGraph(config.log_n, config.log_m, weights);
+            distEdges = generatePairGraph(config.log_n, numEdges, weights);
         }
 
         if (config.shuffle) {

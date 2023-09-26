@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/merge_boxplot-4.csv')
+boruvka = pd.read_csv('../out/files/merge_boxplot-2048.csv')
 
 iterations = np.array(list(boruvka['Iteration']))
 numEdges = np.array(list(boruvka['NumEdges']))
@@ -40,4 +40,3 @@ p.set_xticklabels(labels)
 p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
 
 plt.savefig('../out/plots/merge_box.svg')
-plt.show()

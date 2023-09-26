@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/only-mixedMerge-boruvka.csv')
+boruvka = pd.read_csv('../out/files/only-mixedMerge-boruvka-proc2048-iter2.csv')
 
 mm_initVariables = np.array(list(boruvka['init variables']))
 mm_initialMST = list(boruvka['initial local MST'])[0]
@@ -16,7 +16,7 @@ b_calcIncident = np.array(list(boruvka['calc-incident']))
 b_parentArray = np.array(list(boruvka['parentArray']))
 b_relabel = np.array(list(boruvka['relabel']))
 
-merge = pd.read_csv('../out/files/only-mixedMerge-merge.csv')
+merge = pd.read_csv('../out/files/only-mixedMerge-merge-proc2048-iter2.csv')
 
 m_localMST = np.array((merge['calculate local MST']))
 m_iterations = np.array(list(merge['iteration']))

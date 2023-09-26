@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/only-boruvkaMerge-boruvka.csv')
+boruvka = pd.read_csv('../out/files/only-boruvkaMerge-boruvka-proc2048-iter2.csv')
 
 initVariables = np.array(list(boruvka['init variables']))
 initialMST = list(boruvka['initial local MST'])[0]
@@ -43,7 +43,7 @@ p.bar(range(1, b_size + 1), rest,
       bottom=parallelEdges + parentArray + shrink + localMST + calcIncident + allreduce + relabel,
       color="green")
 
-merge = pd.read_csv('../out/files/only-boruvkaMerge-merge.csv')
+merge = pd.read_csv('../out/files/only-boruvkaMerge-merge-proc2048-iter2.csv')
 
 initialMST = np.array(list(merge['calculate initial MST'])[0])
 localMST = np.array(list(merge['calculate local MST']))

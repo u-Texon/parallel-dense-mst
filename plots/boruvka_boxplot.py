@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/boruvka_boxplot-4.csv')
+boruvka = pd.read_csv('../out/files/boruvka_boxplot-2048.csv')
 
 iterations = np.array(list(boruvka['Iteration']))
 numVertices = np.array(list(boruvka['numVertices']))
@@ -45,6 +45,7 @@ p[1].set_ylabel("Vertices")
 p[1].set_xticks([i for i in range(sizeIt)])
 p[1].set_xticklabels(labels)
 
+p[1].set_xticks(p[1].get_xticks(), p[1].get_xticklabels(), rotation=45, ha='right')
+p[0].set_xticks(p[0].get_xticks(), p[0].get_xticklabels(), rotation=45, ha='right')
 
 plt.savefig('../out/plots/boruvka_box.svg')
-plt.show()
