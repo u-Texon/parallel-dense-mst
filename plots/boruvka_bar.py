@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/only-boruvka-proc2048-iter2.csv')
+boruvka = pd.read_csv('../out/files/only-boruvka-proc4-iter2.csv')
 
 localMST = np.array(list(boruvka['calculate local MST']))
 iterations = np.array(list(boruvka['iteration']))
@@ -70,5 +70,5 @@ title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per 
     p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]\n" + " base case is " + baseCase
 
 plt.title(title)
-
+plt.show()
 plt.savefig('../out/plots/boruvka_bar.svg')

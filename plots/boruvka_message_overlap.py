@@ -5,7 +5,7 @@ import numpy as np
 boruvka = pd.read_csv('../out/files/boruvka.csv')
 boruvkaThread = pd.read_csv('../out/files/boruvka-thread.csv')
 
-procSize = 12
+procSize = 10
 
 nums = np.arange(procSize)
 procs = 2 ** nums
