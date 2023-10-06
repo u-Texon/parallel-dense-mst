@@ -12,7 +12,7 @@ namespace mixed_merge {
     template<typename Timer>
     inline WEdgeList
     getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount,  std::vector<size_t> &numEdges,
-           std::vector<size_t> &numVertices, Timer &timer, bool useKruskal = false, VId treeFactor = 2,
+           std::vector<size_t> &numVertices, Timer &timer, bool removeParallelEdges, bool useKruskal = false, VId treeFactor = 2,
            size_t hashBorder = 1000) {
 
         timer.start("initVariables", 0);
@@ -49,7 +49,7 @@ namespace mixed_merge {
             timer.start("b-iteration", iteration);
             size_t overlapCount = 0;
             boruvka_allreduce::boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, edges, mst, mstCount,
-                                           overlapCount, timer, useKruskal, hashBorder, iteration);
+                                           overlapCount, removeParallelEdges, timer, useKruskal, hashBorder, iteration);
             timer.stop("b-iteration", iteration);
             numVertices.push_back(n);
             numEdges.push_back(edges.size());

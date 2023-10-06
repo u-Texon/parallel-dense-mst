@@ -213,7 +213,10 @@ namespace writer {
                 boruvka = std::stoi(token.erase(0, timerOutput.find('=') + 1));
             } else if (token.substr(0, strlen("shrink")) == "shrink") {
                 shrink.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
-            } else if (token.substr(0, strlen("calc-incident")) == "calc-incident") {
+            } else if (token.substr(0, strlen("overlap")) == "overlap") {
+                allreduce.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
+            }
+            else if (token.substr(0, strlen("calc-incident")) == "calc-incident") {
                 calcIncident.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
             } else if (token.substr(0, strlen("relabel")) == "relabel") {
                 relabel.push_back(std::stoi(token.erase(0, timerOutput.find('=') + 1)));
@@ -254,10 +257,18 @@ namespace writer {
         std::ofstream file;
         hybridMST::mpi::MPIContext ctx;
         if (config.algo == "boruvka" && config.onlyThisAlgo) {
-            file.open(filePath + "only-" + config.algo + "-proc" + std::to_string(ctx.size()) + +"-iter" +
-                      std::to_string(iteration) + ".csv");
+
+            if (config.boruvkaOverlapCount) {
+                file.open(filePath + "only-" + config.algo + "-thread-proc" + std::to_string(ctx.size()) + +"-iter" +
+                          std::to_string(iteration) + ".csv");
+            } else {
+                file.open(filePath + "only-" + config.algo + "-proc" + std::to_string(ctx.size()) + +"-iter" +
+                          std::to_string(iteration) + ".csv");
+            }
+
+
             if (!file.is_open()) {
-                std::cout << "!!! error on opening mergeFile " << filePath << " !!!" << std::endl;
+                std::cout << "!!! error on opening file " << filePath << " !!!" << std::endl;
             }
             file
                     << "run time,init variables,calculate local MST,iteration,allreduce,remove parallel edges,shrink,calc-incident,parentArray,relabel,"

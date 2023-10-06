@@ -137,41 +137,17 @@ namespace boruvka_allreduce {
 
     void removeParallelEdges(WEdgeOriginList &parallelEdges) {
         ips4o::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
-        VId s = -1;
-        VId d = -1;
-        auto it = std::remove_if(parallelEdges.begin(), parallelEdges.end(), [&](const auto &edge) {
-            if (edge.src != s) {
-                s = edge.src;
-                d = edge.dst;
-                return false;
-            } else if (edge.dst != d) {
-                d = edge.dst;
-                return false;
+        auto it = std::unique(parallelEdges.begin(), parallelEdges.end(), [&](const auto &edge1, const auto &edge2) {
+            if (edge1.src == edge2.src) {
+                return edge1.dst == edge2.dst;
             }
-            return true;
+            if (edge1.src == edge2.dst) {
+                return edge1.dst == edge2.src;
+            }
+            return false;
         });
         parallelEdges.erase(it, parallelEdges.end());
 
-        /*
-        WEdgeOriginList edges;
-        VId s = -1;
-        VId d = -1;
-        for (auto &e: parallelEdges) {
-            if (e.get_src() != s) {
-                edges.push_back(e);
-                s = e.get_src();
-                d = e.get_dst();
-            } else if (e.get_dst() != d) {
-                edges.push_back(e);
-                d = e.get_dst();
-            }
-        }
-        parallelEdges = edges;
-        */
-        /*
-        auto last = std::unique(parallelEdges.begin(), parallelEdges.end());
-        parallelEdges.erase(last, parallelEdges.end());
-         */
     }
 
 
@@ -201,12 +177,6 @@ namespace boruvka_allreduce {
         });
         std::vector<WEdgeOrigin> smaller(parallelEdges.begin(), middle);
         std::span<WEdgeOrigin> bigger(middle, parallelEdges.end());
-
-        //   std::cout << "smaller: " << smaller.size() << std::endl;
-        //     std::cout << "bigger: " << bigger.size() << std::endl;
-
-
-
         std::unordered_set<std::pair<VId, VId>, pair_hash> set;
         removeParallelEdges(smaller);
         for (auto &edge: smaller) {
@@ -216,10 +186,7 @@ namespace boruvka_allreduce {
                 set.insert({edge.src, edge.dst});
             }
         }
-
-
         WEdgeOriginList edges(smaller.begin(), smaller.end());
-        //      std::cout << "edges after smaller: " << edges.size() << std::endl;
 
         //remove heavy edges
         for (auto &edge: bigger) {
@@ -238,7 +205,7 @@ namespace boruvka_allreduce {
                 }
             }
         }
-        //      std::cout << "edges after bigger: " << edges.size() << std::endl;
+
 
 
         //finish with base case
@@ -268,9 +235,8 @@ namespace boruvka_allreduce {
     template<typename Timer>
     void boruvkaStep(VId &n, WEdgeOriginList &incidentLocal, WEdgeOriginList &incident, std::vector<VId> &vertices,
                      std::vector<VId> &parent, UnionFind &uf, WEdgeOriginList &edges, WEdgeOriginList &mst,
-                     size_t &localMSTcount, size_t &overlapCount, Timer &timer, bool useKruskal = false,
-                     size_t hashBorder = 1000,
-                     size_t iteration = 0) {
+                     size_t &localMSTcount, size_t &overlapCount, bool removeParallel, Timer &timer,
+                     bool useKruskal = false, size_t hashBorder = 1000, size_t iteration = 0) {
 
         timer.start("shrink", iteration);
         shrink(n, incidentLocal, incident, vertices, parent, uf);
@@ -326,22 +292,11 @@ namespace boruvka_allreduce {
             relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
             timer.stop("relabel", iteration);
 
-
-            //std::cout << "before: " << relabeledEdges.size() << std::endl;
-
             timer.start("removeParallelEdges", iteration);
-            removeParallelEdges(relabeledEdges);
-
-            /*
-            if (relabeledEdges.size() > hashBorder) {
-                removeParallelEdgesHashing(relabeledEdges);
-            } else {
+            if (removeParallel) {
                 removeParallelEdges(relabeledEdges);
-            }*/
+            }
             timer.stop("removeParallelEdges", iteration);
-
-           // std::cout << "after: " << relabeledEdges.size() << std::endl;
-
             edges = relabeledEdges;
         }
 
@@ -356,7 +311,7 @@ namespace boruvka_allreduce {
         template<typename Timer>
         inline WEdgeList
         getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
-               std::vector<size_t> &numVertices, Timer &timer, size_t &overlapCount,
+               std::vector<size_t> &numVertices, Timer &timer, size_t &overlapCount, bool removeParallelEdges,
                bool useKruskal = false, size_t hashBorder = 1000) {
 
             timer.start("initVariables", 0);
@@ -373,8 +328,8 @@ namespace boruvka_allreduce {
 
             while (n > 1) {
                 timer.start("b-iteration", iteration);
-                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, overlapCount, timer,
-                            useKruskal, hashBorder, iteration);
+                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, overlapCount,
+                            removeParallelEdges, timer, useKruskal, hashBorder, iteration);
                 timer.stop("b-iteration", iteration);
                 iteration++;
                 numEdges.push_back(e.size());

@@ -64,9 +64,13 @@ namespace commandParser {
             config.help = true;
         } else if (arg == "k") {
             config.useKruskal = true;
+        } else if (arg == "removeParallel") {
+            config.removeParallelEdges = true;
         } else if (arg == "s") {
             config.shuffle = false;
-        } else if (arg.substr(0, 2) == "o=") {
+        } else if (arg == "f") {
+            config.filterEdges = true;
+        }else if (arg.substr(0, 2) == "o=") {
             config.boruvkaOverlapCount = std::stoi(arg.substr(2, arg.length()));
         } else if (arg == "t") {
             config.test = true;
@@ -92,6 +96,8 @@ namespace commandParser {
         } else if (arg.substr(0, 5) == "algo=") {
             config.algo = arg.substr(5, arg.length());
             checkAlgo(config.algo);
+        } else if (arg.substr(0, 4) == "dir=") {
+            config.dir = arg.substr(4, arg.length());
         } else if (arg.substr(0, 2) == "d=") {
             VId d = std::stoi(arg.substr(2, arg.length()));
             if (d < 2) {

@@ -74,12 +74,15 @@ struct Config {
     size_t localMSTcount = 1;
     size_t repeat = 2; //first iteration will be removed
     size_t boruvkaOverlapCount = 0;
+    std::string dir = "default";
     bool shuffle = true;
     bool useKruskal = false;
     bool test = false;
     bool help = false;
     bool parseError = false;
     bool onlyThisAlgo = false;
+    bool removeParallelEdges = false;
+    bool filterEdges = false;
 
     friend std::ostream &operator<<(std::ostream &out, const Config &c) {
         return out << "graph " << c.graphType << ", with log_n = " << c.log_n
@@ -105,9 +108,9 @@ using WEdgeOriginList = std::vector<WEdgeOrigin>;
 template<typename EdgeType>
 struct SrcDstWeightOrder {
     bool operator()(const EdgeType &l, const EdgeType &r) const {
-        return l.get_src() < r.get_src()
-               || l.get_src() == r.get_src() && l.get_dst() < r.get_dst()
-               || l.get_src() == r.get_src() && l.get_dst() == r.get_dst() && l.get_weight() < r.get_weight();
+        return std::min(l.src, l.dst) < std::min(r.src, r.dst)
+               || std::min(l.src, l.dst) == std::min(r.src, r.dst) && std::max(l.src, l.dst) < std::max(r.src, r.dst)
+               || std::min(l.src, l.dst) == std::min(r.src, r.dst) && std::max(l.src, l.dst) == std::max(r.src, r.dst) && l.weight < r.weight;
     }
 };
 

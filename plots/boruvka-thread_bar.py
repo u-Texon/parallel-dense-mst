@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/only-boruvka-proc1024-iter2.csv')
+boruvka = pd.read_csv('../out/files/only-boruvka-thread-proc1024-iter2.csv')
 
 localMST = np.array(list(boruvka['calculate local MST']))
 iterations = np.array(list(boruvka['iteration']))
@@ -38,16 +38,14 @@ p.bar(range(size), rest, bottom=parallelEdges + parentArray + shrink + localMST 
       color="green")
 
 p.legend(
-    ["shrink old arrays", "calculate local MST", "calculate incident edges", "allreduce", "calculate parent array",
-     "relabel", "remove parallel edges", "rest"])
-
+    ["shrink old arrays", "calculate local MST", "calculate incident edges", "allreduce+localMST",
+     "calculate parent array", "relabel", "remove parallel edges", "rest"])
 
 p.set_xticks(range(size))
-p.set_xticklabels(range(1,size +1))
+p.set_xticklabels(range(1, size + 1))
 p.set_xlabel("Boruvka Round")
 p.set_ylabel("Total Run Time [microseconds]")
 p.set_ylim(bottom=0)
-
 
 numVertices = boruvka['log(n)'][0]
 minWeight = boruvka['minimum weight'][0]
@@ -65,9 +63,8 @@ if baseCase == 0:
 else:
     baseCase = "kruskal"
 
-
 title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
     p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]\n" + " base case is " + baseCase
 
 plt.title(title)
-plt.savefig('../out/plots/boruvka_bar.svg')
+plt.savefig('../out/plots/boruvka-thread_bar.svg')

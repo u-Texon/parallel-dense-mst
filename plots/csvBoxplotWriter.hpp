@@ -25,7 +25,6 @@ namespace writer {
             file << "Algorithm,Processor Number,Iteration,NumEdges,numVertices" << std::endl;
         }
         ctx.barrier();
-
         if (ctx.rank() != 0) {
             file.open(fileName, std::ios::app);
             if (!file.is_open()) {
@@ -38,16 +37,10 @@ namespace writer {
             if (i >= numVertices.size()) {
                 file << config.algo << "," << ctx.rank() << "," << i << "," << numEdges[i] << "," << 0
                      << std::endl;
-
             } else {
-
                 file << config.algo << "," << ctx.rank() << "," << i << "," << numEdges[i] << "," << numVertices[i]
                      << std::endl;
             }
         }
-
-
-        }
-
-
     }
+}
