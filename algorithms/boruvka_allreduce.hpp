@@ -136,17 +136,20 @@ namespace boruvka_allreduce {
 
     void removeParallelEdges(WEdgeOriginList &parallelEdges) {
         ips4o::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
-        auto it = std::unique(parallelEdges.begin(), parallelEdges.end(), [&](const auto &edge1, const auto &edge2) {
-            if (edge1.src == edge2.src) {
-                return edge1.dst == edge2.dst;
+        VId s = -1;
+        VId d = -1;
+        auto it = std::remove_if(parallelEdges.begin(), parallelEdges.end(), [&](const auto &edge) {
+            if (edge.src != s) {
+                s = edge.src;
+                d = edge.dst;
+                return false;
+            } else if (edge.dst != d) {
+                d = edge.dst;
+                return false;
             }
-            if (edge1.src == edge2.dst) {
-                return edge1.dst == edge2.src;
-            }
-            return false;
+            return true;
         });
         parallelEdges.erase(it, parallelEdges.end());
-
     }
 
 

@@ -22,6 +22,8 @@ namespace writer {
             return; //no need to write boxplot more than once
         }
 
+        ctx.barrier();
+
         std::ofstream file;
         if (ctx.rank() == 0) {
             std::filesystem::remove(fileName);

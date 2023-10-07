@@ -12,15 +12,8 @@
 
 
 void filterEdges(WEdgeList &distEdges) {
-    ips4o::sort(distEdges.begin(), distEdges.end(), SrcDstOrder<WEdge>{});
-    auto it = std::unique(distEdges.begin(), distEdges.end(), [&](const auto &edge1, const auto &edge2) {
-        if (edge1.src == edge2.src) {
-            return edge1.dst == edge2.dst;
-        }
-        if (edge1.src == edge2.dst) {
-            return edge1.dst == edge2.src;
-        }
-        return false;
+    auto it = std::remove_if(distEdges.begin(), distEdges.end(), [&](const auto &e) {
+        return e.src > e.dst;
     });
     distEdges.erase(it, distEdges.end());
 }
