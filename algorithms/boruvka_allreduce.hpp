@@ -13,7 +13,6 @@
 
 namespace boruvka_allreduce {
 
-
     /**
      * mpi allreduce function
      */
@@ -338,4 +337,4 @@ namespace boruvka_allreduce {
             return getOriginEdges(mst);
         }
 
-    } //namespace
+} //namespace

@@ -65,7 +65,7 @@ namespace executor {
                 std::string filePath = "out/" + config.dir + "/files/";
                 if (ctx.rank() == 0) {
                     writer::write_csv(filePath, config, timerOutput, i);
-                    std::cout << "results have been written to " << filePath << std::endl;
+                    std::cout << "Results have been written to " << filePath << std::endl;
                 }
             }
         }

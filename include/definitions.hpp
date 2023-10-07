@@ -105,6 +105,15 @@ bool operator==(const WEdgeOrigin &a, const WEdgeOrigin &b) {
 
 using WEdgeOriginList = std::vector<WEdgeOrigin>;
 
+
+template<typename EdgeType>
+struct SrcDstOrder {
+    bool operator()(const EdgeType &l, const EdgeType &r) const {
+        return std::min(l.src, l.dst) < std::min(r.src, r.dst)
+               || std::min(l.src, l.dst) == std::min(r.src, r.dst) && std::max(l.src, l.dst) < std::max(r.src, r.dst);
+    }
+};
+
 template<typename EdgeType>
 struct SrcDstWeightOrder {
     bool operator()(const EdgeType &l, const EdgeType &r) const {

@@ -15,6 +15,13 @@ namespace writer {
         hybridMST::mpi::MPIContext ctx;
         std::string fileName = filePath + config.algo + "_boxplot-" + std::to_string(ctx.size()) + ".csv";
 
+
+        std::ifstream f(fileName);
+        bool alreadyExists = f.good();
+        if (alreadyExists) {
+            return; //no need to write boxplot more than once
+        }
+
         std::ofstream file;
         if (ctx.rank() == 0) {
             std::filesystem::remove(fileName);
@@ -42,5 +49,10 @@ namespace writer {
                      << std::endl;
             }
         }
+
+        if (ctx.rank() == 0) {
+            std::cout << "Boxplot-results have been written to " << filePath << std::endl;
+        }
+
     }
 }

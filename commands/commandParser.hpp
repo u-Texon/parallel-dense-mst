@@ -64,7 +64,7 @@ namespace commandParser {
             config.help = true;
         } else if (arg == "k") {
             config.useKruskal = true;
-        } else if (arg == "removeParallel") {
+        } else if (arg == "remove") {
             config.removeParallelEdges = true;
         } else if (arg == "s") {
             config.shuffle = false;

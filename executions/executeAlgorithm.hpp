@@ -12,7 +12,7 @@
 
 
 void filterEdges(WEdgeList &distEdges) {
-    ips4o::sort(distEdges.begin(), distEdges.end(), SrcDstWeightOrder<WEdge>{});
+    ips4o::sort(distEdges.begin(), distEdges.end(), SrcDstOrder<WEdge>{});
     auto it = std::unique(distEdges.begin(), distEdges.end(), [&](const auto &edge1, const auto &edge2) {
         if (edge1.src == edge2.src) {
             return edge1.dst == edge2.dst;
@@ -37,7 +37,6 @@ runAlgorithm(Config config, VId n, WEdgeList allEdges, WEdgeList distEdges, std:
         filterEdges(distEdges);
         timer.stop("filterEdges", 0);
     }
-
 
     numVertices.push_back(n);
     numEdges.push_back(distEdges.size());
