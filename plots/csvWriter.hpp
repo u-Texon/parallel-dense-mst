@@ -336,14 +336,29 @@ namespace writer {
                 std::cout << "!!! error on opening mergeFile " << fileName << " !!!" << std::endl;
             }
 
-            std::string result = timerOutput.erase(0, timerOutput.find('=') + 1);
+            size_t result = 0;
+            size_t filter = 0;
+            std::string delimiter = " ";
+            size_t pos = 0;
+            std::string token;
+            while ((pos = timerOutput.find(delimiter)) != std::string::npos) {
+                token = timerOutput.substr(0, pos);
+                if (token.substr(0, strlen("filterEdges")) == "filterEdges") {
+                    filter = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+                } else if (token.substr(0, strlen(config.algo.c_str())) == config.algo) {
+                    result = std::stoi(token.erase(0, timerOutput.find('=') + 1));
+                }
+                timerOutput.erase(0, pos + delimiter.length());
+            }
+
+
             if (!alreadyExists) {
                 file
-                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,boruvkaThread,localMSTcount,run time"
+                        << "Algorithm,Processors,log(m),log(n),minimum weight,maximum weight,graph-type,tree-factor,edges per processor,edges are shuffled,kruskal as base case,boruvkaThread,localMSTcount,run time,filter"
                         << std::endl;
             }
             writeResult(file, config);
-            file << "," << result << std::endl;
+            file << "," << result + filter << "," << filter << std::endl;
         }
         file.close();
     }

@@ -7,7 +7,7 @@ boruvkaMerge = pd.read_csv('../out/files/boruvkaMerge.csv')
 merge = pd.read_csv('../out/files/merge.csv')
 mixedMerge = pd.read_csv('../out/files/mixedMerge.csv')
 
-procSize = 12
+procSize = 10
 
 nums = np.arange(procSize)
 procs = 2 ** nums
