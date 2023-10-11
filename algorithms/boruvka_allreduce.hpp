@@ -269,11 +269,10 @@ namespace boruvka_allreduce {
                      size_t &localMSTcount, size_t &overlapCount, bool removeParallel, Timer &timer,
                      bool useKruskal = false, size_t hashBorder = 1000, size_t iteration = 0) {
 
-        if (iteration == 0) {
-            timer.start("shrink", iteration);
-            shrink(n, incidentLocal, incident, vertices, parent, uf);
-            timer.stop("shrink", iteration);
-        }
+        timer.start("shrink", iteration);
+        shrink(n, incidentLocal, incident, vertices, parent, uf);
+        timer.stop("shrink", iteration);
+
         if (overlapCount > 0) { //message overlap
             timer.start("calc-incident", iteration);
             calcMinIncident(n, incidentLocal, edges);
@@ -303,9 +302,7 @@ namespace boruvka_allreduce {
             }
 
             timer.start("calc-incident", iteration);
-            if (!removeParallel || iteration == 0) {
-                calcMinIncident(n, incidentLocal, edges);
-            }
+            calcMinIncident(n, incidentLocal, edges);
             timer.stop("calc-incident", iteration);
 
 
@@ -326,13 +323,9 @@ namespace boruvka_allreduce {
         timer.stop("relabel", iteration);
 
 
-        timer.start("shrink", iteration);
-        shrink(n, incidentLocal, incident, vertices, parent, uf);
-        timer.stop("shrink", iteration);
-
         timer.start("removeParallelEdges", iteration);
         if (removeParallel) {
-            removeParallelEdgesAndCalcIncident(relabeledEdges, incidentLocal, n);
+            removeParallelEdges(relabeledEdges);
         }
         timer.stop("removeParallelEdges", iteration);
         edges = relabeledEdges;
