@@ -1,0 +1,12 @@
+
+MST:9070 terminated with signal 11 at PC=56269d2d4b16 SP=7fff53236450.  Backtrace:
+./build/MST(+0x1bb16)[0x56269d2d4b16]
+./build/MST(+0x136a1a)[0x56269d3efa1a]
+./build/MST(+0x13d614)[0x56269d3f6614]
+./build/MST(+0x1c9af)[0x56269d2d59af]
+./build/MST(+0x12c59d)[0x56269d3e559d]
+./build/MST(+0x26a88)[0x56269d2dfa88]
+./build/MST(+0x158cc)[0x56269d2ce8cc]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7f7ce25f4d90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7f7ce25f4e40]
+./build/MST(+0x16965)[0x56269d2cf965]

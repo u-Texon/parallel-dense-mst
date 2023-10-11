@@ -1,0 +1,12 @@
+
+MST:6147 terminated with signal 11 at PC=561e4e00f084 SP=7ffedcdbc5c8.  Backtrace:
+./build/MST(+0x1b084)[0x561e4e00f084]
+./build/MST(+0x136a50)[0x561e4e12aa50]
+./build/MST(+0x13d7ee)[0x561e4e1317ee]
+./build/MST(+0x1c96f)[0x561e4e01096f]
+./build/MST(+0x12befd)[0x561e4e11fefd]
+./build/MST(+0x266eb)[0x561e4e01a6eb]
+./build/MST(+0x158cc)[0x561e4e0098cc]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7fa465cefd90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7fa465cefe40]
+./build/MST(+0x16965)[0x561e4e00a965]

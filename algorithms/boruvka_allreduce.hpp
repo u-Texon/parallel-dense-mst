@@ -38,30 +38,16 @@ namespace boruvka_allreduce {
         uf.clear(n);
     }
 
-    void calcMinIncident(size_t n, WEdgeOriginList &incidentLocal, WEdgeOriginList &edges) {
-        for (int i = 0; i < n; ++i) {
-            incidentLocal[i] = WEdgeOrigin(i, i, -1); //initialize "empty" entries
-        }
-        for (auto &edge: edges) {
-            VId u = edge.get_src();
-            VId v = edge.get_dst();
-            if (edge.get_weight() < incidentLocal[u].get_weight()) {
-                incidentLocal[u] = edge;
-            }
-            if (edge.get_weight() < incidentLocal[v].get_weight()) {
-                incidentLocal[v] = edge;
-            }
-        }
-    }
-
 
     void addMSTEdges(VId &n, WEdgeOriginList &mst, WEdgeOriginList &incident, WEdgeOriginList &edges) {
+        hybridMST::mpi::MPIContext ctx;
         //add edges to mst
         for (int i = 0; i < n; ++i) {
             if (incident[i].get_weight() != -1) {
                 WEdgeOrigin &edge = incident[i];
-                mst.push_back(edge);
-
+                if (ctx.rank() == 0) {
+                    mst.push_back(edge);
+                }
                 //mark edge as invalid, if it has already been added
                 if (i == edge.get_src() && incident[edge.get_dst()] == edge) {
                     incident[edge.get_dst()].set_weight(-1);
@@ -134,16 +120,63 @@ namespace boruvka_allreduce {
     }
 
 
-    void removeParallelEdges(WEdgeOriginList &parallelEdges) {
-        ips4o::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
-        auto it = std::unique(parallelEdges.begin(), parallelEdges.end(), [&](const auto &edge1, const auto &edge2) {
-            if (edge1.src == edge2.src) {
-                return edge1.dst == edge2.dst;
+    void calcMinIncident(size_t n, WEdgeOriginList &incidentLocal, WEdgeOriginList &edges) {
+        for (int i = 0; i < n; ++i) {
+            incidentLocal[i] = WEdgeOrigin(i, i, -1); //initialize "empty" entries
+        }
+        for (auto &edge: edges) {
+            VId u = edge.get_src();
+            VId v = edge.get_dst();
+            if (edge.get_weight() < incidentLocal[u].get_weight()) {
+                incidentLocal[u] = edge;
             }
-            if (edge1.src == edge2.dst) {
-                return edge1.dst == edge2.src;
+            if (edge.get_weight() < incidentLocal[v].get_weight()) {
+                incidentLocal[v] = edge;
+            }
+        }
+    }
+
+
+    void removeParallelEdgesAndCalcIncident(WEdgeOriginList &parallelEdges, WEdgeOriginList &incidentLocal, VId &n) {
+        if (parallelEdges.empty()) {
+            return;
+        }
+        for (int i = 0; i < n; ++i) {
+            incidentLocal[i] = WEdgeOrigin(i, i, -1); //initialize "empty" entries
+        }
+        ips4o::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
+        auto it = std::unique(parallelEdges.begin(), parallelEdges.end(), [&](WEdgeOrigin &first, WEdgeOrigin &second) {
+            if ((first.src == second.src && first.dst == second.dst) ||
+                (first.src == second.dst && first.dst == second.src)) {
+                return true;
+            }
+            VId s = first.get_src();
+            VId t = first.get_dst();
+            if (first.get_weight() < incidentLocal[s].get_weight()) {
+                incidentLocal[s] = first;
+            }
+            if (first.get_weight() < incidentLocal[t].get_weight()) {
+                incidentLocal[t] = first;
             }
             return false;
+        });
+        parallelEdges.erase(it, parallelEdges.end());
+        //last entry needs to be checked additionally
+        VId s = parallelEdges.back().src;
+        VId t = parallelEdges.back().dst;
+        if (parallelEdges.back().get_weight() < incidentLocal[s].get_weight()) {
+            incidentLocal[s] = parallelEdges.back();
+        }
+        if (parallelEdges.back().get_weight() < incidentLocal[t].get_weight()) {
+            incidentLocal[t] = parallelEdges.back();
+        }
+    }
+
+    void removeParallelEdges(WEdgeOriginList &parallelEdges) {
+        ips4o::sort(parallelEdges.begin(), parallelEdges.end(), SrcDstWeightOrder<WEdgeOrigin>{});
+        auto it = std::unique(parallelEdges.begin(), parallelEdges.end(), [&](const auto &first, const auto &second) {
+            return ((first.src == second.src && first.dst == second.dst) ||
+                    (first.src == second.dst && first.dst == second.src));
         });
         parallelEdges.erase(it, parallelEdges.end());
     }
@@ -236,21 +269,21 @@ namespace boruvka_allreduce {
                      size_t &localMSTcount, size_t &overlapCount, bool removeParallel, Timer &timer,
                      bool useKruskal = false, size_t hashBorder = 1000, size_t iteration = 0) {
 
-        timer.start("shrink", iteration);
-        shrink(n, incidentLocal, incident, vertices, parent, uf);
-        timer.stop("shrink", iteration);
-
+        if (iteration == 0) {
+            timer.start("shrink", iteration);
+            shrink(n, incidentLocal, incident, vertices, parent, uf);
+            timer.stop("shrink", iteration);
+        }
         if (overlapCount > 0) { //message overlap
             timer.start("calc-incident", iteration);
             calcMinIncident(n, incidentLocal, edges);
             timer.stop("calc-incident", iteration);
 
-
             timer.start("overlap", iteration);
-            #pragma omp parallel
+#pragma omp parallel
             {
                 bool is_master = false;
-            #pragma omp master
+#pragma omp master
                 {
                     is_master = true;
                     allReduce(n, incidentLocal, incident);
@@ -263,77 +296,87 @@ namespace boruvka_allreduce {
             timer.stop("overlap", iteration);
         } else {
             if (localMSTcount > 0) {
-                    timer.start("b-calcLocalMST", iteration);
-                    localMST(n, edges, useKruskal, uf);
-                    localMSTcount--;
-                    timer.stop("b-calcLocalMST", iteration);
-                }
-                timer.start("calc-incident", iteration);
+                timer.start("b-calcLocalMST", iteration);
+                localMST(n, edges, useKruskal, uf);
+                localMSTcount--;
+                timer.stop("b-calcLocalMST", iteration);
+            }
+
+            timer.start("calc-incident", iteration);
+            if (!removeParallel || iteration == 0) {
                 calcMinIncident(n, incidentLocal, edges);
-                timer.stop("calc-incident", iteration);
-
-                timer.start("allreduce", iteration);
-                allReduce(n, incidentLocal, incident);
-                timer.stop("allreduce", iteration);
             }
+            timer.stop("calc-incident", iteration);
 
-            hybridMST::mpi::MPIContext ctx;
-            timer.start("parentArray", iteration);
-            if (ctx.rank() == 0) {
-                addMSTEdges(n, mst, incident, edges);
-            }
-            fillParentArray(n, incident, parent);
-            timer.stop("parentArray", iteration);
 
-            timer.start("relabel", iteration);
-            WEdgeOriginList relabeledEdges;
-            relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
-            timer.stop("relabel", iteration);
-
-            timer.start("removeParallelEdges", iteration);
-            if (removeParallel) {
-                removeParallelEdges(relabeledEdges);
-            }
-            timer.stop("removeParallelEdges", iteration);
-            edges = relabeledEdges;
+            timer.start("allreduce", iteration);
+            allReduce(n, incidentLocal, incident);
+            timer.stop("allreduce", iteration);
         }
 
-        WEdgeList getOriginEdges(WEdgeOriginList &mst) {
-            WEdgeList returnEdges;
-            for (auto &edge: mst) {
-                returnEdges.push_back(edge.toWEdge());
-            }
-            return returnEdges;
+
+        timer.start("parentArray", iteration);
+        addMSTEdges(n, mst, incident, edges);
+        fillParentArray(n, incident, parent);
+        timer.stop("parentArray", iteration);
+
+        timer.start("relabel", iteration);
+        WEdgeOriginList relabeledEdges;
+        relabel_V_E(n, incident, parent, vertices, edges, relabeledEdges);
+        timer.stop("relabel", iteration);
+
+
+        timer.start("shrink", iteration);
+        shrink(n, incidentLocal, incident, vertices, parent, uf);
+        timer.stop("shrink", iteration);
+
+        timer.start("removeParallelEdges", iteration);
+        if (removeParallel) {
+            removeParallelEdgesAndCalcIncident(relabeledEdges, incidentLocal, n);
+            // calcMinIncident(n,incidentLocal, relabeledEdges);
         }
 
-        template<typename Timer>
-        inline WEdgeList
-        getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
-               std::vector<size_t> &numVertices, Timer &timer, size_t &overlapCount, bool removeParallelEdges,
-               bool useKruskal = false, size_t hashBorder = 1000) {
 
-            timer.start("initVariables", 0);
-            VId n = vertexCount;
-            WEdgeOriginList mst;
-            WEdgeOriginList incidentLocal;
-            WEdgeOriginList incident; //keeps the lightest incidentLocal edges. relabeledEdges.g. incidentLocal[4] is the lightest edge incidentLocal to vertex 4
-            std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
-            UnionFind uf(n);
-            std::vector<VId> vertices;
-            size_t mstCount = localMSTcount;
-            size_t iteration = 1;
-            timer.stop("initVariables", 0);
+        timer.stop("removeParallelEdges", iteration);
+        edges = relabeledEdges;
+    }
 
-            while (n > 1) {
-                timer.start("b-iteration", iteration);
-                boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, overlapCount,
-                            removeParallelEdges, timer, useKruskal, hashBorder, iteration);
-                timer.stop("b-iteration", iteration);
-                iteration++;
-                numEdges.push_back(e.size());
-                numVertices.push_back(n);
-            }
-            return getOriginEdges(mst);
+    WEdgeList getOriginEdges(WEdgeOriginList &mst) {
+        WEdgeList returnEdges;
+        for (auto &edge: mst) {
+            returnEdges.push_back(edge.toWEdge());
         }
+        return returnEdges;
+    }
+
+    template<typename Timer>
+    inline WEdgeList
+    getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount, std::vector<size_t> &numEdges,
+           std::vector<size_t> &numVertices, Timer &timer, size_t &overlapCount, bool removeParallelEdges,
+           bool useKruskal = false, size_t hashBorder = 1000) {
+
+        timer.start("initVariables", 0);
+        VId n = vertexCount;
+        WEdgeOriginList mst;
+        WEdgeOriginList incidentLocal;
+        WEdgeOriginList incident; //keeps the lightest incidentLocal edges. relabeledEdges.g. incidentLocal[4] is the lightest edge incidentLocal to vertex 4
+        std::vector<VId> parent; //keeps the parent to the indexed vertex. relabeledEdges.g. parent[4] is the parent of vertex 4
+        UnionFind uf(n);
+        std::vector<VId> vertices;
+        size_t mstCount = localMSTcount;
+        size_t iteration = 0;
+        timer.stop("initVariables", 0);
+
+        while (n > 1) {
+            timer.start("b-iteration", iteration);
+            boruvkaStep(n, incidentLocal, incident, vertices, parent, uf, e, mst, mstCount, overlapCount,
+                        removeParallelEdges, timer, useKruskal, hashBorder, iteration);
+            timer.stop("b-iteration", iteration);
+            iteration++;
+            numEdges.push_back(e.size());
+            numVertices.push_back(n);
+        }
+        return getOriginEdges(mst);
+    }
 
 } //namespace
