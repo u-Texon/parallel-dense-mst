@@ -333,10 +333,7 @@ namespace boruvka_allreduce {
         timer.start("removeParallelEdges", iteration);
         if (removeParallel) {
             removeParallelEdgesAndCalcIncident(relabeledEdges, incidentLocal, n);
-            // calcMinIncident(n,incidentLocal, relabeledEdges);
         }
-
-
         timer.stop("removeParallelEdges", iteration);
         edges = relabeledEdges;
     }

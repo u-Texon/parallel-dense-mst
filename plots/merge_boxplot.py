@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/merge_boxplot-2048.csv')
+boruvka = pd.read_csv('../out/files/merge_boxplot-512.csv')
 
 iterations = np.array(list(boruvka['Iteration']))
 numEdges = np.array(list(boruvka['NumEdges']))

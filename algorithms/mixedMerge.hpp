@@ -14,10 +14,8 @@ namespace mixed_merge {
     getMST(VId &vertexCount, WEdgeOriginList &e, size_t &localMSTcount,  std::vector<size_t> &numEdges,
            std::vector<size_t> &numVertices, Timer &timer, bool removeParallelEdges, bool useKruskal = false, VId treeFactor = 2,
            size_t hashBorder = 1000) {
-
         timer.start("initVariables", 0);
         hybridMST::mpi::MPIContext ctx; // calls MPI_Init internally
-        hybridMST::mpi::TypeMapper<WEdgeOrigin> mapper;
         VId n = vertexCount;
         WEdgeOriginList mst;
         WEdgeOriginList incidentLocal;
@@ -27,7 +25,6 @@ namespace mixed_merge {
         size_t mstCount = localMSTcount;
         UnionFind uf(n);
         WEdgeOriginList edges;
-
         timer.stop("initVariables", 0);
 
         timer.start("mm-initial-localMST", 0);
@@ -56,6 +53,7 @@ namespace mixed_merge {
 
             timer.start("iteration", iteration);
             mergeMST::mergeStep(edges, p, uf, n, useKruskal, timer, treeFactor, iteration);
+            uf.clear();
             timer.stop("iteration", iteration);
             numVertices.push_back(n);
             numEdges.push_back(edges.size());
