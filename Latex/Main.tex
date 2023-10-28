@@ -1,0 +1,271 @@
+\documentclass[12pt,a4paper,twoside,bibliography=totocnumbered]{scrartcl}
+
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+% 2 mal farbig Ausdrucken und binden lassen.
+% Kapitel Anfang auf Vorderseite (ungerade)
+% Per Mail an: sanders@kit.edu, schimek@kit.edu, blancani@kit edu
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\usepackage[ngerman]{babel}
+
+
+% Diese (und weitere) Eingabedateien sind in UTF-8
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes} % provides \enquote{} macro for "quotes"
+
+% Verwende gute Type 1 Font: Latin Modern
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% Hyperref für Hyperlink und Sprungtexte
+\usepackage{xcolor,hyperref}
+\usepackage{amsthm}
+% Einige Standard-Mathematik Pakete
+\usepackage{latexsym,amssymb,mathtools,textcomp}
+\usepackage[ngerman,nameinlink]{cleveref}
+
+\usepackage[Algorithmus]{algorithm}  % include code snippits
+\usepackage{algorithmic}  % include code snippits
+
+\renewcommand{\listalgorithmname}{Algorithmenverzeichnis}
+
+% Seitengröße - verwende fast die ganze A4 Seite
+\usepackage[tmargin=22mm,bmargin=22mm,lmargin=20mm,rmargin=20mm]{geometry}
+
+% Einrückung und Abstand zwischen Paragraphen
+\setlength\parskip{\smallskipamount}
+\setlength\parindent{0pt}
+
+
+
+% Unterstützung für Sätze und Definitionen
+
+\newtheorem{thm}{Theorem}
+
+\usepackage[inkscapeformat=png]{svg} %to include svg as images
+\usepackage{float} %images
+
+\newtheorem{Satz}{Satz}[section]
+\newtheorem{Definition}[Satz]{Definition}
+\newtheorem{Lemma}[Satz]{Lemma}
+
+\numberwithin{equation}{section}
+
+\usepackage[
+    backend=biber,
+    style=numeric,
+]{biblatex}
+
+\addbibresource{Bib.bib}
+
+% Unterstützung zum Einbinden von Graphiken
+\usepackage{graphicx}
+
+\usepackage[]{mdframed}
+
+% Pakete die tabular und array verbessern
+\usepackage{array,multirow}
+
+% Kleiner enumerate und itemize Umgebungen
+\usepackage{enumitem}
+
+\setlist[enumerate]{topsep=0pt}
+\setlist[itemize]{topsep=0pt}
+\setlist[description]{font=\normalfont,topsep=0pt}
+
+\setlist[enumerate,1]{label=(\roman*)}
+
+% TikZ für Graphiken in LaTeX
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+% Aktuelle Section und Untersection am Seitenkopf
+\usepackage{fancyhdr}
+
+\fancypagestyle{plain}{
+  \fancyhead{}
+  \fancyfoot{}
+  \fancyfoot[LE,RO]{\normalsize\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+\fancypagestyle{normal}{
+  \setlength{\headheight}{20pt}
+  \setlength\footskip{32pt}
+  \fancyhead{}
+  \fancyhead[LE]{\normalsize\textsc{\nouppercase{\leftmark}}}
+  \fancyhead[RO]{\normalsize\textsc{\nouppercase{\rightmark}}}
+  \fancyfoot{}
+  \fancyfoot[LE,RO]{\normalsize\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+
+
+\hypersetup{
+  pdftitle={Engineering und Evaluation von verteilten MST Algorithmen für dichte Graphen},
+  pdfauthor={David Bumm},
+  pdfsubject={MST, verteilte Algorithmen},
+  colorlinks=true,
+  pdfborder={0 0 0},
+  bookmarksopen=true,
+  bookmarksopenlevel=1,
+  bookmarksnumbered=true,
+  linkcolor=blue!60!black,
+  %linkcolor=black,
+  citecolor=blue!60!black,
+  urlcolor=blue!60!black,
+  filecolor=green!60!black,
+  pdfpagemode=UseNone,
+  unicode=true,
+}
+
+% Paket zum Setzen von Algorithmen in Pseudocode mit kleinen Stilanpassungen
+%\usepackage[ruled,vlined,linesnumbered,norelsize]{algorithm2e}
+%\DontPrintSemicolon
+\def\NlSty#1{\textnormal{\fontsize{8}{10}\selectfont{}#1}}
+%\SetKwSty{texttt}
+%\SetCommentSty{emph}
+\def\listalgorithmcfname{Algorithmenverzeichnis}
+\def\algorithmautorefname{Algorithmus}
+\let\chapter=\section % repariert ein Problem mit algorithm2e
+
+
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagestyle{empty} % keine Seitenzahlen
+
+% Titelblatt der Arbeit
+\begin{titlepage}
+
+  \begin{center}\large
+
+    \quad\includegraphics[height=17mm]{images/kit_logo_de.pdf} \hfill
+    %\includegraphics[height=20mm]{images/grouplogo-algo-blue.pdf}
+    \quad\null
+
+    \vfill
+
+    Bachelorarbeit
+    \vspace*{2cm}
+
+    {\textbf{\huge Engineering und Evaluation von verteilten MST Algorithmen für dichte Graphen} \par}
+    % Siehe auch oben die Felder pdftitle={}
+    % mit \par am Ende stimmt der Zeilenabstand
+
+    \vfill
+
+    David Bumm
+
+    \vspace*{15mm}
+
+    01.06.2023 bis 30.10.2023
+
+    \vspace*{45mm}
+
+    \begin{tabular}{rl}
+      Betreuer: & M.Sc. Matthias Schimek \\
+       Prüfer: & Prof. Dr. Peter Sanders \\
+    \end{tabular}
+    
+    \vspace*{10mm}
+
+    Institut für Theoretische Informatik, Algorithm Engineering \\
+    Fakultät für Informatik \\
+    Karlsruher Institut für Technologie
+
+    \vspace*{12mm}
+  \end{center}
+
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace*{0pt}\vfill
+
+\hrule\medskip
+
+Hiermit versichere ich, dass ich diese Arbeit selbständig verfasst und keine anderen, als die angegebenen Quellen und Hilfsmittel benutzt, die wörtlich oder inhaltlich übernommenen Stellen als solche kenntlich gemacht und die Satzung des Karlsruher Instituts für Technologie zur Sicherung guter wissenschaftlicher Praxis in der jeweils gültigen Fassung beachtet habe.
+
+\bigskip
+
+\noindent
+Ort, Datum, Name\\
+
+---------------------------------------------------------------------
+
+% Unterschrift (handgeschrieben)
+
+\vspace*{5cm}
+
+\clearpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+\include{modules/0-Zusammenfassung}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\pagestyle{normal}
+% markiere sections im Seitenkopf links und subsections rechts
+\renewcommand\sectionmark[1]{\markboth{\thesection\quad\MakeUppercase{#1}}{\thesection\quad\MakeUppercase{#1}}}
+\renewcommand\subsectionmark[1]{\markright{\thesubsection\quad\MakeUppercase{#1}}}
+
+% Inhaltsverzeichnis
+\tableofcontents
+
+
+
+\newcommand{\mergeStep}{\textsc{MergeStep}}
+\newcommand{\boruvkaStep}{\textsc{Bor{\r u}vkaStep}}
+\newcommand{\boruvka}{Bor{\r u}vka }
+\newcommand{\boruvkasAlgorithmus}{Bor{\r u}vkas Algorithmus}
+\newcommand{\boruvkaAllreduce}{\textsc{Bor{\r u}vka-Allreduce} }
+\newcommand{\mergeMST}{\textsc{Merge-Local-MST} }
+\newcommand{\boruvkaMixedMerge}{\textsc{Bor{\r u}vka-Mixed-Merge} }
+\newcommand{\boruvkaThenMerge}{\textsc{Bor{\r u}vka-Then-Merge} }
+
+\include{modules/1-Einführung}
+\include{modules/2-Grundlagen}
+\include{modules/3-Related-Work}
+\include{modules/4-Algorithmen}
+\include{modules/5-Implementierung}
+\include{modules/6-Ergebnisse}
+\include{modules/7-Fazit}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\listoffigures
+\newpage
+%\listoftables
+\listofalgorithms
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\printbibliography
+
+
+\end{document}

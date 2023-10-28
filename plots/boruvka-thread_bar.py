@@ -2,6 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+
+plt.rcParams.update({'font.size': 15})
 boruvka = pd.read_csv('../out/files/only-boruvka-thread-proc1024-iter2.csv')
 
 localMST = np.array(list(boruvka['calculate local MST']))
@@ -64,7 +67,7 @@ else:
     baseCase = "kruskal"
 
 title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
-    p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]\n" + " base case is " + baseCase
+    p) + ",\nWeights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
 
 plt.title(title)
-plt.savefig('../out/plots/boruvka-thread_bar.svg')
+plt.savefig('../out/plots/boruvka-thread_bar.svg',bbox_inches='tight')

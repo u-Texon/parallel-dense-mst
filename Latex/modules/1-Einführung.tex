@@ -1,0 +1,46 @@
+\section{Einführung}\label{Einführung}
+Das MST Problem zählt zu den fundamentalsten Graphenproblemen überhaupt und bietet Raum für viele algorithmische Ansätze.
+Neben der Bedeutung in der Algorithmentheorie ist das MST Problem auch in der Praxis relevant und findet in verschiedenen Bereichen breite Anwendungen. Dazu gehören beispielsweise Clsutering \cite{bateni2017affinity}, Bildsegmentierung \cite{wassenberg2009efficient} und Netzwerkplanung \cite{li2011mst}.
+
+\cref{BasicMST-Img} zeigt \textit{links} einen ungerichteten und gewichteten Beispielgraphen, \textit{mittig} einen beliebigen Spannbaum und \textit{rechts} den dazugehörigen Minimalen Spannbaum.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=16cm]{Figures/Basic-MST.svg}
+    \caption{Beispiel Graph mit MST}
+    \label{BasicMST-Img}
+\end{figure}
+
+\subsection{Motivation}
+Graphen geben uns eine universelle und effiziente Möglichkeit verschiedene Sachverhalte für den Computer einfach darzustellen. Für große und komplexe Probleme kann der resultierende Graph enorme Größen annehmen. Um trotzdem noch solche Eingaben schnell genug zu verarbeiten, reichen sequenzielle Algorithmen nicht aus. Durch die parallele Ausführung von mehreren Prozessoren, kann eine wesentliche Beschleunigung erzielt werden. Bei typischen shared-memory Systemen, können alle Prozessoren gemeinsam auf den selben Hauptspeicher lesend oder schreibend zugreifen. Das ermöglicht einerseits eine relativ einfache Implementierung, da jeder Prozessor die gleichen Informationen besitzt. Anderseits bedeutet das für sehr große Eingaben, dass ein einzelner \enquote{gigantischer} Hauptspeicher nötig ist. Dieser muss nicht nur den gesamten Graphen auf einmal speicher können, sonder gegebenenfalls ein vielfaches davon, da bei der Verarbeitung zusätzliche Datenstrukturen oder Ähnliches notwendig sind. \\
+Weil so riesige Hauptspeicher in der Realität zu teuer und unrealistisch zu realisieren sind, arbeiten wir auf Supercomputern mit verteilten Speicher. Auf diesen Supercomputern besitzt jeder Prozessor seinen eigenen Speicherbereich, sodass gezielt eine bestimmte Anzahl an Prozessoren für eine Aufgabe ausgewählt werden kann und trotzdem immer gleich viel Speicher für jeden Prozessor zur Verfügung steht.
+Das ermöglicht also eine parallele Bearbeitung auf sehr großen Eingaben, indem diese (möglichst) gleichmäßig auf alle Prozessoren aufgeteilt werden. \\
+Aber auch für vergleichsweise kleinere Eingaben sind schnelle verteilte Algorithmen sehr relevant. Man kann beispielsweise beobachten, dass viele gut skalierende Simulationen Probleme damit haben, ihre (deutlich kleinere) Datenanalyse effizient auszuwerten. Dies wiederum mindert die eigentlich sehr gute Skalierung.
+Manche von diesen Analyse Problemen können als Graphenprobleme umformuliert werden, die in wenigen Millisekunden auf den Daten, die von hoch parallelisierten Maschinen entstehen, gelöst werden müssen. Da in diesem Fall die Daten bereits verteilt vorliegen, eignen sich verteilt parallele Algorithmen für diese Auswertung besonders gut.
+
+
+\subsection{Problemstellung}
+Im Gegensatz zu Systemen mit geteiltem Speicher, wird bei distributed-memory  die Eingabe auf alle Prozessoren verteilt.
+Das hat zur Folge, dass jeder Prozessor nur Sicht auf seine eigenen (lokalen) Daten hat und mit anderen Prozessoren kommunizieren muss, um an die gesamten (globale) Informationen zu gelangen. Diese Kommunikationsvorgänge spielen eine erhebliche Rolle bei verteilt parallelen Algorithmen. Besonders in unserem Fall, mit mehreren tausend Prozessoren, kann sowohl die Nachrichtenübertragung als auch notwendige Synchronisationen eine große Auswirkung auf die Laufzeit haben. Die von uns implementierten Algorithmen müssen also diese Aufwände explizit berücksichtigen und ihre Arbeitsweise so gut wie möglich darauf anpassen.\\
+Außerdem ist es nicht immer eindeutig wie man den Eingabegraph am besten auf alle Prozessoren aufteilt. Zum Beispiel können auf manchen dünn besetzten Graphen ($|V| \gg |E|$), alle Kanten auf jedem Prozessor gespeichert werden, aber nicht unbedingt alle Knoten. 
+Ein verteilter MST Algorithmus muss in diesem Fall unterschiedlich arbeiten als auf anderen Eingaben, weil die lokale Sicht der Daten ein Ausschlaggebender Faktor für das Vorgehen ist.\\
+In dieser Arbeit befassen wir uns nur mit einer bestimmten Familie von Graphen, um dieses Problem einheitlich zu betrachten. Im Gegensatz zum eben genannten Beispiel, arbeiten die für uns relevanten Algorithmen nur auf Graphen, bei denen die Knotenmenge auf allen Prozessoren repliziert werden kann. Das bedeutet jeder Prozessor kennt alle Knoten, aber nur $m/p$ Kanten. Das ist der Fall, wenn die Anzahl an Kanten um den Faktor $p$ größer ist als die Knotenmenge. Da in diesem $|V| \leq |E| / p$ ist, also insbesondere $|V| < |E|$ gilt, nennt man den Graphen dicht.
+Auf \enquote{kleineren} Eingaben funktionieren die Algorithmen auch mit $|V| \geq |E|$, da auch hier die Knotenmenge auf alle Prozessoren passt, allerdings sind sie hier weniger effizient.
+
+\subsection{Übersicht}
+Sequenzielle MST Berechnungen spielen auch in verteilten Algorithmen eine wichtige Rolle für die (lokale) Ausführung auf einzelnen Prozessoren. In \hyperref[Grundlagen]{Kapitel} \ref{Grundlagen} klären wir 
+notwendige Grundlagen zu minimalen Spannbäumen und den klassischen sequenziellen MST Algorithmen von Kruskal, \boruvka sowie Jarnik und Prim. Hier stellen wir auch \textsc{Filter-Kruskal}, als eine in der Praxis effizientere Variante von Kruskals Algorithmus vor.\\
+Lokalen Berechnungen sind auch wesentlicher Bestandteil für \textsc{Merge-Local-MST}, einer von vier verteilten parallelen Algorithmen, die wir in \hyperref[Algorithms]{Kapitel} \ref{Algorithms} vorstellen. \textsc{Merge-Local-MST} berechnet schrittweise auf jedem Prozessor einen MST und fügt diese anschließend zusammen. 
+Da sich Bor{\r u}vkas Algorithmus sehr effektiv parallelisieren lässt, bildet dieser das Herzstück für \boruvkaAllreduce.
+Dieser Algorithmus nutzt das Vorgehen von \boruvka, wobei in jeder Iteration ein Allreduce Aufruf durchgeführt wird. Ein Allreduce sammelt von allen Prozessoren Daten, führt sie zusammen und sendet sie anschließend wieder zurück.\\
+Um die Vorteile von \boruvkaAllreduce und \mergeMST zu kombinieren haben wir \boruvkaThenMerge und \boruvkaMixedMerge implementiert. Dabei besteht \boruvkaThenMerge aus einer Reiche an Iterationen von \boruvkaAllreduce gefolgt von \mergeMST. \boruvkaThenMerge hingegen, führt abwechselnd \boruvkaAllreduce und \mergeMST aus.\\
+Theoretische Laufzeitschranken können in der Praxis nicht immer vorhersagen welcher Algorithmus am besten funktioniert, da dies stark von der Implementierung und den  auftretenden Eingaben abhängt.
+Außerdem stimmen die theoretischen Modelle nicht mit den real-existierenden Maschinen überein. Während z.B in theoretischen Analysen die Anzahl an Kanten, Knoten und Prozessoren gegen unendlich gehen, sind die Prozessoren in der Praxis nicht so zahlreich verfügbar. Auch Effekte in der Praxis wie Cache Effizienz werden für theoretische Algorithmen selten in Betracht gezogen, obwohl diese massive Unterschiede erzielen können.
+In \hyperref[Implementierung]{Kapitel} \ref{Implementierung} nennen wesentlichen Faktoren unserer Implementierung so wie auf welchen Eingaben wir unsere Algorithmen evaluieren.\\
+Eine praktische Evaluation mit bis zu 2048 Prozessoren zu den verwendeten Algorithmen ist in \hyperref[Evaluierung]{Kapitel} \ref{Evaluierung} aufgeführt.
+Hierbei vergleichen wir einerseits die jeweiligen Laufzeiten auf drei verschiedenen Graphtypen. Andererseit zeigen wir die Auswirkung von lokalen Berechnungen, mit welchen Parametern die Algorithmen am effizientesten sind und nutzen die Zeit für die Nachrichtenübertragung aus um währenddessen weitere Berechnungen durchzuführen. \\
+In \hyperref[Fazit]{Kapitel} \ref{Fazit} besprechen wir die gesammelten Ergebnisse und erörtern weitere Verbesserungen für mögliche weitere Arbeiten.
+
+
+
+

@@ -1,0 +1,222 @@
+\section{Ergebnisse und Evaluierung}\label{Evaluierung}
+Die Algorithmen aus \hyperref[Algorithms]{Kapitel} \ref{Algorithms} haben wir auf dem SuperMUC-NG Supercomputer ausgeführt. Dieser Supercomputer ist ein Cluster bestehend aus 6336 \emph{Compute-Nodes}. Ein Compute-Node besteht aus 48 Prozessoren und besitzt 96 GByte Hauptspeicher. Untereinander sind die Compute-Nodes über das OmniPath-Network mit einer Bandbreite von 100GBit/s verbunden. Als Compiler haben wir gcc 11.2 und die MPI Version 4.0.7 verwendet.\\
+ Die Folgenden Angaben zur Kantenmenge bezieht sich immer auf den \textbf{ungerichteten} Graphen. Allerdings ist die Kantemenge für die Ausführung genau doppelt so Groß, da wir die jeweiligen Rückkanten mit generiert haben. Insgesamt haben wir jeweils 5 durchläufe von jedem Algorithmus ausgeführt und den jeweils ersten verworfen, um \emph{Warmup}-Effekte auszuschließen. Aus den restlichen 4 Laufzeiten haben wir schließlich den Durschschnitt berechnet.
+
+\subsection{Lokalen MST Berechnung}
+Weil lokale Berechnung von MSTs ein wesentlicher Teil von den verteilt parallelen Algorithmen ist, muss dieser so effizient wie möglich sein. 
+Wir nutzen wie in \cref{Filter-Kruskal-Algo} beschrieben, für die lokale MST Berechnung 
+\textsc{Filter-Kruskal} als alternative zum klassischen Kruskal. Dieser ermöglicht in der Praxis eine deutlich bessere Laufzeit auf einer breiten Masse an Eingaben. 
+In \cref{Filter-Kruskal-Img} ist ein direkter Vergeleich zwischen Kruskals Algorithmus und \cref{Filter-Kruskal-Algo} zu sehen. Die Ausführung hat auf einem Graph mit $2^{18}$ Knoten und $2^{18}$ bis $2^{24}$ Kanten statt gefunden.
+Es ist zu erkennen, dass \textsc{Filter-Kruskal} effizienter ist als Kruskals Algorithmus. Den Aufwand zum Sortieren der Kanten zu reduzieren hat sich wie zu erwarten in der Praxis als vorteilhaft gezeigt.
+Aus diesem Grund verwendet wir für die folgenden Experminte immer \textsc{Filter-Kruskal} als Basis Algorithmus für lokale MSTs.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=10cm]{ergebnisse/sequential/sequential.svg}
+    \caption{Vergleich zwischen Kruskals Algorithmus und \textsc{Filter-Kruskal}}
+    \label{Filter-Kruskal-Img}
+\end{figure}
+
+
+
+\subsection{Sehr Dichte Graphen}\label{dense}
+Die behandelten MST Algorithmen sind für sehr dichten Graphen ausgelegt. Einerseits muss die Knotenmenge auf jedem PE repliziert werden können und andererseits sind jegliche Iterationen von \boruvkaAllreduce und \mergeMST auf dichten Graphen besonders effektiv. Insbesondere werden auf dichten Graphen in einer Iteration von \boruvkasAlgorithmus \space  mehr Knoten in einer Iteration kontrahiert und bei einer Iteration von \mergeMST mehr Kanten durch lokale MST berechnungen entfernt.\\
+In \cref{WeakSkale-dense-Img} sehen wir die Laufzeiten von \textsc{Bor{\r u}vka-Allreduce}, \textsc{Merge-Local-MST}, \boruvkaMixedMerge und \textsc{Bor{\r u}vka-Then-Merge}. Hierbei handelt es sich um \enquote{weak scaling}, d.h die Anzahl an Kanten im Graphen skaliert mit der Anzahl an PEs. Eine optimale Effizienz der Algorithmen würde sich also als eine konstante Linie widerspiegeln. In diesem Fall haben wir die Algorithmen auf einem RHG und einem GNM Graph mit $2^{18}$ Knoten und $2^{22}$ Kanten pro PE ausgeführt. Auf der X-Achse ist die Anzahl an PEs angegeben von 1 bis 2048 und auf der Y-Achse sehen wir die Laufzeit in Millisekunden angegeben. \boruvkaAllreduce berechnet nur zu Beginn einen lokalen MST und entfernt keine parallelen Kanten. Außerdem ist der verwendete Treefactor für alle Algorithmen $D=2$.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=8.33cm]{ergebnisse/dense/weak-scale-RHG.svg}
+    \includesvg[width=7.67cm]{ergebnisse/dense/weak-scale-GNM.svg}
+    \caption{Weaksclale}
+    \label{WeakSkale-dense-Img}
+\end{figure}
+
+Wir erkennen, dass Merge-Local-MST mit ca. 0,75 Sekunden bei 2048 PEs am schlechtesten abschneidet, wobei die übrigen Algorithmen alle mit ca. 0,5 Sekunden fast identisch sind. Es ist erwartbar, dass Merge-Local-MST am langsamsten ist. Immerhin werden nur in der ersten Iteration alle PEs gänzlich genutzt. Es überrascht allerdings, dass es quasi keinen Unterschied zwischen den restlichen Algorithmen gibt. Hierfür betrachten wir in \cref{Explicit-dense-Img} explizit die Laufzeiten der einzelnen Algorithmen. Diese sind aufgeteilt in die jeweiligen Iterationen und Phasen.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=8.11cm]{ergebnisse/dense/merge_bar.svg}
+    \includesvg[width=7.89cm]{ergebnisse/dense/boruvkaMerge_bar.svg}
+
+    \includesvg[width=7.89cm]{ergebnisse/dense/boruvka_bar.svg}
+   \includesvg[width=8.11cm]{ergebnisse/dense/mixedMerge_bar.svg}
+    \caption{Ansicht für einzelne Algorithmen}
+    \label{Explicit-dense-Img}
+\end{figure}
+
+
+Hier ist eindeutig, dass die Laufzeit fast ausschließlich von lokalen MST Berechnung stammt. Bei \boruvkaAllreduce domminiert einerseits die Laufzeit der ersten Iteration und andererseits haben folgenden Iterationen kaum eine Auswirkung auf die Laufzeit.
+So benötigt der lokale MST mit ca. 0.38 Sekunden etwa 80\% der gesamten Laufzeit. Da sowohl \boruvkaAllreduce als auch \boruvkaThenMerge und \boruvkaMixedMerge mit einem \boruvkaStep beginnen und dieser Schritt fast die gesamte Laufzeit beansprucht, wird klar warum diese Algorithmen fast identische Laufzeiten haben.
+
+
+Wenn aber nur die lokale MST Berechnung relevant für den globalen MST ist, warum ist dann nicht auch \mergeMST gleich schnell? Immerhin besteht dieser Algorithmus fast nur aus diesen Schritten. \\
+Um diese Frage zu beantworten betrachten wir die Boxplots in \cref{Boxplot-dense-Img}.
+Diese Graphik zeigt die Anzahl an Knoten und Kanten für jeden PE nach den jeweiligen Iterationen.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=8.45cm]{ergebnisse/dense/boruvka_box.svg}
+    \includesvg[width=7.55cm]{ergebnisse/dense/merge_box.svg}
+    \caption{Boxplots}
+    \label{Boxplot-dense-Img}
+\end{figure}
+
+Da der Graph besonders dicht war, konnte \mergeMST in der ersten Iteration besonders viele Kanten bereits aussortieren. Allerdings ist das bei den folgenden Iterationen nicht mehr möglich. Nach der ersten Iteration hält jeder PE nur noch ca. $n=2^{18}$ Kanten. In den nächsten Iteration werden also nur zwei MSTs mit $2^{18}$ Kanten verschmolzen bis nur noch ein PE aktiv ist.
+Während also die anderen Algorithmen mit einem \boruvkaStep den Graph schrumpfen und die restlichen Kanten aussortieren, benötigt Merge-Local-MST viel Zeit mit weiteren lokalen Berechnungen, die kaum zielführend sind. 
+
+
+
+
+\subsection{Verschmelzen von lokalen MSTs}\label{eval-treefactor}
+Der Treefactor (oder $D$) gibt an wie viele lokale MSTs in einer Iteration von Merge-Local-MST verschmolzen werden. Ein kleinerer Treefactor sorgt somit für mehr Iterationen und weniger Prozessoren sind im Anschluss inaktiv.
+In \cref{Treefactor-Img} sehen wir \mergeMST mit fünf verschiedenen werten für $D$.
+Dabei unterscheiden wir für die Treefactor Werte zwischen 2, 4, 8 und 16 auf einem GNM Graphen mit $2^{18}$ Knoten und $2^{20}$ Kanten pro PE unter Verwendung von Filter-Kruskal.
+
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=8cm]{ergebnisse/treeFactor/mergeMST-RHG.svg}
+    \includesvg[width=8cm]{ergebnisse/treeFactor/mergeMST-GNM.svg}
+    
+    \caption{Laufzeit von Merge-Local-MST mit verschiedenen Treefactor Werten}
+    \label{Treefactor-Img}
+\end{figure}
+
+
+Dehne und Götz \cite{dehne1998practical} haben in ihren Experminenten mit D=3 die besten Ergebnisse erzielt. 
+Wie man in \cref{Treefactor-Img} aber sieht, war das bei uns nicht der Fall. Hier hat Merge-Local-MST mit $D=4$ bzw. $D=2$ die beste Laufzeit. 
+Insgesamt ist eindeutig, dass sich ein größerer Treefactor als 4 bereits negativ auf die Laufzeit auswirkt. Dies wird durch diese Graphik auch nochmal bestätigt. Bereits mit D=8 ist die Laufzeit ca. 10\% und bei D=16 schon ca.50\% höher als bei D=2.\\
+Für die meisten Eingaben war $D=2$ am effizientesten, wesshalb im wesentlichen diesen Wert für alle unsere Experimente verwendet haben.
+
+
+
+\subsection{Verschiedene Graphen}
+Wir betrachten nun die von uns Implementierten Algorithmen auf drei unterschiedlichen Graphtypen. Dabei betrachten wir als Eingabe GNM, RHG und Pair Graphen mit $2^{18}$ Knoten und $2^{17}$ bis $2^{20}$ Kanten pro PE.
+
+
+\subsubsection{GNM}
+\cref{GNM-graphs-Img} zeigt die Ergebnisse unserer Experimente mit dem GNM Graphen als Eingabe. \\
+Die gute Skalierung der Algorithmen wird dadurch deutlich, dass obwohl die Eingaben bis zu vier mal mehr Kanten besitzen, die Laufzeiten dennoch in der selben Größenordnung liegen. So ist \textsc{Merge-Local-MST} bei $2^{20}$ Kanten pro PE nur 10\% langsamer als bei $2^{20}$ Kanten auf 2048 Prozessoren. Weiterhin zeigen die Experminte zu unserer Erwartung, dass \textsc{Merge-Local-MST} die größte Laufzeit von allen Algorithmen benötigt. Das liegt daran, \textsc{Merge-Local-MST} nach der ersten Iteration nur noch deutlich langsamer Fortschritte macht, wie es auch z.B in \hyperref[dense]{Kapitel} \ref{dense} zu beobachten ist.\\
+Im Gegensatz zu \hyperref[dense]{Kapitel} \ref{dense} ist der Graph deutlich weniger dicht
+und die lokale MST Berechnung domioniert die Laufzeit weniger stark.
+Nun sind Unterschiede zwischen \boruvkaAllreduce, \boruvkaThenMerge und \boruvkaMixedMerge erkennbar. So sieht man, dass \boruvkaAllreduce über 10\% langsamer ist, als \boruvkaThenMerge und \boruvkaMixedMerge. Dennoch liegen die Laufzeiten dieser drei Algorithmen nah bei einander, da nach wie vor wenige Iterationen von \boruvkaAllreduce einen geoßen Teil der Laufzeit ausmachen.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=8cm]{ergebnisse/graphs/gnm-17.svg}
+    \includesvg[width=8cm]{ergebnisse/graphs/gnm-18.svg}
+
+    \includesvg[width=8cm]{ergebnisse/graphs/gnm-19.svg}
+    \includesvg[width=8cm]{ergebnisse/graphs/gnm-20.svg}
+    \caption{GNM Weakscale}
+    \label{GNM-graphs-Img}
+\end{figure}
+
+
+\subsubsection{RHG}
+In \cref{RHG-graphs-Img} sieht man die Laufzeiten der Algorithmen mit den selben Konfigurationen, aber diesmal auf dem RHG Graph. Wie bei den GNM Graphen bleibt die gute Skalierung erhalten und auch der Verlauf der Laufzeiten sieht identisch aus. Hierbei liegen die Laufzeiten von \boruvkaAllreduce, \boruvkaThenMerge und \boruvkaMixedMerge noch näher bei einander als auf GNM Graphen. Vermutlich sorgt die Struktur des Graphen für eine erhöhte Effizienz bei Iterationen von \boruvkaAllreduce. Damit sind die Aufwände der drei Algorithmen größtenteils nur von \boruvkaAllreduce abhängig. \\
+Die Unterschiede zwischen den drei Algorithmen werden erst deutlich, wenn mehr Iterationen von \boruvkaAllreduce nötig sind um den MST zu berechnen. Um diesen Fall zu betrachten bietet sich der Pair Graph an.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=8cm]{ergebnisse/graphs/rhg-17.svg}
+    \includesvg[width=8cm]{ergebnisse/graphs/rhg-18.svg}
+    \includesvg[width=8cm]{ergebnisse/graphs/rhg-19.svg}
+    \includesvg[width=8cm]{ergebnisse/graphs/rhg-20.svg}
+    \caption{RHG Weakscale}
+    \label{RHG-graphs-Img}
+\end{figure}
+
+
+
+
+
+\subsubsection{Pair}
+Schließlich betrachten wir die Laufzeiten der Algorithmen auf dem Pair Graphen in \cref{Pair-graphs-Img}. Im Gegensatz zu GNM und RHG Graphen, sind hier deutliche Unterschiede in der Effizienz der Algorithmen zu erkennen.\\
+\boruvkaAllreduce ist nun der langsamste Algorithmus. Das ist in diesem Fall sinnvoll, da der Pair Graph den schlechtest möglichen Eingabegraph für \boruvkasAlgorithmus \space darstellt, indem eine maximale Anzahl an Iterationen erzwungen wird.
+Der effizienteste Algorithmus ist hingegen \boruvkaMixedMerge. Durch die Abwecheslnde Ausführung von einem \boruvkaStep \space und einem \mergeStep \space wird die Kantenanzahl vor jedem \boruvkaStep verringert, sodass dieser deutlich weniger Zeit benötigt.\\
+\boruvkaThenMerge ist hier etwas langsamer, da die ersten Iterationen von \boruvkasAlgorithmus \space immer noch starke Auswirkungen haben. Allerdings lohnen sie sich dennoch insofern, dass \boruvkaThenMerge noch effizienter als \mergeMST ist.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=8cm]{ergebnisse/graphs/pair-17.svg}
+    \includesvg[width=8cm]{ergebnisse/graphs/pair-18.svg}
+    \includesvg[width=8cm]{ergebnisse/graphs/pair-19.svg}
+    \includesvg[width=8cm]{ergebnisse/graphs/pair-20.svg}
+    \caption{Pair Weakscale}
+    \label{Pair-graphs-Img}
+\end{figure}
+
+
+\subsection{Entfernen von parallelen Kanten}\label{remove-Section}
+Nachdem wir in einem \boruvkaStep den Graph kontrahiert und die Kanten umbenannt haben, bleiben viele Kanten übrig die man verwerfen kann. Einerseits gibt es Kanten der Form $(s,t,w)$, bei denen die Knoten $s$ und $t$ in der gleichen Komponente lagen und diese im Anschluss die Form $(s',s',w)$ haben. Diese Schlingen sind offensichtlich niemals Teil eines MSTs und werden in unserer Implementierung bei der Umbenennung direkt entfernt.\\
+Andererseits können auch viele \emph{parallele} Kante auftreten, also mehrere Kanten die die gleichen Knoten Verbinden wie z.B die Kante $(0,1,7)$ und $(0,1,12)$. Hierbei muss nur diejenige Kante beibehalten werden, welche das geringste Gewicht besitzt. Da dieser Schritt allerdings nur Kanten entfernt, die niemals zum MST hinzugefügt werden, ist dieses Vorgehen bei einem \boruvkaStep optional. \\
+Nun fragen wir uns ob bzw. wie sehr sich dieser Schritt lohnt und auf welche Weise man diesen am effizientesten implementieren kann.\\
+Für unsere Implementierung zum Entfernen der parallelen Kanten haben wir zunächst alle Kanten nach Startknoten, Endknoten und dann nach Gewicht sortiert. Anschließend iterieren wir ein weiteres mal über die Kanten und behalten nur das erste Vorkommen einer Kante. Damit benötigt removeParallelEdges $O(m\log m)$ Operationen zum Sortieren plus $O(m)$ Operation für das Entfernen.\\
+Alternativ dazu können wir auch zu beginn von jedem \boruvkaStep mittels Filter-Kruskal einen lokalen MST berechnen.\\
+
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=5.3cm]{ergebnisse/remove/boruvka-default.svg}
+    \includesvg[width=5.3cm]{ergebnisse/remove/boruvka-remove.svg}
+    \includesvg[width=5.3cm]{ergebnisse/remove/boruvka-mst.svg}
+    \caption{....}
+    \label{RemoveParallel-Img}
+\end{figure}
+
+Wir haben in \cref{RemoveParallel-Img} die Laufzeiten von \boruvkaAllreduce verglichen. Der linke Graph zeigt die Laufzeit von \boruvkaAllreduce ohne das Entfernen von parallelen Kanten und in der Mitte mit dem Entfernen. Rechts sieht man die Alternative mittels \textsc{Filter-Kruskal}. Beachte, dass wir bei allen drei Durchläufen immer zu beginn einen lokalen MST berechnen, da dieses Vorgehen generell sehr effizient ist.\\
+Wie man sieht bildet das Entfernen der Parallelen kanten einen großen Nachteil im Vergleich zu den andern beiden alternativen. Scheinbar werden verhältnismäßig wenige Kanten aussortiert und das benötigte Sortieren aller umbenannten Kanten hat deutliche negative Auswirkungen auf die Laufzeit.\\
+Weiterhin fällt auf, dass \textsc{Filter-Kruskal} hingegen sehr effizient ist. Bei genauerer Überlegung wird klar, dass \textsc{Filter-Kruskal} mit einer erwarteten Laufzeit von $O(m)$ nicht nur schneller als unsere Implementierung in $O(m \log m)$ ist, sondern potenziell noch mehr Kanten als nur die parallelen entfernt. \\
+Damit hat sich heraus gestellt, dass sich Filter-Kruskal in der Praxis als eine sehr gute Methode entpuppt um parallele Kanten zu entfernen.\\
+Um unsere Implementierung in der Praxis zu verbessern ist es weiterhin möglich Hash Tabellen zu verwenden. Dafür haben wir einen Teil (ca. 5\%) der leichtesten Kanten in einer Hash Tabelle gespeichert und anschließend für die übrigen Kanten überprüft ob diese bereits in der Tabelle vorkommen. Wenn sie bereits enthalten sind, kann man sie entfernen, da sie ein höheres Gewicht haben. Im Anschluss haben von allen übrigen Kanten mit unserer $O(m \log m)$ Implementierung die parallelen Kanten entfernt. \\
+Leider hat sich dieses Vorgehen in unseren Experimenten nicht als Vorteilhaft herausgestellt, weswegen wir dieses wieder verworfen haben.
+
+
+
+
+
+\subsection{Nachrichten Überlagern}
+Eine Möglichkeit um einen \boruvkaStep zu beschleunigen, ist es den Allreduce Aufruf mit der lokalen MST Berechnung zu überlagern. Da sowohl Synchronisation und Nachrichtenübertragung, sowie das lokale Berechnen von MSTs einen Großteil von einem \boruvkaStep ausmachen, möchten wir dies zu unserem Vorteil nutzen.\\
+Unsere Idee war es zunächst mittels \emph{Hyper-Threading} zwei Threads pro PE zu starten, sodass ein Thread den Allreduce Aufruf durchführt während der andere den lokalen MST berechnet. Bei Hyper-Threading laufen mehrere Threads auf einem Prozessor und können den Prozessor effizienter ausnutzen, indem z.B ein Thread auf dem Prozesor läuft während der andere auf eine Antwort oder Ähnliches warten muss.
+Leider konnte uns dieses Vorgehen in der Praxis keinen Vorteil verschaffen, da unsere Implementierung nicht ohne weiteres auf Hyper-Threading ausgelegt war.
+Leider hat die Zeit für diese Abschlussarbeit gefehlt um das Vorgehen eines \boruvkaStep mit Hyperthreading genauer zu analysieren und die Implementierung effizienter umzusetzen. Um dennoch untersuchen zu können, ob das Überlagern von Nachrichten in der Praxis effizient ist, haben wir stattdessen zusätzliche PEs für den Allreduce Aufruf angefordert. Hierbei haben wir einem MPI Aufruf zwei PEs zugeordnet, damit in jegem \boruvkaStep ein PE den lokalen MST berechnet, während der andere den Allreduce Auffruf durchführt. Insgesamt haben wir die Experminte mit der doppelten Anzahl an PEs ausgeführt.
+Außerhalb der Nachrichtenüberlagerung wartet die Hälfte der PEs.\\
+
+Der Ansatz der Nachrichtenüberlagerung lohnt sich am meisten, wenn der Allreduce Aufruf und die lokale MST Berechnung einen großen Bestandteil der Laufzeit ausmachen.
+Dafür hat sich in \cref{remove-Section} praktischerweise ergeben, dass es sich lohnt in jedem \boruvkaStep einen lokalen MST mit \textsc{Filter-Kruskal} zu berechnen anstatt parallele Kanten zu entfernen. 
+ 
+Zusätzlich muss der lokale MST ähnlich viel Aufwand bilden wie der Allreduce Aufruf. Das ist leider nicht immer der Fall. Unsere Experimente haben ergeben, dass für $m/p \approx n$ der Allreduce Aufruf ungefähr solange wie \textsc{Filter-Kruskal} benötigt. Um dies zu verdeutlichen zeigt \cref{X-Img} die Laufzeit von drei \boruvkaAllreduce Durchläufen mit jeweils 1000 PEs. Die Ausführung hat auf einen GNM Graphen mit $2^{18}$ Knoten und $2^{17}$, $2^{18}$ und $2^{19}$ Kanten pro PE statt gefunden.
+
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=5.3cm]{ergebnisse/overlap/boruvka-17.svg}
+    \includesvg[width=5.3cm]{ergebnisse/overlap/boruvka-18.svg}
+    \includesvg[width=5.3cm]{ergebnisse/overlap/boruvka-19.svg}
+    \caption{Vergleich zwischen $m/p= 2^{18},  2^{19}$ und $2^{20}$ mit $n=2^{19}$}
+    \label{X-Img}
+\end{figure}
+
+Hierbei erkennt man, dass bei $m/p=2^{17}$ und $m/p=2^{18}$ die lokale MST Berechnung ähnlich viel Zeit wie der Allreduce Aufruf gebraucht hat. Daher betrachten wir auf diesen beiden Eingaben in \cref{Overlap-Img} die Laufzeiten \boruvkaAllreduce mit und ohne Nachrichtenüberlagerung. Wir führen \boruvkaAllreduce ohne Nachrichtenüberlagerung auch auf doppelt so vielen PE's aus, nutzen dabei die extra PEs nicht. 
+Damit sorgen wir für gleiche Bedingungen, da in diesem Fall ggf. mehr Speicher für die einzelnen PEs zur Verfügung steht. Dadurch sind die Laufzeiten in \cref{Overlap-Img} außerdem noch ein Stück schneller als in \cref{X-Img}.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=8cm]{ergebnisse/overlap/overlap-17.svg}
+     \includesvg[width=8cm]{ergebnisse/overlap/overlap-18.svg}
+    \caption{Nachrichten Überlagerung}
+    \label{Overlap-Img}
+\end{figure}
+
+Man erkennt, dass auf diesen beiden Eingaben die Überlagerung von Nachrichten einen Vorteil gegnüber zu einem üblichen \boruvkaAllreduce hat. Dabei ist eine Beschleunigung von biszu 30\% zu beobachten.\\ 
+
+
+
+!!!!!!!!!!!!!!Noch erwähnen das claclMinIncident länger braucht !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

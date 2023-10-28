@@ -1,0 +1,241 @@
+\section{Algorithmen}\label{Algorithms}
+In diesem Kapitel betrachten wir die Funktionsweise, Eigenschaften und Komplexität der von uns implementierten verteilt parallelen Algorithmen \cite{adler1998communication, dehne1998practical}.
+Wir gehen ab sofort davon aus, dass der Graph bereits verteilt auf den PEs vorliegt, welche von $0$ bis $p-1$ durchnummeriert sind.
+Damit ist die lokale Kantenmenge $E_{\ell i}$ je nach PE i unterschiedlich ($\bigcap_{i=0}^{p-1} E_{\ell i}=\emptyset$) und es gilt für die globale Kantenmenge $E = \bigcup_{i=0}^{p-1} E_{\ell i}$.
+Am Ende jedes Algorithmus liegt der globale MST vollständig auf dem PE mit Identifikator (ID) 0 vor.
+
+\subsection{\mergeMST}
+Die Idee des \mergeMST Algorithmus ist es schrittweise auf jedem PE einen lokalen MST zu berechnen und diesen anschließend mit dem MST von anderen PEs zusammen zu fassen. Dieser Vorgang wird solange wiederholt bis noch genau ein PE mit dem globalen MST übrig ist.
+
+
+\subsubsection{Funktionsweise}
+In jeder Iteration i des  \textsc{Merge-Local-MST} Algorithmus berechnen alle noch aktiven PEs auf ihren lokalen Kanten einen MST (z.b mittels Kruskal). Anschließend empfängt jeder $D$-te aktive PE die MSTs von den folgenden aktiven $D-1$ PEs. Nachdem ein PE seinen MST versendet hat, ist dieser anschließend nicht mehr aktiv und wird nicht weiter benötigt. Die restlichen PEs können aus den empfangen Daten nun erneut einen lokalen MST berechnen.
+Dieses Vorgehen wird solange wiederholt bis nur noch ein Prozessor aktiv ist. Dieser berechnet nun ein letztes Mal einen MST und gibt diesen zurück.
+
+Wie viele MSTs in jedem Schritt zusammengefasst werden bezeichnen wir als \emph{treefacor} oder auch $D$. Hierbei kann $D$ (kleiner als p) beliebig gewählt werden. So kann es vorkommen, dass in einer Iteration ein PE weniger als $D-1$ MSTs empfängt, falls $\log_D(p) \notin \mathbb{N}$.\\
+Insgesamt sind also $\lfloor \log_{D}($p$) \rfloor $ Iterationen nötig.
+Eine Iteration dieses Verfahrens ist in \cref{MergeStep} geschildert und das vollständige Vorgehen in \cref{Merge-Local-MST-Algo}.
+
+
+In \hyperref[eval-treefactor]{Kapitel} \ref{eval-treefactor} arbeiten wir heraus, welche Werte sich für $D$ in der Praxis eignen.\\
+\cref{MergeMST-Img} zeigt wie das Zusammenfügen der MSTs für 8 PEs mit einem treefactor von 2 funktioniert. 
+Zu beginn sind alle acht PEs aktiv und in jeder Iteration sendet ein PE seinen MST weiter, sodass immer $D=2$ MSTs verschmolzen werden. So sind z.B nach der ersten Iteration nur noch die PEs 0, 2, 4 und 6 aktiv und insgesamt nach $\log_2(8) = 3$ Iterationen liegt der globale MST auf PE 0 vor.\\
+
+\newpage
+ 
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=11cm]{Figures/Merge.svg}
+    \caption{Übersicht zur Verschmelzung von MSTs}
+    \label{MergeMST-Img}
+\end{figure}
+
+
+\begin{algorithm} 
+\caption{\textsc{MergeStep}(V, MST: Kantenliste, D: int)}
+\begin{algorithmic}[1]
+\label{MergeStep}
+\STATE andereMSTs: Liste an Kantenlinsten
+\IF{(PE ist empfänger)}
+    \STATE andereMSTs $\gets$ empfange (biszu) $D$ MST 
+\ELSE
+    \STATE sende MST zu Empfänger PE
+    \RETURN //Dieser PE ist nun inaktiv
+\ENDIF
+\FOR{Kanten $\in$ andereMSTs}
+    \STATE MST $\gets$ MST $\cup$ Kanten
+\ENDFOR
+\STATE MST $\leftarrow$ localMST(MST, V)
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm} 
+\caption{\textsc{Merge-Local-MST}(V, E, D: int): Kantenliste}
+\begin{algorithmic}[1]
+\label{Merge-Local-MST-Algo}
+ 
+\STATE MST $\leftarrow$ localMST(E, V)
+\FOR{i $\leftarrow$ 0 bis $\lfloor \log_{D}($p$) \rfloor $}
+    \STATE MergeStep(V, MST, D)
+\ENDFOR
+
+\RETURN MST
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\subsubsection{Eigenschaften und Komplexität}
+Sei $m'$ die maximale Anzahl an lokalen Kanten eines PEs und $T_{seq}$ die Laufzeit für eine lokale MST Berechnung.
+%Dann liegt die Laufzeit im BSP Modell für eine Iteration von Merge-Local-MST bei $W+gh+LT$, mit $W=T_{seq}(n,Dm') + O(Dm'), H\leq Dm'$\ und $T=1$. \\
+Dann liegen im Alpha-Beta Modell die Kosten für das Senden eines MSTs $\alpha + \beta \ell$, wobei $\ell$ die Länge des zu sendenden MSTs ist.  Angenommen $m \geq n$, so ergibt sich die Laufzeit einer Iteration durch eine lokale MST Berechnung, gefolgt von $D$ Nachrichtenübertragungen für das Empfangen der MSTs mit einer jeweiligen maximalen Länge von $n-1$. In diesem Fall liegt die Laufzeit für den ersten \textsc{MergeStep} in  $O(T_{seq}(n,m') + D(\alpha +\beta n))$. 
+Im Anschluss hält jeder aktive PE höchstens n-1 Kanten. Daraus ergibt sich die Gesamte Laufzeit von \textsc{Merge-Local-Mst} in 
+\begin{center}
+    $O(T_{seq}(n,m') +
+    \log_{D}(p) (T_{seq}(n,Dn) + D(\alpha +\beta n)))$.
+\end{center}
+
+Sei nach wie vor $m \geq n$, dann können wir ohne Beschränkung der Allgemeinheit annehmen, dass jeder PE nach Iteration i einen MST mit höchstens n-1 Kanten hält. Dann reduziert sich, in einem weiteren  \textsc{MergeStep},die Anzahl der übrigen Kanten um den Faktor $D$.
+
+Ein Nachteil dieses Algorithmus ist natürlich, dass nur im ersten Schritt wirklich alle PEs genutzt werden und bereits in der nächsten Iteration mindestens die Hälfte inaktiv sind.
+Außerdem ist \textsc{Merge-Local-MST} auf dünn besetzten Graphen deutlich weniger effektiv. In diesem Fall werden bei einer lokalen MST Berechnung fast alle Kanten beibehalten, da bei $m \ll n$ beinahe alle Kanten zu einem MST dazugehören.
+
+\subsubsection{Korrektheit von lokalen MST Berechnungen}\label{Korrektheit}
+\mergeMST liefert nur einen korrekten MST, wenn bei lokalen MST Berechnungen in keinem Fall eine MST Kanten aus dem globalen Graph entfernt wird.
+Tatsächlich ist diese Aussage korrekt und wir können lokale MST Berechnungen auch bei den folgenden Algorithmen verwenden. \\
+Angenommen jeder PE i hat auf seinen lokalen Kanten $E_{\ell i}$ einen MST berechnet und dabei die Kanten $E_{Ri}$ entfernt. Das bedeutet, dass für eine Kante $\{s,t\} \in E_{Ri}$, die Knoten $s$ und $t$ bereits lokal über einen günstigeren Pfad verbunden sind. Global betrachtet, kann höchstens noch besserer Pfad von $s$ nach $t$ gefunden werden, aber die Kante $\{s,t\}$ wird nie eine Verbesserung dafür sein. Angenommen wir fügen die Kante $\{s,t\}$ dennoch zum MST hinzu, so schließt sich ein Kreis $K$ und die Kante $e \in K$  mit dem größten Gewicht kann nach der \hyperref[Kreiseigenschaft]{Kreiseigenschaft} verworfen werden. Das größte Gewicht in $K$ muss aber die Kante $\{s,t\}$ haben, da sie sonst bereits in der lokalen MST Berechnung zum MST gehört hätte.
+
+\subsection{\boruvkaAllreduce}
+Der \boruvkaAllreduce Algorithmus ist eine verteilt parallele Variante von \boruvkasAlgorithmus \space\cite{boruuvka1926jistem}. \\
+Jeder PE rechnet die lokalen leichtesten inzidenten Kanten aus und verständigt sich mittels eines Allreduce Aufrufs, um die globalen Kanten zu erhalten. Anschließend kontrahiert jeder PE den Graphen wie im sequenziellen \boruvka Algorithmus und führt die Berechnung fort. Der Pseudocode von \cref{Boruvka-Allreduce-Algo} veranschaulicht dieses Vorgehen zusammen mit der folgenden Beschreibung der  \hyperref[Funktion-Borruvka]{Funktionsweise}.
+
+\subsection{Funktionsweise}\label{Funktion-Borruvka}
+Am Anfang einer Iteration kann jeder PE $p_j$ auf seiner lokalen Kantenmenge einen MST berechnen. Dieser Schritt ist optional, kann sich aber positiv auf die Laufzeit auswirken (siehe \hyperref[remove-Section]{Kapitel} \ref{remove-Section}).
+Als nächstes berechnet $p_j$ für jeden Knoten diejenige inzidente Kante mit dem geringsten Gewicht und schreibt diese in ein Array $I_L$ der Länge n (\hyperref[Incident-start]{Zeile} \ref{Incident-start} - \ref{Incident-end}). Dabei steht im i-ten Eintrag von $I_L$, die leichteste inzidente Kante zu Knoten i. Um das globalen inzidente Kanten Array $E_I$ zu erhalten, nutzen wir die Allreduce Operation, welche das Array $I_L$ von jedem Prozessor als Eingabe bekommt (\hyperref[Allreduce-code]{Zeile} \ref{Allreduce-code}). Hier werden alle Arrays $I_L$ miteinander verglichen, sodass jeder Prozessor ein Array $E_I$ mit den global kleinsten inzidenten Kanten als Ausgabe erhält. \\
+Diese Kanten fügt nur PE $p_0$ zum MST hinzu (\hyperref[addMST-start]{Zeile} \ref{addMST-start} - \ref{addMST-end}), damit der MST schließlich einheitlich vorliegt.
+Anschließen kontrahiert PE $p_j$ den Graphen (\hyperref[kontrahiere-start]{Zeile} \ref{kontrahiere-start} - \ref{kontrahiere-end}), genau wie im sequenziellen Fall. Ein Beispiel zur Kontraktion eines Graphen ist in \cref{Boruvka-Img} zu sehen.
+Um herauszufinden welche Knoten kontrahiert werden können, nutzen wir ein weiteres Array $P$ der Länge n. Hier schreibt $p_j$ in den i-ten Eintrag den Vorgängerknoten (\textbf{parent vertex}) des i-ten Knoten (\hyperref[parent-start]{Zeile} \ref{parent-start} - \ref{parent-end}).
+Der Vorgänger ist hier der kleinste Knoten der über die leichtesten inzidenten Kanten erreichbar ist. Damit können in $O(n)$ alle Knoten mit dem selben Vorgänger kontrahiert werden.\\
+Am Ende dieser Iteration kann optional $p_j$ noch die übrigen Parallelen Kanten zwischen zwei Knoten entfernt werden (\hyperref[removeParallel-code]{Zeile} \ref{removeParallel-code}). \\
+Insgesamt wird das Vorgehen solange wiederholt, bis nur noch ein Graph mit genau einem Knoten übrig bleibt.\\
+Anschließend muss der berechnete MST noch in die ursprüngliche Form zurück umgewandelt werden, da die MST Kanten durch das Vorgehen umbenannt wurden.
+Wir haben diesen Schritt in $O(n)$ implementiert, indem unsere Kanten die Form $(s,t,w,s_{origin},t_{origin})$ hatten. Wir haben den originalen Start- und Endknoten zusätzlich gespeichert, sodass wir die Kanten wieder direkt in ihren Ausganszustand bringen können.
+
+\begin{algorithm} 
+\caption{\boruvkaStep(V, E, MST: Kantenliste)}
+\begin{algorithmic}[1]
+\label{BoruvkaStep}
+
+\STATE E $\leftarrow$ localMST(E,V) //optional
+\STATE $I_L$[|V|]
+\STATE $I_L$ $\gets [\infty, ..., \infty]$ 
+\FOR{\textbf{each} $e \in E$} \label{Incident-start}
+    \IF{$e.w$ < $I_L$[$e.s$].$w$}
+        \STATE $I_L$[$e.s$] $\gets$ $e$
+    \ENDIF
+    \IF{$e.w$ < $I_L$[$e.t$].$w$}
+        \STATE $I_L$[$e.t$] $\gets$ $e$
+    \ENDIF
+\ENDFOR \label{Incident-end}
+\STATE $E_I$ $\leftarrow$ AllreduceMinIncident(N, $I_L$) \label{Allreduce-code}
+\IF{PE hat ID = 0} \label{addMST-start}
+    \STATE MST $\gets$ MST $\cup$ $E_I$ 
+\ENDIF \label{addMST-end}
+\STATE P[|V|]
+\FOR{$i\gets$ 0 bis |V|-1} \label{parent-start}
+    \STATE P[i] $\gets$ $min_V$\{V ist über $E_I$ zu Knoten i verbunden\}
+\ENDFOR \label{parent-end}
+\STATE V $\gets$ relabelVertices($E_I$, P) \label{kontrahiere-start}
+\STATE E $\gets$ relabelEdges($E_I$, P)\label{kontrahiere-end}
+\STATE E $\gets$ removeParallelEdges(E) //optional \label{removeParallel-code}
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{algorithm} 
+\caption{\textsc{Boruvka-Allreduce}(V, E): Kantenliste}
+\begin{algorithmic}[1]
+\label{Boruvka-Allreduce-Algo}
+
+\STATE MST: Kantenliste
+\WHILE{|V| > 1}
+    \STATE Bor{\r u}vkaStep(V, E, MST)
+\ENDWHILE
+
+\RETURN getOriginEdges(MST) //Umbenennung der Kanten rückgängig machen
+\end{algorithmic}
+\end{algorithm}
+
+
+\subsubsection{Eigenschaften und Komplexität}
+\textsc{Boruvka-Allreduce} reduziert die Anzahl an Knoten in jeder Iteration um mindestens die Hälfte. Jeder Knoten wird anhand einer Kante mit einem oder mehreren Knoten zusammengefasst. Umso dichter der Graph also ist, desto wahrscheinlicher ist es dass mehr Knoten in einer Iteration zusammengefasst werden. Insgesamt ergibt sich damit, dass für \textsc{Boruvka-Allreduce} maximal $\log(n)$ Iterationen nötig sind.
+
+Die Berechnung der leichtesten inzidenten Kanten ist in $O(m)$ möglich, der Allreduce benötigt $O(\alpha \log(p)+\beta \ell)$ im Alpha-Beta Modell. Wobei $\ell$ die Größe des Arrays mit den leichtesten inzidenten Kanten ist, also $\ell \in O(n)$.
+Anhand der inzidenten Kanten kann man den Graph in $O(n + m)$ kontrahieren.
+
+
+Sei $m'$ die maximale Anzahl an lokalen Kanten eines PEs.
+Dann liegt der initiale \boruvkaStep \space in $O(m'+ \alpha \log(p)+\beta n)$.
+Für jeden folgenden \boruvkaStep \space wird n mindestens um die Hälfte kleiner. Hierbei liegt die Summe aus $\sum_{i=i}^{\log n} \beta \frac{n}{2^i}$ in $O(\beta n)$.
+Damit ergibt sich die gesamte Laufzeit von \textsc{Boruvka-Allreduce} in $O(\log n [m' + \alpha \log p]  +\beta n)$.
+
+
+
+
+\subsection{Boruvka-Mixed-Merge}
+Jede Iteration von \boruvkaMixedMerge besteht aus einer abwechselnden Ausführung von einem \boruvkaStep \space gefolgt von einem \textsc{MergeStep}.
+Damit verbindet dieser Algorithmus die Vorteile von \textsc{Merge-Local-MST} und \textsc{Boruvka-Allreduce}.
+Der Aufwand von einem \boruvkaStep \space hängt von $m$ und $p$ ab und ein \textsc{MergeStep} ist auf möglichst dichten Graphen am effizientesten. Diese Eigenschaften werden durch \boruvkaMixedMerge zum Vorteil verwendet.
+Denn durch das Vorgehen von \boruvkaMixedMerge, wird vor jedem \textsc{MergeStep} die Knotenmenge des Graphen mindestens halbiert und die Kantenanzahl sowie die aktiven PEs vor jedem (außer dem ersten) Brouvkastep um den Faktor $D$ reduziert.
+Daher verspricht \boruvkaMixedMerge eine effiziente Ausführung in der Praxis.
+Der Pseudocode von \cref{Boruvka-Mixed-Merge-Algo} zeigt die genaue Vorgehensweise von \boruvkaMixedMerge.
+
+Insgesamt benötigt dieser Algorithmus $\lfloor \log_{D}($p$) \rfloor $ Iterationen, so wie \mergeMST, wegen dem Zusammenfügen der MST.
+Zum Schluss müssen die MST Kanten wieder zu ihrer Ausgangsform umbenannt werden, da sich der Graph wie in \boruvkaAllreduce verändert hat.\\
+
+
+\begin{algorithm} 
+\caption{\textsc{Boruvka-Mixed-Merge}(V, E, D: int): Kantenliste}
+\begin{algorithmic}[1]
+\label{Boruvka-Mixed-Merge-Algo}
+
+\STATE MST: Kantenliste
+\STATE lokalerMST $\gets$ localMST(E, V)
+\FOR{i $\leftarrow$ 0 bis $\lfloor \log_{D}($p$) \rfloor $}
+    \STATE Bor{\r u}vkaStep(V, lokalerMST, MST)
+    \STATE MergeStep(V, MST, D)
+\ENDFOR
+
+\RETURN getOriginEdges(MST) //Umbenennung der Kanten rückgängig machen
+\end{algorithmic}
+\end{algorithm}
+
+Die Laufzeit setzt sich insgesamt aus $\lfloor \log_{D}(p) \rfloor$  \textsc{Bor{\r u}vkaSteps} und einem \textsc{MergeSteps} zusammen. Sei $m \geq n$ und $m'$ die maximale Anzahl an lokalen Kanten eines PEs, dann liegt die gesamte Laufzeit in 
+\begin{center}
+$O(\alpha \log(p) + D\beta n + \log_D(p) \cdot D\alpha \cdot T_{seq}(n,Dn))$.
+\end{center} 
+Hierbei ist zu beachten, dass man den $\log(p/D^i)$ Term, der bei jedem \textsc{MergeStep} auftritt, asymptotisch mit $\log(p)$ abschätzen kann.
+
+
+\subsection{Boruvka-Then-Merge}
+\boruvkaThenMerge führt mehrmals den \boruvkaStep\space durch und anschließend den \textsc{Merge-Local-MST} Algorithmus, um einen MST zu berechnen. Da die Kanten durch mehrere Iterationen von \boruvkaAllreduce angepasst wurden, müssen diese für die Ausgabe wieder in den Ausgangszustand gebracht werden. \\
+Wie bei \boruvkaMixedMerge werden hier die Vorteile von \boruvkaAllreduce und \mergeMST hervorgehoben.
+Da dieser Algorithmus damit anfängt mehrere \boruvkaStep \textsc{s} auszuführen, wird der Graph verkleinert ohne das bereits PEs inaktiv werden. Erst wenn nur noch höchstens $Border$ Knoten übrig sind, wird der restliche MST mittels \mergeMST berechnet. In diesem Fall hat jeder PE deutlich weniger Knoten, als in der Eingabe und ein \mergeStep\space kann \emph{schneller} abgearbeitet werden.
+
+Wie oft man zu Beginn einen \boruvkaStep \space durchführt, hängt vom Anwendungsfall ab. Zu viele Iterationen von \boruvkaAllreduce führen zu keiner Verbesserung, da sich der Algorithmus im kaum von \boruvkaAllreduce unterscheidet. Zu wenige Iterationen führen dazu, dass sich \boruvkaThenMerge sehr ähnlich zu \mergeMST verhält.\\
+Dehne et al. \cite{dehne1998practical} führen \boruvka solange durch bis weniger als $n/\log_{D}^2(p)$ Knoten übrig sind und daher haben wir das auch in unserer Implementierung übernommen.
+
+
+
+\begin{algorithm} 
+\caption{\textsc{Boruvka-Then-Merge}(V, E, D: int, Border: int): Kantenliste}
+\begin{algorithmic}[1]
+\label{Boruvka-Then-Merge-Algo}
+
+\STATE MST: Kantenliste
+\STATE lokalerMST $\gets$ localMST(E, V)
+\WHILE{|V| $\geq$ Border}
+    \STATE Bor{\r u}vkaStep(V, lokalerMST, MST)
+\ENDWHILE
+
+\STATE MST $\gets$ Merge-Local-MST(V, MST, D)
+
+\RETURN getOriginEdges(MST) //Umbenennung der Kanten rückgängig machen
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+Die gesamte Laufzeit ergibt sich durch $B$ mal einen \boruvkaStep \space und $\lfloor \log_{D}($p$) \rfloor$ mal einen \textsc{MergeStep}. 
+Sei $m'$ die maximale Anzahl an lokalen Kanten eines PEs, $T_{seq}$ die Laufzeit für eine lokale MST Berechnung und es gelte $m \geq n$.
+Dann liegt \textsc{Boruvka-Then-Merge} in 
+\begin{center}
+$O(B \cdot (m' + \alpha \log p) + \beta n
++ \log_{D}(p)  (T_{seq}(\frac{n}{2^B},\frac{n}{2^B}) + D(\alpha + \beta \frac{n}{2^B}))
++ T_{seq}(\frac{n}{2^B},m')
+)$
+\end{center}

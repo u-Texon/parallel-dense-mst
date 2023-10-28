@@ -2,17 +2,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+plt.rcParams.update({'font.size': 15})
 merge = pd.read_csv('../out/files/only-merge-proc2048-iter2.csv')
 
-initialMST = np.array(list(merge['calculate initial MST'])[0])
-localMST = np.array(list(merge['calculate local MST']))
+initialMST = np.array(list(merge['calculate initial MST'])[0]) /1000
+localMST = np.array(list(merge['calculate local MST'])) /1000
 
-iterations = np.array(list(merge['iteration']))
-sendRecv = np.array(list(merge['send/receive MST']))
+iterations = np.array(list(merge['iteration'])) /1000
+sendRecv = np.array(list(merge['send/receive MST'])) /1000
 
 rest = []
 
-labels = ["initial local MST"]
+labels = ["Lokaler MST"]
 
 size = len(iterations)
 for i in range(size):
@@ -25,14 +26,15 @@ fig.set_figheight(8)
 fig.set_figwidth(10)
 
 
-p.bar(0, initialMST, color="orange")
-p.bar(range(1, size + 1), localMST, color="blue")
-p.bar(range(1, size + 1), sendRecv, bottom=localMST, color="red")
-p.bar(range(1, size + 1), rest, bottom=sendRecv + localMST, color="green")
+p.bar(0, initialMST, color='#f7930f') #yellow
+p.bar(range(1, size + 1), sendRecv,  color="#de1f1f") #red
+p.bar(range(1, size + 1), localMST, bottom=sendRecv, color='#f7930f') #yellow
 
-p.legend(["calculate initial local MST", "calculate local MST", "send/receive MST", "rest"])
+# p.bar(range(1, size + 1), rest, bottom=sendRecv + localMST, color="green")
 
-p.set_ylabel("Total Run Time [microseconds]")
+p.legend(["Lokalen MST Berechnen", "MST Senden/Empfangen"])
+
+p.set_ylabel("Laufzeit [Millisekunden]")
 p.set_xticks(range(size + 1))
 p.set_xticklabels(labels)
 p.set_xticks(p.get_xticks(), p.get_xticklabels(), rotation=45, ha='right')
@@ -56,9 +58,9 @@ else:
     baseCase = "kruskal"
 
 title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
-        p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]\n" + " base case is " + baseCase
+        p) + ",\nWeights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
 
-plt.title(title)
+plt.title("Merge-Local-MST")
 
 
-plt.savefig('../out/plots/merge_bar.svg')
+plt.savefig('../out/plots/merge_bar.svg',bbox_inches='tight')

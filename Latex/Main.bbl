@@ -1,0 +1,773 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{adler1998communication}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=89dd4d771bea8e1401e8d0db0653dc1b}{%
+           family={Adler},
+           familyi={A\bibinitperiod},
+           given={Micah},
+           giveni={M\bibinitperiod}}}%
+        {{hash=2bc9d6cfaf4bd0c14068539ffc842336}{%
+           family={Dittrich},
+           familyi={D\bibinitperiod},
+           given={Wolfgang},
+           giveni={W\bibinitperiod}}}%
+        {{hash=d73cff1f5f413437ae7eb5064fe99532}{%
+           family={Juurlink},
+           familyi={J\bibinitperiod},
+           given={Ben},
+           giveni={B\bibinitperiod}}}%
+        {{hash=cb054c46d68d125e1078e9f70dacaf11}{%
+           family={Kuty{ł}owski},
+           familyi={K\bibinitperiod},
+           given={Miros{ł}aw},
+           giveni={M\bibinitperiod}}}%
+        {{hash=1095c80855abd086e3503e4a3c9f18ac}{%
+           family={Rieping},
+           familyi={R\bibinitperiod},
+           given={Ingo},
+           giveni={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{f7a4228b9fcd66e1fa0aaacce6874d30}
+      \strng{fullhash}{3ba311ba66fcc1f712ee011415709b04}
+      \strng{bibnamehash}{f7a4228b9fcd66e1fa0aaacce6874d30}
+      \strng{authorbibnamehash}{f7a4228b9fcd66e1fa0aaacce6874d30}
+      \strng{authornamehash}{f7a4228b9fcd66e1fa0aaacce6874d30}
+      \strng{authorfullhash}{3ba311ba66fcc1f712ee011415709b04}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the tenth annual ACM symposium on Parallel algorithms and architectures}
+      \field{title}{Communication-optimal parallel minimum spanning tree algorithms}
+      \field{year}{1998}
+      \field{pages}{27\bibrangedash 36}
+      \range{pages}{10}
+    \endentry
+    \entry{axtmann2017}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=25e3d27b84b39428e108c878e617580c}{%
+           family={Axtmann},
+           familyi={A\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=1d0298898e07043c5f24e5bd1aa22b5a}{%
+           family={Witt},
+           familyi={W\bibinitperiod},
+           given={Sascha},
+           giveni={S\bibinitperiod}}}%
+        {{hash=155669a128ec70047540809c42ca0dc1}{%
+           family={Ferizovic},
+           familyi={F\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=be6c7f12620ef1a8d1d85d96d476a158}{%
+           family={Sanders},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik}%
+      }
+      \strng{namehash}{df7b55c4270bddf646dd010638b7a8ee}
+      \strng{fullhash}{bed2a7eee6bf707877595a4904e866b7}
+      \strng{bibnamehash}{df7b55c4270bddf646dd010638b7a8ee}
+      \strng{authorbibnamehash}{df7b55c4270bddf646dd010638b7a8ee}
+      \strng{authornamehash}{df7b55c4270bddf646dd010638b7a8ee}
+      \strng{authorfullhash}{bed2a7eee6bf707877595a4904e866b7}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{25th Annual European Symposium on Algorithms (ESA 2017)}
+      \field{series}{Leibniz International Proceedings in Informatics (LIPIcs)}
+      \field{title}{{In-Place Parallel Super Scalar Samplesort (IPSSSSo)}}
+      \field{volume}{87}
+      \field{year}{2017}
+      \field{pages}{9:1\bibrangedash 9:14}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.4230/LIPIcs.ESA.2017.9
+      \endverb
+    \endentry
+    \entry{bateni2017affinity}{article}{}
+      \name{author}{7}{}{%
+        {{hash=0d2dd00d0a700a761f8f63c76ac696d1}{%
+           family={Bateni},
+           familyi={B\bibinitperiod},
+           given={MohammadHossein},
+           giveni={M\bibinitperiod}}}%
+        {{hash=5ef039c1e9f20d69163685188f0c957d}{%
+           family={Behnezhad},
+           familyi={B\bibinitperiod},
+           given={Soheil},
+           giveni={S\bibinitperiod}}}%
+        {{hash=08e7ba040815bcc86f35fdd33687f62c}{%
+           family={Derakhshan},
+           familyi={D\bibinitperiod},
+           given={Mahsa},
+           giveni={M\bibinitperiod}}}%
+        {{hash=79b32f14d02efefe5a896fd564c804c0}{%
+           family={Hajiaghayi},
+           familyi={H\bibinitperiod},
+           given={MohammadTaghi},
+           giveni={M\bibinitperiod}}}%
+        {{hash=b221e9e16d9f2bceaf72be187ccc8b7b}{%
+           family={Kiveris},
+           familyi={K\bibinitperiod},
+           given={Raimondas},
+           giveni={R\bibinitperiod}}}%
+        {{hash=5681ea16e5d63a76143c93b584264e8c}{%
+           family={Lattanzi},
+           familyi={L\bibinitperiod},
+           given={Silvio},
+           giveni={S\bibinitperiod}}}%
+        {{hash=2403978c38056af7a74b3ef42192cc46}{%
+           family={Mirrokni},
+           familyi={M\bibinitperiod},
+           given={Vahab},
+           giveni={V\bibinitperiod}}}%
+      }
+      \strng{namehash}{5e02575bcfd6ac83cf27f178106e9164}
+      \strng{fullhash}{c27b508f25766fccdcc684294c33f2d1}
+      \strng{bibnamehash}{5e02575bcfd6ac83cf27f178106e9164}
+      \strng{authorbibnamehash}{5e02575bcfd6ac83cf27f178106e9164}
+      \strng{authornamehash}{5e02575bcfd6ac83cf27f178106e9164}
+      \strng{authorfullhash}{c27b508f25766fccdcc684294c33f2d1}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Advances in Neural Information Processing Systems}
+      \field{title}{Affinity clustering: Hierarchical clustering at scale}
+      \field{volume}{30}
+      \field{year}{2017}
+    \endentry
+    \entry{boruuvka1926jistem}{article}{}
+      \name{author}{1}{}{%
+        {{hash=a67946b7c23c417d32f628f20f6e977a}{%
+           family={Borůvka},
+           familyi={B\bibinitperiod},
+           given={Otakar},
+           giveni={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{a67946b7c23c417d32f628f20f6e977a}
+      \strng{fullhash}{a67946b7c23c417d32f628f20f6e977a}
+      \strng{bibnamehash}{a67946b7c23c417d32f628f20f6e977a}
+      \strng{authorbibnamehash}{a67946b7c23c417d32f628f20f6e977a}
+      \strng{authornamehash}{a67946b7c23c417d32f628f20f6e977a}
+      \strng{authorfullhash}{a67946b7c23c417d32f628f20f6e977a}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{O jistém problému minimálním}
+      \field{year}{1926}
+    \endentry
+    \entry{chung1996parallel}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=77e5fb13a5b8218a48b847311d5b8d83}{%
+           family={Chung},
+           familyi={C\bibinitperiod},
+           given={Sun},
+           giveni={S\bibinitperiod}}}%
+        {{hash=8c066f798710ece4dc0fa6384d6f49d2}{%
+           family={Condon},
+           familyi={C\bibinitperiod},
+           given={Anne},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{e32a891c5a1b8d54f53ab15bf56d37a7}
+      \strng{fullhash}{e32a891c5a1b8d54f53ab15bf56d37a7}
+      \strng{bibnamehash}{e32a891c5a1b8d54f53ab15bf56d37a7}
+      \strng{authorbibnamehash}{e32a891c5a1b8d54f53ab15bf56d37a7}
+      \strng{authornamehash}{e32a891c5a1b8d54f53ab15bf56d37a7}
+      \strng{authorfullhash}{e32a891c5a1b8d54f53ab15bf56d37a7}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of International Conference on Parallel Processing}
+      \field{title}{Parallel implementation of Bouvka's minimum spanning tree algorithm}
+      \field{year}{1996}
+      \field{pages}{302\bibrangedash 308}
+      \range{pages}{7}
+    \endentry
+    \entry{dehne1998practical}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=79492b3b4704b729b7c5bb0a9b87345c}{%
+           family={Dehne},
+           familyi={D\bibinitperiod},
+           given={Frank},
+           giveni={F\bibinitperiod}}}%
+        {{hash=6caa0fed8f2e2c2ef61c9b9b8b36da8d}{%
+           family={Gotz},
+           familyi={G\bibinitperiod},
+           given={Silvia},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{544a4dec62fdd5adad5e3ac5b91e743c}
+      \strng{fullhash}{544a4dec62fdd5adad5e3ac5b91e743c}
+      \strng{bibnamehash}{544a4dec62fdd5adad5e3ac5b91e743c}
+      \strng{authorbibnamehash}{544a4dec62fdd5adad5e3ac5b91e743c}
+      \strng{authornamehash}{544a4dec62fdd5adad5e3ac5b91e743c}
+      \strng{authorfullhash}{544a4dec62fdd5adad5e3ac5b91e743c}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings Seventeenth IEEE Symposium on Reliable Distributed Systems (Cat. No. 98CB36281)}
+      \field{title}{Practical parallel algorithms for minimum spanning trees}
+      \field{year}{1998}
+      \field{pages}{366\bibrangedash 371}
+      \range{pages}{6}
+    \endentry
+    \entry{dhulipala2021theoretically}{article}{}
+      \name{author}{3}{}{%
+        {{hash=dca3687587741f3b6ea18a0ec8bcc5d3}{%
+           family={Dhulipala},
+           familyi={D\bibinitperiod},
+           given={Laxman},
+           giveni={L\bibinitperiod}}}%
+        {{hash=14a27cb3652854f74c4942f51299d35e}{%
+           family={Blelloch},
+           familyi={B\bibinitperiod},
+           given={Guy\bibnamedelima E},
+           giveni={G\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=c8ace46c74c6e208ab806cbfab00ecad}{%
+           family={Shun},
+           familyi={S\bibinitperiod},
+           given={Julian},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM New York, NY, USA}%
+      }
+      \strng{namehash}{ca0e681efbc605420b8f9d9e5ae9c7d1}
+      \strng{fullhash}{ca0e681efbc605420b8f9d9e5ae9c7d1}
+      \strng{bibnamehash}{ca0e681efbc605420b8f9d9e5ae9c7d1}
+      \strng{authorbibnamehash}{ca0e681efbc605420b8f9d9e5ae9c7d1}
+      \strng{authornamehash}{ca0e681efbc605420b8f9d9e5ae9c7d1}
+      \strng{authorfullhash}{ca0e681efbc605420b8f9d9e5ae9c7d1}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ACM Transactions on Parallel Computing (TOPC)}
+      \field{number}{1}
+      \field{title}{Theoretically efficient parallel graph algorithms can be fast and scalable}
+      \field{volume}{8}
+      \field{year}{2021}
+      \field{pages}{1\bibrangedash 70}
+      \range{pages}{70}
+    \endentry
+    \entry{funke2017communication}{inproceedings}{}
+      \name{author}{6}{}{%
+        {{hash=0d989f2ea373beaee7db78515d1fb704}{%
+           family={Funke},
+           familyi={F\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=2ad7caad2171bd852e335ac477aa846f}{%
+           family={Lamm},
+           familyi={L\bibinitperiod},
+           given={Sebastian},
+           giveni={S\bibinitperiod}}}%
+        {{hash=be6c7f12620ef1a8d1d85d96d476a158}{%
+           family={Sanders},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=687669742165d7a49a8816f5f97f5701}{%
+           family={Schulz},
+           familyi={S\bibinitperiod},
+           given={Christian},
+           giveni={C\bibinitperiod}}}%
+        {{hash=855a06bea0b075b7622b995c5dd605c8}{%
+           family={Strash},
+           familyi={S\bibinitperiod},
+           given={Darren},
+           giveni={D\bibinitperiod}}}%
+        {{hash=eaa03daab70da42eb3a2a935560eb23d}{%
+           family={Looz},
+           familyi={L\bibinitperiod},
+           given={Moritz},
+           giveni={M\bibinitperiod},
+           prefix={von},
+           prefixi={v\bibinitperiod}}}%
+      }
+      \strng{namehash}{20c1213010db1b9fa57418368008d197}
+      \strng{fullhash}{12625012459965e511cd78680527bc69}
+      \strng{bibnamehash}{20c1213010db1b9fa57418368008d197}
+      \strng{authorbibnamehash}{20c1213010db1b9fa57418368008d197}
+      \strng{authornamehash}{20c1213010db1b9fa57418368008d197}
+      \strng{authorfullhash}{12625012459965e511cd78680527bc69}
+      \field{sortinit}{F}
+      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2018 {IEEE} International Parallel and Distributed Processing Symposium, {IPDPS} 2018, Vancouver, BC, Canada, May 21 -- May 25, 2018}
+      \field{title}{Communication-free Massively Distributed Graph Generation}
+      \field{year}{2018}
+    \endentry
+    \entry{hoare1962quicksort}{article}{}
+      \name{author}{1}{}{%
+        {{hash=1b90617fa75100f342ab862472a433b1}{%
+           family={Hoare},
+           familyi={H\bibinitperiod},
+           given={Charles\bibnamedelima AR},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Oxford University Press}%
+      }
+      \strng{namehash}{1b90617fa75100f342ab862472a433b1}
+      \strng{fullhash}{1b90617fa75100f342ab862472a433b1}
+      \strng{bibnamehash}{1b90617fa75100f342ab862472a433b1}
+      \strng{authorbibnamehash}{1b90617fa75100f342ab862472a433b1}
+      \strng{authornamehash}{1b90617fa75100f342ab862472a433b1}
+      \strng{authorfullhash}{1b90617fa75100f342ab862472a433b1}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The computer journal}
+      \field{number}{1}
+      \field{title}{Quicksort}
+      \field{volume}{5}
+      \field{year}{1962}
+      \field{pages}{10\bibrangedash 16}
+      \range{pages}{7}
+    \endentry
+    \entry{HubSan2020RMAT}{article}{}
+      \name{author}{2}{}{%
+        {{hash=c85bc6a9aa366f8d331b5e9a6c260649}{%
+           family={Hübschle-Schneider},
+           familyi={H\bibinithyphendelim S\bibinitperiod},
+           given={Lorenz},
+           giveni={L\bibinitperiod}}}%
+        {{hash=be6c7f12620ef1a8d1d85d96d476a158}{%
+           family={Sanders},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press}%
+      }
+      \strng{namehash}{a7abe5770bed4bbe4dd0b901ffed5a2b}
+      \strng{fullhash}{a7abe5770bed4bbe4dd0b901ffed5a2b}
+      \strng{bibnamehash}{a7abe5770bed4bbe4dd0b901ffed5a2b}
+      \strng{authorbibnamehash}{a7abe5770bed4bbe4dd0b901ffed5a2b}
+      \strng{authornamehash}{a7abe5770bed4bbe4dd0b901ffed5a2b}
+      \strng{authorfullhash}{a7abe5770bed4bbe4dd0b901ffed5a2b}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Network Science}
+      \field{number}{4}
+      \field{title}{Linear Work Generation of {R-MAT} Graphs}
+      \field{volume}{8}
+      \field{year}{2020}
+      \field{pages}{543\bibrangedash 550}
+      \range{pages}{8}
+    \endentry
+    \entry{karger1995randomized}{article}{}
+      \name{author}{3}{}{%
+        {{hash=c583a42e891550b0d55f659f34537f82}{%
+           family={Karger},
+           familyi={K\bibinitperiod},
+           given={David\bibnamedelima R},
+           giveni={D\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=273c08956334f2b17010bdfd364fc594}{%
+           family={Klein},
+           familyi={K\bibinitperiod},
+           given={Philip\bibnamedelima N},
+           giveni={P\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=5db7b92ac36b92505a52cbe66bcce4d6}{%
+           family={Tarjan},
+           familyi={T\bibinitperiod},
+           given={Robert\bibnamedelima E},
+           giveni={R\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM New York, NY, USA}%
+      }
+      \strng{namehash}{002fae6acc9c1d006f796d9459df6d78}
+      \strng{fullhash}{002fae6acc9c1d006f796d9459df6d78}
+      \strng{bibnamehash}{002fae6acc9c1d006f796d9459df6d78}
+      \strng{authorbibnamehash}{002fae6acc9c1d006f796d9459df6d78}
+      \strng{authornamehash}{002fae6acc9c1d006f796d9459df6d78}
+      \strng{authorfullhash}{002fae6acc9c1d006f796d9459df6d78}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of the ACM (JACM)}
+      \field{number}{2}
+      \field{title}{A randomized linear-time algorithm to find minimum spanning trees}
+      \field{volume}{42}
+      \field{year}{1995}
+      \field{pages}{321\bibrangedash 328}
+      \range{pages}{8}
+    \endentry
+    \entry{koohi2022mastiff}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=32514b11c2d23d6fa59373f4a7ecbe77}{%
+           family={Koohi\bibnamedelima Esfahani},
+           familyi={K\bibinitperiod\bibinitdelim E\bibinitperiod},
+           given={Mohsen},
+           giveni={M\bibinitperiod}}}%
+        {{hash=323105f0e62160e7e4668b8518a131ae}{%
+           family={Kilpatrick},
+           familyi={K\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=6cfdc5f40cec44378769c956157b3a9c}{%
+           family={Vandierendonck},
+           familyi={V\bibinitperiod},
+           given={Hans},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{9c6b6754cf306015c3716717c8a65844}
+      \strng{fullhash}{9c6b6754cf306015c3716717c8a65844}
+      \strng{bibnamehash}{9c6b6754cf306015c3716717c8a65844}
+      \strng{authorbibnamehash}{9c6b6754cf306015c3716717c8a65844}
+      \strng{authornamehash}{9c6b6754cf306015c3716717c8a65844}
+      \strng{authorfullhash}{9c6b6754cf306015c3716717c8a65844}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 36th ACM International Conference on Supercomputing}
+      \field{title}{MASTIFF: structure-aware minimum spanning tree/forest}
+      \field{year}{2022}
+      \field{pages}{1\bibrangedash 13}
+      \range{pages}{13}
+    \endentry
+    \entry{kruskal1956shortest}{article}{}
+      \name{author}{1}{}{%
+        {{hash=569f9ff2dff516524ca08370ba81ba29}{%
+           family={Kruskal},
+           familyi={K\bibinitperiod},
+           given={Joseph\bibnamedelima B},
+           giveni={J\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+      }
+      \strng{namehash}{569f9ff2dff516524ca08370ba81ba29}
+      \strng{fullhash}{569f9ff2dff516524ca08370ba81ba29}
+      \strng{bibnamehash}{569f9ff2dff516524ca08370ba81ba29}
+      \strng{authorbibnamehash}{569f9ff2dff516524ca08370ba81ba29}
+      \strng{authornamehash}{569f9ff2dff516524ca08370ba81ba29}
+      \strng{authorfullhash}{569f9ff2dff516524ca08370ba81ba29}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the American Mathematical society}
+      \field{number}{1}
+      \field{title}{On the shortest spanning subtree of a graph and the traveling salesman problem}
+      \field{volume}{7}
+      \field{year}{1956}
+      \field{pages}{48\bibrangedash 50}
+      \range{pages}{3}
+    \endentry
+    \entry{li2011mst}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=8dbac327f65c6734344493bf6ffa5dc5}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={You},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=9f50cf8bf83c2a5fa25d804d47204062}{%
+           family={Chang},
+           familyi={C\bibinitperiod},
+           given={Xianrong},
+           giveni={X\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{5b590973ac2f7c6410ef5d05134ccbc4}
+      \strng{fullhash}{5b590973ac2f7c6410ef5d05134ccbc4}
+      \strng{bibnamehash}{5b590973ac2f7c6410ef5d05134ccbc4}
+      \strng{authorbibnamehash}{5b590973ac2f7c6410ef5d05134ccbc4}
+      \strng{authornamehash}{5b590973ac2f7c6410ef5d05134ccbc4}
+      \strng{authorfullhash}{5b590973ac2f7c6410ef5d05134ccbc4}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2011 International Conference on Mechatronic Science, Electric Engineering and Computer (MEC)}
+      \field{title}{A MST-based and new GA supported distribution network planning}
+      \field{year}{2011}
+      \field{pages}{2534\bibrangedash 2538}
+      \range{pages}{5}
+    \endentry
+    \entry{osipov2009filter}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=6f3748967b6af3d396917f05af83384c}{%
+           family={Osipov},
+           familyi={O\bibinitperiod},
+           given={Vitaly},
+           giveni={V\bibinitperiod}}}%
+        {{hash=be6c7f12620ef1a8d1d85d96d476a158}{%
+           family={Sanders},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=493eaeca394ad2b41e31aa35a37cd227}{%
+           family={Singler},
+           familyi={S\bibinitperiod},
+           given={Johannes},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {SIAM}%
+      }
+      \strng{namehash}{399643b1545d369ea7084a8210898bc6}
+      \strng{fullhash}{399643b1545d369ea7084a8210898bc6}
+      \strng{bibnamehash}{399643b1545d369ea7084a8210898bc6}
+      \strng{authorbibnamehash}{399643b1545d369ea7084a8210898bc6}
+      \strng{authornamehash}{399643b1545d369ea7084a8210898bc6}
+      \strng{authorfullhash}{399643b1545d369ea7084a8210898bc6}
+      \field{sortinit}{O}
+      \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2009 Proceedings of the Eleventh Workshop on Algorithm Engineering and Experiments (ALENEX)}
+      \field{title}{The filter-kruskal minimum spanning tree algorithm}
+      \field{year}{2009}
+      \field{pages}{52\bibrangedash 61}
+      \range{pages}{10}
+    \endentry
+    \entry{prim1957shortest}{article}{}
+      \name{author}{1}{}{%
+        {{hash=61c0477fc96cd0a4c1f1b551dd5e274c}{%
+           family={Prim},
+           familyi={P\bibinitperiod},
+           given={Robert\bibnamedelima Clay},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Nokia Bell Labs}%
+      }
+      \strng{namehash}{61c0477fc96cd0a4c1f1b551dd5e274c}
+      \strng{fullhash}{61c0477fc96cd0a4c1f1b551dd5e274c}
+      \strng{bibnamehash}{61c0477fc96cd0a4c1f1b551dd5e274c}
+      \strng{authorbibnamehash}{61c0477fc96cd0a4c1f1b551dd5e274c}
+      \strng{authornamehash}{61c0477fc96cd0a4c1f1b551dd5e274c}
+      \strng{authorfullhash}{61c0477fc96cd0a4c1f1b551dd5e274c}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Bell System Technical Journal}
+      \field{number}{6}
+      \field{title}{Shortest connection networks and some generalizations}
+      \field{volume}{36}
+      \field{year}{1957}
+      \field{pages}{1389\bibrangedash 1401}
+      \range{pages}{13}
+    \endentry
+    \entry{sanders2023engineering}{article}{}
+      \name{author}{2}{}{%
+        {{hash=be6c7f12620ef1a8d1d85d96d476a158}{%
+           family={Sanders},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=cbcfd89669749888253c179826d0311b}{%
+           family={Schimek},
+           familyi={S\bibinitperiod},
+           given={Matthias},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{054b24b775187edd8b32473270995237}
+      \strng{fullhash}{054b24b775187edd8b32473270995237}
+      \strng{bibnamehash}{054b24b775187edd8b32473270995237}
+      \strng{authorbibnamehash}{054b24b775187edd8b32473270995237}
+      \strng{authornamehash}{054b24b775187edd8b32473270995237}
+      \strng{authorfullhash}{054b24b775187edd8b32473270995237}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2302.12199}
+      \field{title}{Engineering Massively Parallel MST Algorithms}
+      \field{year}{2023}
+    \endentry
+    \entry{sanders2009two}{article}{}
+      \name{author}{3}{}{%
+        {{hash=be6c7f12620ef1a8d1d85d96d476a158}{%
+           family={Sanders},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=dee7e2b7a462ce73723425242e56c1e2}{%
+           family={Speck},
+           familyi={S\bibinitperiod},
+           given={Jochen},
+           giveni={J\bibinitperiod}}}%
+        {{hash=79006924e90b5d582556a40c21409c41}{%
+           family={Träff},
+           familyi={T\bibinitperiod},
+           given={Jesper\bibnamedelima Larsson},
+           giveni={J\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{d4220f74b610ba2add50ee6f1fe8ede7}
+      \strng{fullhash}{d4220f74b610ba2add50ee6f1fe8ede7}
+      \strng{bibnamehash}{d4220f74b610ba2add50ee6f1fe8ede7}
+      \strng{authorbibnamehash}{d4220f74b610ba2add50ee6f1fe8ede7}
+      \strng{authornamehash}{d4220f74b610ba2add50ee6f1fe8ede7}
+      \strng{authorfullhash}{d4220f74b610ba2add50ee6f1fe8ede7}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Parallel Computing}
+      \field{number}{12}
+      \field{title}{Two-tree algorithms for full bandwidth broadcast, reduction and scan}
+      \field{volume}{35}
+      \field{year}{2009}
+      \field{pages}{581\bibrangedash 594}
+      \range{pages}{14}
+    \endentry
+    \entry{sanders2019sequential}{book}{}
+      \name{author}{4}{}{%
+        {{hash=be6c7f12620ef1a8d1d85d96d476a158}{%
+           family={Sanders},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=c2f239e3cf9c48b72ce5f4ca9b5e478e}{%
+           family={Mehlhorn},
+           familyi={M\bibinitperiod},
+           given={Kurt},
+           giveni={K\bibinitperiod}}}%
+        {{hash=b3729237385542cc130552f38ee83186}{%
+           family={Dietzfelbinger},
+           familyi={D\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod}}}%
+        {{hash=89256955c7f8f5097859cdcc42fafcdb}{%
+           family={Dementiev},
+           familyi={D\bibinitperiod},
+           given={Roman},
+           giveni={R\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{9125836292a866a1387bff5550a96590}
+      \strng{fullhash}{5408da68a57796a4f0fda66f706e0b76}
+      \strng{bibnamehash}{9125836292a866a1387bff5550a96590}
+      \strng{authorbibnamehash}{9125836292a866a1387bff5550a96590}
+      \strng{authornamehash}{9125836292a866a1387bff5550a96590}
+      \strng{authorfullhash}{5408da68a57796a4f0fda66f706e0b76}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Sequential and Parallel Algorithms and Data Structures}
+      \field{year}{2019}
+    \endentry
+    \entry{valiant1990bridging}{article}{}
+      \name{author}{1}{}{%
+        {{hash=5f6de757ace433a38a527a005db316f1}{%
+           family={Valiant},
+           familyi={V\bibinitperiod},
+           given={Leslie\bibnamedelima G},
+           giveni={L\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM New York, NY, USA}%
+      }
+      \strng{namehash}{5f6de757ace433a38a527a005db316f1}
+      \strng{fullhash}{5f6de757ace433a38a527a005db316f1}
+      \strng{bibnamehash}{5f6de757ace433a38a527a005db316f1}
+      \strng{authorbibnamehash}{5f6de757ace433a38a527a005db316f1}
+      \strng{authornamehash}{5f6de757ace433a38a527a005db316f1}
+      \strng{authorfullhash}{5f6de757ace433a38a527a005db316f1}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Communications of the ACM}
+      \field{number}{8}
+      \field{title}{A bridging model for parallel computation}
+      \field{volume}{33}
+      \field{year}{1990}
+      \field{pages}{103\bibrangedash 111}
+      \range{pages}{9}
+    \endentry
+    \entry{wassenberg2009efficient}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=00ec2d6f96e977422cec21a17ee67242}{%
+           family={Wassenberg},
+           familyi={W\bibinitperiod},
+           given={Jan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=66bd888a0b3b30bf78a7f3cde3017eee}{%
+           family={Middelmann},
+           familyi={M\bibinitperiod},
+           given={Wolfgang},
+           giveni={W\bibinitperiod}}}%
+        {{hash=be6c7f12620ef1a8d1d85d96d476a158}{%
+           family={Sanders},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{ec3ce18594fb4b05a47c6e5a1c716e6f}
+      \strng{fullhash}{ec3ce18594fb4b05a47c6e5a1c716e6f}
+      \strng{bibnamehash}{ec3ce18594fb4b05a47c6e5a1c716e6f}
+      \strng{authorbibnamehash}{ec3ce18594fb4b05a47c6e5a1c716e6f}
+      \strng{authornamehash}{ec3ce18594fb4b05a47c6e5a1c716e6f}
+      \strng{authorfullhash}{ec3ce18594fb4b05a47c6e5a1c716e6f}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{International Conference on Computer Analysis of Images and Patterns}
+      \field{title}{An efficient parallel algorithm for graph-based image segmentation}
+      \field{year}{2009}
+      \field{pages}{1003\bibrangedash 1010}
+      \range{pages}{8}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

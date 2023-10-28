@@ -2,12 +2,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+plt.rcParams.update({'font.size': 15})
 boruvka = pd.read_csv('../out/files/boruvka.csv')
 boruvkaMerge = pd.read_csv('../out/files/boruvkaMerge.csv')
 merge = pd.read_csv('../out/files/merge.csv')
 mixedMerge = pd.read_csv('../out/files/mixedMerge.csv')
 
-procSize = 10
+procSize = 12
 
 nums = np.arange(procSize)
 procs = 2 ** nums
@@ -65,26 +66,32 @@ fig, x = plt.subplots(1)
 fig.set_figheight(8)
 fig.set_figwidth(10)
 
-x.plot(nums, b_avg, label='boruvka-allreduce', color="blue")
-x.plot(nums, m_avg, label='merge-local-mst', color="red")
-x.plot(nums, mm_avg, label='boruvka-mixed-merge', color="green")
-x.plot(nums, bm_avg, label='boruvka-then-merge', color="orange")
-x.set_ylabel('execution time [milliseconds]')
+x.plot(nums, b_avg, label='Boruvka-Allreduce', color='#02008f', marker="o") #blue
+x.plot(nums, m_avg, label='Merge-Local-MST', color="#de1f1f", marker="s") #red
+x.plot(nums, mm_avg, label='Boruvka-Mixed-Merge', color="#02a131", marker="*") #green
+x.plot(nums, bm_avg, label='Boruvka-Then-Merge', color='#f7930f', marker="D") #yellow
+
 
 plotName = '../out/plots/weak-scale-parallel.svg'
 title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Edges per PE: " + str(
-    p) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
+    p) + ",\nWeights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
 
 if p == 0:
     plotName = '../out/plots/strong-scale-parallel.svg'
     title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", log(m): " + str(
         edgeCount) + ", Weights: [" + str(minWeight) + "," + str(maxWeight) + "]" + " base case is " + baseCase
 
-x.set_title(title)
-x.set_xlabel('Number of Processors')
+x.set_title("Pair Graph mit $n=2^{" + str(numVertices) + "}$ und $m/p=2^{" + str(p) + "}$ ")
+x.set_xlabel('Anzahl an PEs')
 x.legend()
 x.xaxis.set_ticks(nums)
 x.xaxis.set_ticklabels(procs)
-x.set_ylim(bottom=0)
+x.set_ylim(bottom=0, top=650)
 
-plt.savefig(plotName)
+x.set_ylabel('Laufzeit [Millisekunden]')
+#frame1 = plt.gca()
+#frame1.axes.yaxis.set_ticklabels([])
+
+plt.grid()
+
+plt.savefig(plotName, bbox_inches='tight')

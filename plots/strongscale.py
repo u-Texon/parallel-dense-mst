@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+plt.rcParams.update({'font.size': 15})
 boruvka = pd.read_csv('../out/files/boruvka.csv')
 boruvkaMerge = pd.read_csv('../out/files/boruvkaMerge.csv')
 merge = pd.read_csv('../out/files/merge.csv')
@@ -117,5 +119,5 @@ x[1].legend()
 
 
 
-plt.savefig(plotName)
+plt.savefig(plotName,bbox_inches='tight')
 plt.show()

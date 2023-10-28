@@ -1,0 +1,8 @@
+\section{Fazit}\label{Fazit}
+
+Die Experimente haben gezeigt, dass die von Dehne et al. \cite{dehne1998practical} entwickelten Algorithmen in der Praxis auch auf mehreren tausend Prozessoren effizient skalieren. Während \mergeMST selten kürzere Laufzeiten als \boruvkaAllreduce besitzt, so waren \boruvkaMixedMerge und \boruvkaThenMerge auf vielen verschiedenen Eingaben die effizientesten Algorithmen. Besonder \boruvkaMixedMerge war auf dem Pair Graphen, der viele Iterationen von \boruvkaAllreduce benötigt, die höchste Effizienz gezeigt. \\
+Zusätzlich konnten wir einen deutlichen Einfluss auf die verteilt parallelen Algorithmen durch lokalen MST Berechnungen beobachten. Nicht nur bildet ein in der Praxis effizienter sequenzieller MST Algorithmus eine wichtige Basis für verteilte MST Algorithmen. Sondern machen diese auch bei sehr dichten Graphen einen Großteil der Laufzeit aus. Dabei war die Verwendung von \textsc{Filter-Kruskal} gegen über Kruskals Algorithmus ein wesentlicher Faktor für eine bessere Effizienz der gesamten Laufzeit. Zusätzlich hat sich \textsc{Filter-Kruskal} als eine sehr effiziente Option offenbart um in \boruvkasAlgorithmus \space parallele Kanten zu entfernen.\\
+Allerdings hat sich eine effiziente Umsetzung der Überlagerung zwischen Kommunikation und lokalen MST Berechnungen als komplizierter herausgestellt als anfänglich erwartet. Hierbei haben wir gesehen, dass dieses Vorgehen einen schnellere Laufzeit von bis zu 30\% ermöglichen kann, allerdings nur wenn die lokalen MST Berechnungen einen ähnlich Anteil an der Laufzeit ausmachen wie die Kommunikation. Dies war bei unseren Experimenten nur auf weniger dichten Graphen möglich, was wiederum die generelle Effizienz der Algorithmen mindert.
+
+
+!!! Future work !!!!

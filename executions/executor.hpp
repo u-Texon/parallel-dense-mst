@@ -22,11 +22,10 @@ namespace executor {
     }
 
 
-    void executeAlgorithm(Config &config, WEdgeList &distEdges, WEdgeList &allEdges, WEdgeOriginList &distOriginEdges,
-                          size_t mstWeight) {
+    void executeAlgorithm(Config &config, WEdgeList &distEdges, WEdgeList &allEdges, WEdgeOriginList &distOriginEdges) {
         hybridMST::mpi::MPIContext ctx;
         VId n = pow(2, config.log_n);
-
+        size_t mstWeight = 0;
 
         for (size_t i = 0; i < config.repeat; ++i) {
             std::vector<size_t> numEdges;
@@ -44,17 +43,15 @@ namespace executor {
                 std::cout << timerOutput << std::endl;
                 if (mstWeight == 0) {
                     mstWeight = algoWeight;
-                } else {
-                    if (mstWeight != algoWeight) {
-                        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-                        std::cout << "in iteration " << i << ", mst got weight of " << algoWeight << " instead of "
-                                  << mstWeight << std::endl;
-                        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-                    }
+                } else if (mstWeight != algoWeight) {
+                    std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+                    std::cout << "in iteration " << i << ", " << config.algo << " got weight of " << algoWeight
+                              << " instead of "
+                              << mstWeight << std::endl;
+                    std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
                 }
-
             }
-            if (i== 0) {
+            if (i == 0) {
                 std::string filePath = "out/" + config.dir + "/files";
                 std::filesystem::create_directories(filePath);
                 std::filesystem::create_directory("out/" + config.dir + "/plots");
@@ -76,7 +73,6 @@ namespace executor {
         WEdgeList distEdges = generateGraph::getDistEdges<WEdge>(config);
         WEdgeList allEdges;
         WEdgeOriginList distOriginEdges;
-        size_t mstWeight = 0;
 
         if (config.algo == "kruskal" || config.algo == "all" || config.algo == "filter" || config.test) {
             allEdges = generateGraph::getAllEdges(distEdges);
@@ -97,10 +93,10 @@ namespace executor {
             }
             for (const auto &algo: algorithms) {
                 config.algo = algo;
-                executeAlgorithm(config, distEdges, allEdges, distOriginEdges, mstWeight);
+                executeAlgorithm(config, distEdges, allEdges, distOriginEdges);
             }
         } else {
-            executeAlgorithm(config, distEdges, allEdges, distOriginEdges, mstWeight);
+            executeAlgorithm(config, distEdges, allEdges, distOriginEdges);
         }
     }
 

@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+plt.rcParams.update({'font.size': 15})
 kruskal = pd.read_csv('../out/files/kruskal.csv')
 filterKruskal = pd.read_csv('../out/files/filter.csv')
 
@@ -46,23 +48,23 @@ for i in range(minEdges, maxEdges + 1):
     f_avg.append(get_average(f_edges, f_times, i) / 1000)
     labels.append("2^" + str(i))
 
-fig, p = plt.subplots(2)
-fig.tight_layout(pad=5.0)
+fig, p = plt.subplots(1)
+fig.tight_layout(pad=1.0)
 fig.set_figheight(8)
 fig.set_figwidth(10)
 
-p[0].plot(k_avg, label='kruskal', color="green")
-p[0].plot(f_avg, label='filter-kruskal', color="blue")
-p[0].set_xticks(range(size))
-p[0].set_xticklabels(labels)
-p[0].set_ylim(bottom=0)
+#p[0].plot(k_avg, label='kruskal', color="green")
+#p[0].plot(f_avg, label='filter-kruskal', color="blue")
+#p[0].set_xticks(range(size))
+#p[0].set_xticklabels(labels)
+#p[0].set_ylim(bottom=0)
 
 title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Weights: [" + str(minWeight) + "," + str(
     maxWeight) + "]"
-p[0].set_title(title)
-p[0].set_xlabel('Number of Edges')
-p[0].set_ylabel('execution time \n [milliseconds]')
-p[0].legend()
+#p[0].set_title(title)
+#p[0].set_xlabel('Number of Edges')
+#p[0].set_ylabel('execution time \n [milliseconds]')
+#p[0].legend()
 
 k_avg = []
 f_avg = []
@@ -72,18 +74,21 @@ for i in range(minEdges, maxEdges + 1):
     f_avg.append(get_average(f_edges, f_times, i) / pow(2, i))
     labels.append(str((pow(2, i) / pow(2, numVertices))))
 
-p[1].plot(k_avg, label='kruskal', color="green")
-p[1].plot(f_avg, label='filter-kruskal', color="blue")
-p[1].set_xticks(range(size))
-p[1].set_xticklabels(labels)
-p[1].set_ylim(bottom=0)
+
+
+
+p.plot(k_avg, label='Kruskal', color="#de1f1f", marker="s") #red
+p.plot(f_avg, label='Filter-Kruskal', color='#02008f', marker="o") #blue
+p.set_xticks(range(size))
+p.set_xticklabels(labels)
+p.set_ylim(bottom=0)
+plt.grid()
 
 title = "Graph: " + str(graph) + ", log(n): " + str(numVertices) + ", Weights: [" + str(minWeight) + "," + str(
     maxWeight) + "]"
-p[1].set_title(title)
-p[1].set_ylabel('Time per Edge \n [time/numEdges]')
-p[1].set_xlabel('Degree  \n [numVertices / numEdges]')
-p[1].legend()
+p.set_title("GNM Graph mit $2^{"  + str(numVertices) + "}$ Knoten")
+p.set_ylabel('Zeit pro Kante \n [Millisekunden]')
+p.set_xlabel('Knotengrad ')
+p.legend()
 
-plt.savefig('../out/plots/Sequential.svg')
-plt.show()
+plt.savefig('../out/plots/Sequential.svg',bbox_inches='tight')

@@ -2,10 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+plt.rcParams.update({'font.size': 15})
 boruvka = pd.read_csv('../out/files/boruvka.csv')
 boruvkaThread = pd.read_csv('../out/files/boruvka-thread.csv')
 
-procSize = 12
+procSize = 11
 
 nums = np.arange(procSize)
 procs = 2 ** nums
@@ -59,9 +61,9 @@ fig, x = plt.subplots(1)
 fig.set_figheight(8)
 fig.set_figwidth(10)
 
-x.plot(nums, b_avg, label='boruvka-allreduce', color="blue")
-x.plot(nums, bt_avg, label='boruvka with message overlap', color="red")
-x.set_ylabel('execution time [milliseconds]')
+x.plot(nums, b_avg, label='Boruvka-Allreduce', color='#02008f', marker="o") #blue
+x.plot(nums, bt_avg, label='Boruvka-Allreduce mit Nachrichtenüberlagerung', color="#de1f1f", marker="s") #red
+x.set_ylabel('Laufzeit [Millisekunden]')
 
 plotName = '../out/plots/weak-scale-boruvkaThread.svg'
 
@@ -77,12 +79,13 @@ title += ", Weights: [" + str(minWeight) + "," + str(
     maxWeight) + "]\n" + " base case is " + baseCase + ". localMST=" + str(
     localMSTcount) + ", boruvkaThreadCount=" + str(threadCount)
 
-x.set_title(title)
-x.set_xlabel('Number of Processors')
+x.set_title("GNM Graph mit $n=2^{" + str(int(numVertices)) + "}$ und  $m/p=2^{" + str(int(p)) + "}$")
+x.set_xlabel('Anzahl an MPI Prozessen')
 x.legend()
 x.xaxis.set_ticks(nums)
 x.xaxis.set_ticklabels(procs)
 x.set_ylim(bottom=0)
 
-plt.savefig(plotName)
-plt.show()
+plt.grid()
+plt.savefig(plotName,bbox_inches='tight')
+

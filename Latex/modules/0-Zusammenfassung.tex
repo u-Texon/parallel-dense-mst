@@ -1,0 +1,24 @@
+\vspace*{0pt}\vfill
+
+\begin{abstract}
+\centerline{\textbf{Zusammenfassung}}
+\hfill
+
+
+Das \textbf{M}inimum \textbf{S}panning \textbf{T}ree (MST) Problem sucht für einen ungerichteten und (kanten-)gewichteten Eingabegraphen $G = (V, E)$ nach einem Baum $T = (V, E'  \subseteq E)$, welcher alle Knoten aus $V$ verbindet und minimales Gewicht besitzt. \newline
+Wir beschäftigen uns mit der Frage, wie MSTs auf Supercomputer mit mehreren tausend Prozessoren effizient berechnet werden können. Solche Supercomputer sind verteilte Systeme, in welchen die Prozessoren nicht über den geteilten Speicher (shared-memory), sondern mittels dedizierten
+Nachrichten über Hochleistungsnetzwerke kommunizieren. Dadurch ergeben sich deutlich andere Anforderungen an effiziente Algorithmen als in herkömmlichen shared-memory Systemen.
+\newline
+Unsere Arbeit beruht auf den Algorithmen von Dehne et al. \cite{dehne1998practical} und Adler et al. \cite{adler1998communication}.\\
+Diese Algorithmen arbeiten auf einem verteilt vorliegenden Eingabegraphen, wobei jeder Prozessor $|E|/p$ Kanten erhält. Zusätzlich muss die Knotenmenge auf allen $p$ Prozessoren repliziert werden können. Dafür muss die Anzahl an Kanten um den Faktor $p$ größer sein als die Knotenmenge ($|V| \leq |E| / p$). \\
+Auf diesen \enquote{dichten} Graphen hab wir vier verteilte MST Algorithmen \\(nach-)implementiert, weitere Verbesserungen für die Praxis vorgenommen und auf über zweitausend Prozessoren evaluiert.
+
+
+\end{abstract}
+
+
+\vfill
+
+
+\vfill\vfill\vfill
+\clearpage

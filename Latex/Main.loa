@@ -1,0 +1,9 @@
+\contentsline {algorithm}{\numberline {1}{\ignorespaces Kruskal(V, E, UF: UnionFind): Kantenliste}}{11}{algorithm.1}%
+\contentsline {algorithm}{\numberline {2}{\ignorespaces \textsc {Filter-Kruskal}(V, E, UF: UnionFind, Grenze: int): Kantenliste}}{12}{algorithm.2}%
+\contentsline {algorithm}{\numberline {3}{\ignorespaces \textsc {Filter}(E, UF: UnionFind): Kantenliste}}{12}{algorithm.3}%
+\contentsline {algorithm}{\numberline {4}{\ignorespaces \textsc {MergeStep}(V, MST: Kantenliste, D: int)}}{16}{algorithm.4}%
+\contentsline {algorithm}{\numberline {5}{\ignorespaces \textsc {Merge-Local-MST}(V, E, D: int): Kantenliste}}{16}{algorithm.5}%
+\contentsline {algorithm}{\numberline {6}{\ignorespaces \textsc {Bor{\r u}vkaStep}(V, E, MST: Kantenliste)}}{18}{algorithm.6}%
+\contentsline {algorithm}{\numberline {7}{\ignorespaces \textsc {Boruvka-Allreduce}(V, E): Kantenliste}}{18}{algorithm.7}%
+\contentsline {algorithm}{\numberline {8}{\ignorespaces \textsc {Boruvka-Mixed-Merge}(V, E, D: int): Kantenliste}}{19}{algorithm.8}%
+\contentsline {algorithm}{\numberline {9}{\ignorespaces \textsc {Boruvka-Then-Merge}(V, E, D: int, Border: int): Kantenliste}}{20}{algorithm.9}%

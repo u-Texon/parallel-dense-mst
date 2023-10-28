@@ -2,7 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-boruvka = pd.read_csv('../out/files/mixedMerge_boxplot-512.csv')
+
+
+plt.rcParams.update({'font.size': 15})
+boruvka = pd.read_csv('../out/files/mixedMerge_boxplot-2048.csv')
 
 iterations = np.array(list(boruvka['Iteration']))
 numVertices = np.array(list(boruvka['numVertices']))
@@ -56,4 +59,4 @@ p[1].set_xticks([i for i in range(sizeIt)])
 p[1].set_xticklabels(labels)
 p[1].set_xticks(p[1].get_xticks(), p[1].get_xticklabels(), rotation=45, ha='right')
 
-plt.savefig('../out/plots/mixedMerge_box.svg')
+plt.savefig('../out/plots/mixedMerge_box.svg',bbox_inches='tight')

@@ -2,9 +2,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+plt.rcParams.update({'font.size': 15})
 merge = pd.read_csv('../out/files/merge.csv')
 
-procSize = 11
+procSize = 12
 
 nums = np.arange(procSize)
 procs = 2 ** nums
@@ -32,29 +34,34 @@ def get_average_runtimes(tree_factor):
 
 
 m2 = get_average_runtimes(2)
-m3 = get_average_runtimes(3)
+m3 = get_average_runtimes(4)
 m4 = get_average_runtimes(8)
 m5 = get_average_runtimes(16)
-m6 = get_average_runtimes(30)
+m6 = get_average_runtimes(3)
 
 fig = plt.figure()
+fig.tight_layout(pad=5.0)
+fig.set_figheight(8)
+fig.set_figwidth(10)
+
+
 x = fig.add_subplot()
 
-x.plot(nums, m2, label='d = 2', color="blue")
-x.plot(nums, m3, label='d = 3', color="green")
-x.plot(nums, m4, label='d = 8', color="brown")
-x.plot(nums, m5, label='d = 16', color="red")
-x.plot(nums, m6, label='d = 30', color="orange")
+x.plot(nums, m2, label='D = 2', color='#02008f', marker="o") #blue
+x.plot(nums, m6, label='D = 3', color="black", marker="x")
+x.plot(nums, m3, label='D = 4', color="#02a131", marker="*") #green
+x.plot(nums, m4, label='D = 8', color='#f7930f', marker="D") #yellow
+x.plot(nums, m5, label='D = 16', color="#de1f1f", marker="s") #red
 
-plt.title('mergeMST with different tree-factor d (2²² Edges per PE)')
-plt.xlabel('Number of Processors')
-plt.ylabel('execution time [milliseconds]')
+plt.title('RHG Graph mit $n=2^{18}$ und $m/p=2^{20}$')
+plt.xlabel('Anzahl an PEs')
+plt.ylabel('Laufzeit [Millisekunden]')
 plt.legend()
 
-x.set_ylim(bottom=0)
+x.set_ylim(bottom=0, top=850)
 
 x.xaxis.set_ticks(nums)
 x.xaxis.set_ticklabels(procs)
+plt.grid()
 
-plt.savefig('../out/plots/mergeMST.svg')
-plt.show()
+plt.savefig('../out/plots/mergeMST.svg',bbox_inches='tight')

@@ -1,0 +1,42 @@
+\section{Implementierung}\label{Implementierung}
+Auch wenn man mittels Laufzeitschranken Algorithmen sinnvoll miteinander vergleichen Kann, geben sie uns immer nur einen Einblick in den schlecht möglichsten Fall. Damit sind diese oft sehr pessimistisch und die tatsächlichen Ergebnisse können in der Praxis stark schwanken. Aus diesem Grund klären wir im Folgenden Details die unsere Implementierung betroffen haben sowie die Art und Weise wie wir unsere Eingabegraphen konstruiert haben.\\
+Die Programmierung unserer Algorithmen \footnote{\url{https://github.com/u-Texon/parallel-dense-mst}} ist in der Programmiersprache $C$++ einstanden unter Verwendung verschiedener Bibliotheken. So haben wir für die Kommunikation zwischen Prozessoren das \textbf{M}essage \textbf{P}assing \textbf{I}nterface (MPI) verwendet. MPI ermöglicht einen einfachen und gezielten Umgang und bietet auch eine Vielzahl an kollektiven Operationen an.
+Für die Generierung der Eingabegraphen haben wir \textit{Kagen}\footnote{\url{https://github.com/KarlsruheGraphGeneration/KaGen}} \cite{funke2017communication,HubSan2020RMAT} verwendet und zum Sortieren (z.B bei Kruskals Algorithmus) 
+\textit{IpsoSort}\footnote{\url{https://github.com/SaschaWitt/ips4o}} \cite{axtmann2017}. Dieser Sortieralgorithmus kann sowohl parallel als auch sequenziell verwendet werden. Da wir in den Algorithmen nur sequenziell Sortieren, haben wir den parallelen Algorithmus auch nicht verwendet.
+
+
+\subsection{Zeitmessung}
+Damit die Laufzeitmessung unserer Algorithmen auf mehreren Prozessoren funktioniert, wird vor dem Start-Aufruf des Timers immer eine Barriere aufgerufen, die solange das Programm anhält bis alle Prozessoren an dieser Stelle im Code angekommen sind (und auch die Barriere aufrufen). Erst ab diesem Punkt fängt die Zeit an zu laufen. Mit demselben Vorgehen wird vor dem Stoppen des Timers auch über eine Barriere sichergestellt, dass alle Prozessoren am Ende der Ausführung angekommen sind. Erst dann wird die Zeit angehalten. \\
+
+Das bedeutet im wesentlichen, dass ein Timer Aufruf auch immer zwangsläufig ein Barrieren Aufruf beinhaltet. Somit wird zusätzliche Zeit benötigt, um darauf zu warten, dass alle Prozessoren die selben Codebereiche ausgeführt haben. \\
+Da wir für alle Algorithmen nicht nur die gesamte Laufzeit, sondern auch einzelne Phasen der Algorithmen messen wollen, sind wir wie folgt vorgegangen: Für die Evaluation jeglicher Weak- und Strongscaling Ergebnisse, haben wir nur einen Timeraufruf vor und nach dem Algorithmus ausgeführt, damit die zusätzlichen Synchronisationen des Timers keine Auswirkung auf den Algorithmus selber haben.\\
+Bei den Messungen der einzelnen Phasen eines Algorithmus, können wir dieses Problem allerdings nicht umgehen. Daher sollte man beachten, dass einerseits die Gesamtlaufzeit in diesem Fall ggf. etwas höher ist als bei den Weak- und Strongscaling Ergebnisse. Anderseits können Phasen wie das Allreduce bei dem Boruvka-Allreduce Algorithmus geringer erscheinen als sie im Normalfall tatsächlich wären. Das liegt daran, dass für ein Allreduce eine Synchronisation aller Prozessoren für den Nachrichtenaustausch passiert. Sollte also ein einzelner Prozessor länger für eine vorherige Aufgabe benötigen als die übrigen, so gehört zum Allreduce das warten auf diesem Prozessor dazu. Da wir in unserem Fall aber über den Timer Aufruf einmal alle Prozessoren synchronisieren, fällt dieses Warten auf einen einzelnen Prozessor im Anschluss nicht mehr so stark ins Gewicht.
+
+
+\subsection{Generierung der Graphen}
+Die von uns verwendete Kagen Bibliothek generiert abhängig von der Anzahl an $n$ Knoten, $m$ Kanten, $p$ Prozessoren und Graphtyp $t$ einen bestimmten Graphen. Für diese Generierung muss $p,m,n \in \{2^k | k \in \mathbb{N}\}$ gelten. Daher haben wir unsere Implementierung nur mit einer Zweierpotenz an Prozessoren, Kanten und Knoten evaluiert und getestet. Auch wenn die Algorithmen mit beliebigen Eingaben und Konfigurationen funktionieren. \\
+Nach der Generierung liegt der Graph bereits verteilt auf den einzelnen Prozessoren sortiert nach Start Knoten vor. Das bedeutet Prozess 2 besitzt Kanten der Form $(2,1), (2,4), (2,7)$ und so weiter. Zu jeder Kante $(s,t,w)$ wird auch die Rückkante $(t,s,w)$ generiert. Da wir diese Sortierung nicht weiter benötigen haben wir direkt nach der Generierung die Kanten zufällig an alle Prozessoren verteilt. Zu den wesentlichen Graph Typen die wir verwendet haben gehören GNM, RHG und PAIR. 
+
+\subsubsection{GNM und RHG Graph}
+Kagen ermöglicht es uns eine Vielzahl an verschiedenen Graphen zu generieren. Dazu gehören folgende Familien an Graphen: random geometric graphs (RGG), random hyperbolic graphs (RHG), random delaunay graphs (RDGs), grid2D/3D sowie G(n,m) bzw. G(n,p). \\
+Für unsere Evaluierung nutzen wir G(n,m) (bzw. GNM) Graphen, welche im wesentlichen von den Eingabeparametern n und m abhängen. Dabei sind diese GNM Graphen im wesentlichen beliebige Zufällige Graphen, die mit m Kanten und n Knoten auftreten können. \\
+Bei RHG Graphen hingegen werden zunächst n Punkte auf einem Kreis mit Radius R gesetzt. Mit weiteren Parametern kann gesteuert werden, wie nah diese Punkte an dem Kreis liegen sollen. \\
+
+
+\subsubsection{Pair Graph}
+Der Pair Graph ist ein von uns erstellter Graph beruhend auf der Idee von Dehne und Götz \cite{dehne1998practical} mit dem Ziel möglichst viele Iterationen von Boruvka zu erzwingen.\\
+In jeder Iteration von Boruvka verringert sich die Knotenanzahl um mindestens die Hälfte. Besonders auf dichten Graphen können in einem Schritt eine Vielzahl von Knoten zusammengefasst werden, dass Boruvka deutlich weniger als $\log(n)$ Iterationen benötigt. Um aber explizit dieses Szenario betrachten zu können, haben wir mit der Beschreibung  einen eigenen Pair Graphen generiert. \\
+
+Das Vorgehen zum Generieren eines solchen Graphen ist relativ simpel, besonders für uns, da wir nur Graphen mit $n = 2^k$ betrachten: \\
+Wir erstellen zunächst zwischen jedem Zweierpaar an Knoten eine Kante mit Gewicht 1, anschließend zwischen jedem Viererpaaren mit Gewicht 2, dann zwischen Achterpaaren mit Gewicht 3 und so weiter. Somit generieren wir insgesamt n-1 Kanten und können weitere zufällige Kanten (mit minimalem Gewicht von n) je nach belieben hinzufügen. Eine einfache Darstellung wie dieser Graph schlussendlich aussieht ist in Abbildung \cref{Pair-Graph-Img} dargestellt.\\
+
+Durch die geringen Kantengewichte stellen wir sicher, dass es sich bei all diese Kanten genau um die MST-Kanten des Graphen handelt. Im ersten Borvkaschritt werden also alle Knotenpaare die über eine Kante mit Gewicht eins verbunden sind kontrahiert, im nächsten Schritt diejenigen paare die über Gewicht zwei verbunden sind und so weiter. Damit ergibt sich für unsere Eingaben immer die maximal mögliche Anzahl an Boruvkaschritten von $\log(n)$.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=12cm]{Figures/PAIR-Graph.svg}
+    \caption{Pair Graph mit n=8}
+    \label{Pair-Graph-Img}
+\end{figure}
+
+

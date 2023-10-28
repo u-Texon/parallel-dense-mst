@@ -141,6 +141,7 @@ namespace boruvka_allreduce {
         if (parallelEdges.empty()) {
             return;
         }
+        // overlap zwischen sorieren und allreduce
         for (int i = 0; i < n; ++i) {
             incidentLocal[i] = WEdgeOrigin(i, i, -1); //initialize "empty" entries
         }
