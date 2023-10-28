@@ -1,19 +1,19 @@
 \babel@toc {ngerman}{}\relax 
-\contentsline {figure}{\numberline {1}{\ignorespaces Beispiel Graph mit MST}}{5}{figure.1}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Beispiel für die Schnitteigenschaft}}{9}{figure.2}%
-\contentsline {figure}{\numberline {3}{\ignorespaces Beispiel für die Kreiseigenschaft}}{9}{figure.3}%
-\contentsline {figure}{\numberline {4}{\ignorespaces Beispieldurchlauf von Bor{\r u}vkas Algorithmus}}{11}{figure.4}%
-\contentsline {figure}{\numberline {5}{\ignorespaces Übersicht zur Verschmelzung von MSTs}}{16}{figure.5}%
-\contentsline {figure}{\numberline {6}{\ignorespaces Pair Graph mit n=8}}{23}{figure.6}%
-\contentsline {figure}{\numberline {7}{\ignorespaces Vergleich zwischen Kruskals Algorithmus und \textsc {Filter-Kruskal}}}{24}{figure.7}%
-\contentsline {figure}{\numberline {8}{\ignorespaces Weaksclale}}{25}{figure.8}%
-\contentsline {figure}{\numberline {9}{\ignorespaces Ansicht für einzelne Algorithmen}}{26}{figure.9}%
-\contentsline {figure}{\numberline {10}{\ignorespaces Boxplots}}{27}{figure.10}%
-\contentsline {figure}{\numberline {11}{\ignorespaces Laufzeit von Merge-Local-MST mit verschiedenen Treefactor Werten}}{27}{figure.11}%
-\contentsline {figure}{\numberline {12}{\ignorespaces GNM Weakscale}}{29}{figure.12}%
-\contentsline {figure}{\numberline {13}{\ignorespaces RHG Weakscale}}{30}{figure.13}%
-\contentsline {figure}{\numberline {14}{\ignorespaces Pair Weakscale}}{31}{figure.14}%
-\contentsline {figure}{\numberline {15}{\ignorespaces ....}}{32}{figure.15}%
-\contentsline {figure}{\numberline {16}{\ignorespaces Vergleich zwischen $m/p= 2^{18}, 2^{19}$ und $2^{20}$ mit $n=2^{19}$}}{33}{figure.16}%
-\contentsline {figure}{\numberline {17}{\ignorespaces Nachrichten Überlagerung}}{34}{figure.17}%
+\contentsline {figure}{\numberline {1}{\ignorespaces Beispiel Graph mit MST}}{6}{figure.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Beispiel für die Schnitteigenschaft}}{10}{figure.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Beispiel für die Kreiseigenschaft}}{10}{figure.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Beispieldurchlauf von Bor{\r u}vkas Algorithmus}}{12}{figure.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Übersicht zur Verschmelzung von MSTs}}{17}{figure.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Pair Graph mit $n=8$}}{24}{figure.6}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Vergleich zwischen Kruskals Algorithmus und \textsc {Filter-Kruskal}}}{25}{figure.7}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Weaksclale}}{26}{figure.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Ansicht für einzelne Algorithmen}}{27}{figure.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Boxplots}}{28}{figure.10}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Laufzeit von Merge-Local-MST mit verschiedenen Treefactor Werten}}{28}{figure.11}%
+\contentsline {figure}{\numberline {12}{\ignorespaces GNM Graphen mit $2^{18}$ Knoten und $2^{17}$ bis $2^{20}$ Kanten pro PE}}{30}{figure.12}%
+\contentsline {figure}{\numberline {13}{\ignorespaces RHG Graphen mit $2^{18}$ Knoten und $2^{17}$ bis $2^{20}$ Kanten pro PE}}{31}{figure.13}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Pair Graphen mit $2^{18}$ Knoten und $2^{17}$ bis $2^{20}$ Kanten pro PE}}{32}{figure.14}%
+\contentsline {figure}{\numberline {15}{\ignorespaces \textsc {Bor{\r u}vka-Allreduce} mit und ohne optionaler Kantenreduktionen}}{33}{figure.15}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Vergleich zwischen $m/p= 2^{18}, 2^{19}$ und $2^{20}$ mit $n=2^{19}$}}{34}{figure.16}%
+\contentsline {figure}{\numberline {17}{\ignorespaces Nachrichten Überlagerung}}{35}{figure.17}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

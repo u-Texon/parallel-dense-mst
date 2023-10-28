@@ -135,7 +135,7 @@ Wir haben diesen Schritt in $O(n)$ implementiert, indem unsere Kanten die Form $
 
 
 \begin{algorithm} 
-\caption{\textsc{Boruvka-Allreduce}(V, E): Kantenliste}
+\caption{\textsc{Bor{\r u}vka-Allreduce}(V, E): Kantenliste}
 \begin{algorithmic}[1]
 \label{Boruvka-Allreduce-Algo}
 
@@ -150,7 +150,7 @@ Wir haben diesen Schritt in $O(n)$ implementiert, indem unsere Kanten die Form $
 
 
 \subsubsection{Eigenschaften und Komplexität}
-\textsc{Boruvka-Allreduce} reduziert die Anzahl an Knoten in jeder Iteration um mindestens die Hälfte. Jeder Knoten wird anhand einer Kante mit einem oder mehreren Knoten zusammengefasst. Umso dichter der Graph also ist, desto wahrscheinlicher ist es dass mehr Knoten in einer Iteration zusammengefasst werden. Insgesamt ergibt sich damit, dass für \textsc{Boruvka-Allreduce} maximal $\log(n)$ Iterationen nötig sind.
+\boruvkaAllreduce reduziert die Anzahl an Knoten in jeder Iteration um mindestens die Hälfte. Jeder Knoten wird anhand einer Kante mit einem oder mehreren Knoten zusammengefasst. Umso dichter der Graph also ist, desto wahrscheinlicher ist es dass mehr Knoten in einer Iteration zusammengefasst werden. Insgesamt ergibt sich damit, dass für \boruvkaAllreduce maximal $\log(n)$ Iterationen nötig sind.
 
 Die Berechnung der leichtesten inzidenten Kanten ist in $O(m)$ möglich, der Allreduce benötigt $O(\alpha \log(p)+\beta \ell)$ im Alpha-Beta Modell. Wobei $\ell$ die Größe des Arrays mit den leichtesten inzidenten Kanten ist, also $\ell \in O(n)$.
 Anhand der inzidenten Kanten kann man den Graph in $O(n + m)$ kontrahieren.
@@ -159,14 +159,14 @@ Anhand der inzidenten Kanten kann man den Graph in $O(n + m)$ kontrahieren.
 Sei $m'$ die maximale Anzahl an lokalen Kanten eines PEs.
 Dann liegt der initiale \boruvkaStep \space in $O(m'+ \alpha \log(p)+\beta n)$.
 Für jeden folgenden \boruvkaStep \space wird n mindestens um die Hälfte kleiner. Hierbei liegt die Summe aus $\sum_{i=i}^{\log n} \beta \frac{n}{2^i}$ in $O(\beta n)$.
-Damit ergibt sich die gesamte Laufzeit von \textsc{Boruvka-Allreduce} in $O(\log n [m' + \alpha \log p]  +\beta n)$.
+Damit ergibt sich die gesamte Laufzeit von \boruvkaAllreduce in $O(\log n [m' + \alpha \log p]  +\beta n)$.
 
 
 
 
-\subsection{Boruvka-Mixed-Merge}
+\subsection{Bor{\r u}vka-Mixed-Merge}
 Jede Iteration von \boruvkaMixedMerge besteht aus einer abwechselnden Ausführung von einem \boruvkaStep \space gefolgt von einem \textsc{MergeStep}.
-Damit verbindet dieser Algorithmus die Vorteile von \textsc{Merge-Local-MST} und \textsc{Boruvka-Allreduce}.
+Damit verbindet dieser Algorithmus die Vorteile von \textsc{Merge-Local-MST} und \boruvkaAllreduce.
 Der Aufwand von einem \boruvkaStep \space hängt von $m$ und $p$ ab und ein \textsc{MergeStep} ist auf möglichst dichten Graphen am effizientesten. Diese Eigenschaften werden durch \boruvkaMixedMerge zum Vorteil verwendet.
 Denn durch das Vorgehen von \boruvkaMixedMerge, wird vor jedem \textsc{MergeStep} die Knotenmenge des Graphen mindestens halbiert und die Kantenanzahl sowie die aktiven PEs vor jedem (außer dem ersten) Brouvkastep um den Faktor $D$ reduziert.
 Daher verspricht \boruvkaMixedMerge eine effiziente Ausführung in der Praxis.
@@ -177,7 +177,7 @@ Zum Schluss müssen die MST Kanten wieder zu ihrer Ausgangsform umbenannt werden
 
 
 \begin{algorithm} 
-\caption{\textsc{Boruvka-Mixed-Merge}(V, E, D: int): Kantenliste}
+\caption{\textsc{Bor{\r u}vka-Mixed-Merge}(V, E, D: int): Kantenliste}
 \begin{algorithmic}[1]
 \label{Boruvka-Mixed-Merge-Algo}
 
@@ -199,7 +199,7 @@ $O(\alpha \log(p) + D\beta n + \log_D(p) \cdot D\alpha \cdot T_{seq}(n,Dn))$.
 Hierbei ist zu beachten, dass man den $\log(p/D^i)$ Term, der bei jedem \textsc{MergeStep} auftritt, asymptotisch mit $\log(p)$ abschätzen kann.
 
 
-\subsection{Boruvka-Then-Merge}
+\subsection{Bor{\r u}vka-Then-Merge}
 \boruvkaThenMerge führt mehrmals den \boruvkaStep\space durch und anschließend den \textsc{Merge-Local-MST} Algorithmus, um einen MST zu berechnen. Da die Kanten durch mehrere Iterationen von \boruvkaAllreduce angepasst wurden, müssen diese für die Ausgabe wieder in den Ausgangszustand gebracht werden. \\
 Wie bei \boruvkaMixedMerge werden hier die Vorteile von \boruvkaAllreduce und \mergeMST hervorgehoben.
 Da dieser Algorithmus damit anfängt mehrere \boruvkaStep \textsc{s} auszuführen, wird der Graph verkleinert ohne das bereits PEs inaktiv werden. Erst wenn nur noch höchstens $Border$ Knoten übrig sind, wird der restliche MST mittels \mergeMST berechnet. In diesem Fall hat jeder PE deutlich weniger Knoten, als in der Eingabe und ein \mergeStep\space kann \emph{schneller} abgearbeitet werden.
@@ -210,7 +210,7 @@ Dehne et al. \cite{dehne1998practical} führen \boruvka solange durch bis wenige
 
 
 \begin{algorithm} 
-\caption{\textsc{Boruvka-Then-Merge}(V, E, D: int, Border: int): Kantenliste}
+\caption{\textsc{Bor{\r u}vka-Then-Merge}(V, E, D: int, Border: int): Kantenliste}
 \begin{algorithmic}[1]
 \label{Boruvka-Then-Merge-Algo}
 
@@ -232,7 +232,7 @@ Dehne et al. \cite{dehne1998practical} führen \boruvka solange durch bis wenige
 
 Die gesamte Laufzeit ergibt sich durch $B$ mal einen \boruvkaStep \space und $\lfloor \log_{D}($p$) \rfloor$ mal einen \textsc{MergeStep}. 
 Sei $m'$ die maximale Anzahl an lokalen Kanten eines PEs, $T_{seq}$ die Laufzeit für eine lokale MST Berechnung und es gelte $m \geq n$.
-Dann liegt \textsc{Boruvka-Then-Merge} in 
+Dann liegt \boruvkaThenMerge in 
 \begin{center}
 $O(B \cdot (m' + \alpha \log p) + \beta n
 + \log_{D}(p)  (T_{seq}(\frac{n}{2^B},\frac{n}{2^B}) + D(\alpha + \beta \frac{n}{2^B}))

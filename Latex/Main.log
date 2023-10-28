@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.10.26)  28 OCT 2023 16:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.10.26)  28 OCT 2023 23:10
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1314,7 +1314,7 @@ File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 (./modules/0-Zusammenfassung.aux) (./modules/1-Einf√ºhrung.aux)
 (./modules/2-Grundlagen.aux) (./modules/3-Related-Work.aux)
 (./modules/4-Algorithmen.aux) (./modules/5-Implementierung.aux)
-(./modules/6-Ergebnisse.aux))
+(./modules/6-Ergebnisse.aux) (./modules/7-Fazit.aux))
 \openout1 = `Main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 138.
@@ -1429,10 +1429,8 @@ File: bkm-pdftex.def 2020-11-06 v1.29 bookmark driver for pdfTeX (HO)
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-(|'inkscape' -V )
 Package biblatex Info: Trying to load language 'ngerman'...
 Package biblatex Info: ... file 'ngerman.lbx' found.
-
 (/usr/share/texlive/texmf-dist/tex/latex/biblatex/lbx/ngerman.lbx
 File: ngerman.lbx 2022/02/02 v3.17 biblatex localization (PK/MW)
 Package biblatex Info: Trying to load language 'german'...
@@ -1535,29 +1533,36 @@ LaTeX Font Info:    Trying to load font information for T1+lmss on input line 2
 
 (/usr/share/texmf/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) (./Main.toc)
-\tf@toc=\write6
-\openout6 = `Main.toc'.
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 243.
-
+) (./Main.toc
+Package cleveref Info: loaded `ngerman' language definitions on input line 1.
+LaTeX Font Info:    Font shape `U/lasy/b/n' in size <8> not available
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 15.
+LaTeX Font Info:    Font shape `U/lasy/b/n' in size <6> not available
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 15.
+Package cleveref Info: loaded `ngerman' language definitions on input line 45.
  [4
 
 
 
-]
+])
+\tf@toc=\write6
+\openout6 = `Main.toc'.
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 245.
+
+ [5]
 \openout2 = `modules/1-Einf√ºhrung.aux'.
 
 
 (./modules/1-Einf√ºhrung.tex
-<./svg-inkscape/Basic-MST_svg-raw.png, id=44, 686.565pt x 182.1204pt>
+<./svg-inkscape/Basic-MST_svg-raw.png, id=137, 686.565pt x 182.1204pt>
 File: ./svg-inkscape/Basic-MST_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/Basic-MST_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/Basic-MST_svg-raw.png  used on input li
 ne 9.
 (pdftex.def)             Requested size: 686.56332pt x 182.11995pt.
 Package cleveref Info: loaded `ngerman' language definitions on input line 29.
- [5
+ [6
 
 pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) ha
 s been already used, duplicate ignored
@@ -1565,25 +1570,20 @@ s been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.29 
       <./svg-inkscape/Basic-MST_svg-raw.png>]
-
-LaTeX Warning: Hyper reference `Fazit' on page 6 undefined on input line 42.
-
-
-LaTeX Warning: Reference `Fazit' on page 6 undefined on input line 42.
-
 Package cleveref Info: loaded `ngerman' language definitions on input line 43.
-[6])
-Package cleveref Info: loaded `ngerman' language definitions on input line 243.
+ [7])
+Package cleveref Info: loaded `ngerman' language definitions on input line 245.
 
- [7]
+ [8]
 \openout2 = `modules/2-Grundlagen.aux'.
 
- (./modules/2-Grundlagen.tex
+
+(./modules/2-Grundlagen.tex
 Package mdframed Info: mdframed works in twoside mode on input line 22.
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
 (mdframed)              on input line 22.
-<./svg-inkscape/Schnitt_svg-raw.png, id=85, 332.6829pt x 167.1846pt>
+<./svg-inkscape/Schnitt_svg-raw.png, id=172, 332.6829pt x 167.1846pt>
 File: ./svg-inkscape/Schnitt_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/Schnitt_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/Schnitt_svg-raw.png  used on input line
@@ -1593,7 +1593,7 @@ Package pdftex.def Info: ./svg-inkscape/Schnitt_svg-raw.png  used on input line
 Underfull \vbox (badness 4181) has occurred while \output is active []
 
 Package cleveref Info: loaded `ngerman' language definitions on input line 39.
- [8
+ [9
 
 
 
@@ -1602,7 +1602,7 @@ Package mdframed Info: mdframed works in twoside mode on input line 43.
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
 (mdframed)              on input line 43.
-<./svg-inkscape/Kreis_svg-raw.png, id=99, 212.2329pt x 125.9907pt>
+<./svg-inkscape/Kreis_svg-raw.png, id=184, 212.2329pt x 125.9907pt>
 File: ./svg-inkscape/Kreis_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/Kreis_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/Kreis_svg-raw.png  used on input line 5
@@ -1614,8 +1614,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 68--70
  []
 
 Package cleveref Info: loaded `ngerman' language definitions on input line 72.
-[9pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) 
-has been already used, duplicate ignored
+[10pdfTeX warning (ext4): destination with the same identifier (name{figure.2})
+ has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.72 
@@ -1629,7 +1629,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 81--88
 
  []
 
-<./svg-inkscape/Boruvka_svg-raw.png, id=123, 610.6815pt x 125.9907pt>
+<./svg-inkscape/Boruvka_svg-raw.png, id=207, 610.6815pt x 125.9907pt>
 File: ./svg-inkscape/Boruvka_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/Boruvka_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/Boruvka_svg-raw.png  used on input line
@@ -1639,13 +1639,13 @@ Package pdftex.def Info: ./svg-inkscape/Boruvka_svg-raw.png  used on input line
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 Package cleveref Info: loaded `ngerman' language definitions on input line 97.
- [10]
+ [11]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 108.
 Package cleveref Info: loaded `ngerman' language definitions on input line 126.
 
 
-[11pdfTeX warning (ext4): destination with the same identifier (name{figure.4})
+[12pdfTeX warning (ext4): destination with the same identifier (name{figure.4})
  has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
@@ -1657,12 +1657,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 130--135
 
 Package cleveref Info: loaded `ngerman' language definitions on input line 190.
 
-[12]
-LaTeX Font Info:    Font shape `U/lasy/b/n' in size <8> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 199.
-LaTeX Font Info:    Font shape `U/lasy/b/n' in size <6> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 199.
-
+[13]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 199.
@@ -1688,15 +1683,15 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 199.
 
 )
-Package cleveref Info: loaded `ngerman' language definitions on input line 244.
+Package cleveref Info: loaded `ngerman' language definitions on input line 246.
 
- [13]
+ [14]
 \openout2 = `modules/3-Related-Work.aux'.
 
  (./modules/3-Related-Work.tex)
-Package cleveref Info: loaded `ngerman' language definitions on input line 245.
+Package cleveref Info: loaded `ngerman' language definitions on input line 247.
 
- [14
+ [15
 
 
 
@@ -1714,51 +1709,43 @@ Underfull \hbox (badness 10000) in paragraph at lines 20--23
  []
 
 Package cleveref Info: loaded `ngerman' language definitions on input line 24.
-[15
+[16
 
 
 
 ]
-<./svg-inkscape/Merge_svg-raw.png, id=238, 753.5352pt x 357.4956pt>
+<./svg-inkscape/Merge_svg-raw.png, id=308, 753.5352pt x 357.4956pt>
 File: ./svg-inkscape/Merge_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/Merge_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/Merge_svg-raw.png  used on input line 2
 9.
 (pdftex.def)             Requested size: 753.53336pt x 357.49472pt.
 Package cleveref Info: loaded `ngerman' language definitions on input line 81.
- [16pdfTeX warning (ext4): destination with the same identifier (name{figure.5}
+ [17pdfTeX warning (ext4): destination with the same identifier (name{figure.5}
 ) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.81 E
       in Nachteil dieses Algorithmus ist nat√ºrlich, dass nur im ersten Schr...
  <./svg-inkscape/Merge_svg-raw.png>]
-
-LaTeX Warning: Hyper reference `remove-Section' on page 17 undefined on input l
-ine 94.
-
-
-LaTeX Warning: Reference `remove-Section' on page 17 undefined on input line 94
-.
-
 Package cleveref Info: loaded `ngerman' language definitions on input line 104.
 
-[17]
-Underfull \vbox (badness 3872) has occurred while \output is active []
+ [18]
+Underfull \vbox (badness 3758) has occurred while \output is active []
 
 Package cleveref Info: loaded `ngerman' language definitions on input line 154.
 
- [18]
+ [19]
 Underfull \hbox (badness 10000) in paragraph at lines 175--177
 
  []
 
 Package cleveref Info: loaded `ngerman' language definitions on input line 202.
 
-[19])
-Package cleveref Info: loaded `ngerman' language definitions on input line 246.
+[20])
+Package cleveref Info: loaded `ngerman' language definitions on input line 248.
 
- [20]
+ [21]
 \openout2 = `modules/5-Implementierung.aux'.
 
  (./modules/5-Implementierung.tex
@@ -1775,49 +1762,53 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--10
  []
 
 
-Underfull \vbox (badness 2970) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 17--23
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 19.
- [21
+ []
+
+
+Underfull \vbox (badness 6641) has occurred while \output is active []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 23.
+ [22
 
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 21--24
+Underfull \hbox (badness 10000) in paragraph at lines 25--27
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 27--29
+Underfull \hbox (badness 10000) in paragraph at lines 28--31
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 30--32
-
- []
-
-<./svg-inkscape/PAIR-Graph_svg-raw.png, id=377, 663.9204pt x 153.4533pt>
+<./svg-inkscape/PAIR-Graph_svg-raw.png, id=442, 663.9204pt x 153.4533pt>
 File: ./svg-inkscape/PAIR-Graph_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/PAIR-Graph_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/PAIR-Graph_svg-raw.png  used on input l
-ine 37.
+ine 36.
 (pdftex.def)             Requested size: 663.91878pt x 153.4529pt.
-Package cleveref Info: loaded `ngerman' language definitions on input line 41.
-[22])
-Package cleveref Info: loaded `ngerman' language definitions on input line 247.
 
- [23pdfTeX warning (ext4): destination with the same identifier (name{figure.6}
-) has been already used, duplicate ignored
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+Package cleveref Info: loaded `ngerman' language definitions on input line 40.
+ [23])
+Package cleveref Info: loaded `ngerman' language definitions on input line 249.
+
+
+[24pdfTeX warning (ext4): destination with the same identifier (name{figure.6})
+ has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.247 \include{modules/5-Implementierung}
+l.249 \include{modules/5-Implementierung}
                                           <./svg-inkscape/PAIR-Graph_svg-raw.pn
 g>]
 \openout2 = `modules/6-Ergebnisse.aux'.
 
  (./modules/6-Ergebnisse.tex
-<./svg-inkscape/sequential_svg-raw.png, id=397, 698.8509pt x 559.6107pt>
+<./svg-inkscape/sequential_svg-raw.png, id=456, 698.8509pt x 559.6107pt>
 File: ./svg-inkscape/sequential_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/sequential_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/sequential_svg-raw.png  used on input l
@@ -1831,7 +1822,7 @@ Overfull \hbox (17.25291pt too wide) in paragraph at lines 23--25
  []
 
 Package cleveref Info: loaded `ngerman' language definitions on input line 25.
-[24
+[25
 
 
 
@@ -1841,344 +1832,321 @@ s been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.25 
       <./svg-inkscape/sequential_svg-raw.png>]
-<./svg-inkscape/weak-scale-RHG_svg-raw.png, id=407, 628.9899pt x 522.2712pt>
+<./svg-inkscape/weak-scale-RHG_svg-raw.png, id=465, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/weak-scale-RHG_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/weak-scale-RHG_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/weak-scale-RHG_svg-raw.png  used on inp
 ut line 28.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/weak-scale-GNM_svg-raw.png, id=408, 578.16pt x 522.2712pt>
+<./svg-inkscape/weak-scale-GNM_svg-raw.png, id=466, 578.16pt x 522.2712pt>
 File: ./svg-inkscape/weak-scale-GNM_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/weak-scale-GNM_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/weak-scale-GNM_svg-raw.png  used on inp
 ut line 29.
 (pdftex.def)             Requested size: 578.15858pt x 522.26991pt.
-<./svg-inkscape/merge_bar_svg-raw.png, id=410, 489.027pt x 411.4572pt>
+<./svg-inkscape/merge_bar_svg-raw.png, id=468, 489.027pt x 411.4572pt>
 File: ./svg-inkscape/merge_bar_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/merge_bar_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/merge_bar_svg-raw.png  used on input li
-ne 40.
+ne 41.
 (pdftex.def)             Requested size: 489.02579pt x 411.45618pt.
-<./svg-inkscape/boruvkaMerge_bar_svg-raw.png, id=411, 480.1137pt x 415.3116pt>
+<./svg-inkscape/boruvkaMerge_bar_svg-raw.png, id=469, 480.1137pt x 415.3116pt>
 File: ./svg-inkscape/boruvkaMerge_bar_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvkaMerge_bar_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvkaMerge_bar_svg-raw.png  used on i
-nput line 41.
+nput line 42.
 (pdftex.def)             Requested size: 480.11252pt x 415.31058pt.
-<./svg-inkscape/boruvka_bar_svg-raw.png, id=412, 489.027pt x 411.4572pt>
+<./svg-inkscape/boruvka_bar_svg-raw.png, id=470, 489.027pt x 411.4572pt>
 File: ./svg-inkscape/boruvka_bar_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvka_bar_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvka_bar_svg-raw.png  used on input 
-line 43.
+line 44.
 (pdftex.def)             Requested size: 489.02579pt x 411.45618pt.
-<./svg-inkscape/mixedMerge_bar_svg-raw.png, id=413, 470.4777pt x 389.0535pt>
+<./svg-inkscape/mixedMerge_bar_svg-raw.png, id=471, 470.4777pt x 389.0535pt>
 File: ./svg-inkscape/mixedMerge_bar_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/mixedMerge_bar_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/mixedMerge_bar_svg-raw.png  used on inp
-ut line 44.
+ut line 45.
 (pdftex.def)             Requested size: 470.47655pt x 389.05254pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 48.
- [25pdfTeX warning (ext4): destination with the same identifier (name{figure.8}
+Package cleveref Info: loaded `ngerman' language definitions on input line 49.
+ [26pdfTeX warning (ext4): destination with the same identifier (name{figure.8}
 ) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.48 
+l.49 
       <./svg-inkscape/weak-scale-RHG_svg-raw.png> <./svg-inkscape/weak-scale-GN
 M_svg-raw.png>]
-<./svg-inkscape/boruvka_box_svg-raw.png, id=424, 657.4161pt x 538.4115pt>
+<./svg-inkscape/boruvka_box_svg-raw.png, id=481, 657.4161pt x 538.4115pt>
 File: ./svg-inkscape/boruvka_box_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvka_box_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvka_box_svg-raw.png  used on input 
-line 62.
+line 63.
 (pdftex.def)             Requested size: 657.4145pt x 538.41019pt.
-<./svg-inkscape/merge_box_svg-raw.png, id=425, 672.111pt x 608.5134pt>
+<./svg-inkscape/merge_box_svg-raw.png, id=482, 672.111pt x 608.5134pt>
 File: ./svg-inkscape/merge_box_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/merge_box_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/merge_box_svg-raw.png  used on input li
-ne 63.
+ne 64.
 (pdftex.def)             Requested size: 672.10934pt x 608.51192pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 67.
- [26pdfTeX warning (ext4): destination with the same identifier (name{figure.9}
+Package cleveref Info: loaded `ngerman' language definitions on input line 68.
+ [27pdfTeX warning (ext4): destination with the same identifier (name{figure.9}
 ) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.67 
+l.68 
       <./svg-inkscape/merge_bar_svg-raw.png> <./svg-inkscape/boruvkaMerge_bar_s
 vg-raw.png> <./svg-inkscape/boruvka_bar_svg-raw.png> <./svg-inkscape/mixedMerge
 _bar_svg-raw.png>]
-<./svg-inkscape/mergeMST-RHG_svg-raw.png, id=436, 628.9899pt x 522.2712pt>
+<./svg-inkscape/mergeMST-RHG_svg-raw.png, id=493, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/mergeMST-RHG_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/mergeMST-RHG_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/mergeMST-RHG_svg-raw.png  used on input
- line 82.
+ line 83.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/mergeMST-GNM_svg-raw.png, id=437, 628.9899pt x 522.2712pt>
+<./svg-inkscape/mergeMST-GNM_svg-raw.png, id=494, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/mergeMST-GNM_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/mergeMST-GNM_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/mergeMST-GNM_svg-raw.png  used on input
- line 83.
+ line 84.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-Package cleveref Info: loaded `ngerman' language definitions on input line 94.
- [27pdfTeX warning (ext4): destination with the same identifier (name{figure.10
+Package cleveref Info: loaded `ngerman' language definitions on input line 95.
+ [28pdfTeX warning (ext4): destination with the same identifier (name{figure.10
 }) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.94 
+l.95 
      pdfTeX warning (ext4): destination with the same identifier (name{figure.1
 1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.94 
+l.95 
       <./svg-inkscape/boruvka_box_svg-raw.png> <./svg-inkscape/merge_box_svg-ra
 w.png> <./svg-inkscape/mergeMST-RHG_svg-raw.png> <./svg-inkscape/mergeMST-GNM_s
 vg-raw.png>]
-<./svg-inkscape/gnm-17_svg-raw.png, id=454, 628.9899pt x 522.2712pt>
+Overfull \hbox (5.27237pt too wide) in paragraph at lines 104--109
+\T1/lmr/m/n/12 man bei $\OT1/lmr/m/n/12 2[]$ \T1/lmr/m/n/12 Kan-ten pro PE, das
+s \T1/lmr/m/sc/12 Bor∑vka-Allreduce \T1/lmr/m/n/12 ¸ber 10% lang-sa-mer ist, al
+s \T1/lmr/m/sc/12 Bor∑vka-
+ []
+
+<./svg-inkscape/gnm-17_svg-raw.png, id=511, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/gnm-17_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/gnm-17_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/gnm-17_svg-raw.png  used on input line 
-110.
+112.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/gnm-18_svg-raw.png, id=455, 628.9899pt x 522.2712pt>
+<./svg-inkscape/gnm-18_svg-raw.png, id=512, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/gnm-18_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/gnm-18_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/gnm-18_svg-raw.png  used on input line 
-111.
+113.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/gnm-19_svg-raw.png, id=456, 628.9899pt x 522.2712pt>
+<./svg-inkscape/gnm-19_svg-raw.png, id=513, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/gnm-19_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/gnm-19_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/gnm-19_svg-raw.png  used on input line 
-113.
+115.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/gnm-20_svg-raw.png, id=457, 628.9899pt x 522.2712pt>
+<./svg-inkscape/gnm-20_svg-raw.png, id=514, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/gnm-20_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/gnm-20_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/gnm-20_svg-raw.png  used on input line 
-114.
+116.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 118.
+Package cleveref Info: loaded `ngerman' language definitions on input line 120.
 
- [28]
-<./svg-inkscape/rhg-17_svg-raw.png, id=466, 628.9899pt x 522.2712pt>
+ [29]
+<./svg-inkscape/rhg-17_svg-raw.png, id=521, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/rhg-17_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/rhg-17_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/rhg-17_svg-raw.png  used on input line 
-128.
+130.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/rhg-18_svg-raw.png, id=467, 628.9899pt x 522.2712pt>
+<./svg-inkscape/rhg-18_svg-raw.png, id=522, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/rhg-18_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/rhg-18_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/rhg-18_svg-raw.png  used on input line 
-129.
+131.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/rhg-19_svg-raw.png, id=468, 628.9899pt x 522.2712pt>
+<./svg-inkscape/rhg-19_svg-raw.png, id=523, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/rhg-19_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/rhg-19_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/rhg-19_svg-raw.png  used on input line 
-130.
+132.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/rhg-20_svg-raw.png, id=469, 628.9899pt x 522.2712pt>
+<./svg-inkscape/rhg-20_svg-raw.png, id=524, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/rhg-20_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/rhg-20_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/rhg-20_svg-raw.png  used on input line 
-131.
+133.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 135.
+Package cleveref Info: loaded `ngerman' language definitions on input line 137.
 
- [29pdfTeX warning (ext4): destination with the same identifier (name{figure.12
+ [30pdfTeX warning (ext4): destination with the same identifier (name{figure.12
 }) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.135 
+l.137 
        <./svg-inkscape/gnm-17_svg-raw.png> <./svg-inkscape/gnm-18_svg-raw.png> 
 <./svg-inkscape/gnm-19_svg-raw.png> <./svg-inkscape/gnm-20_svg-raw.png>]
-
-LaTeX Warning: Reference `Pair-graphs-Img' on page 1 undefined on input line 14
-1.
-
-<./svg-inkscape/pair-17_svg-raw.png, id=480, 628.9899pt x 522.2712pt>
+<./svg-inkscape/pair-17_svg-raw.png, id=535, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/pair-17_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/pair-17_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/pair-17_svg-raw.png  used on input line
- 148.
+ 150.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/pair-18_svg-raw.png, id=481, 628.9899pt x 522.2712pt>
+<./svg-inkscape/pair-18_svg-raw.png, id=536, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/pair-18_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/pair-18_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/pair-18_svg-raw.png  used on input line
- 149.
+ 151.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/pair-19_svg-raw.png, id=482, 628.9899pt x 522.2712pt>
+<./svg-inkscape/pair-19_svg-raw.png, id=537, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/pair-19_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/pair-19_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/pair-19_svg-raw.png  used on input line
- 150.
+ 152.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/pair-20_svg-raw.png, id=483, 628.9899pt x 522.2712pt>
+<./svg-inkscape/pair-20_svg-raw.png, id=538, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/pair-20_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/pair-20_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/pair-20_svg-raw.png  used on input line
- 151.
+ 153.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 155.
+Package cleveref Info: loaded `ngerman' language definitions on input line 157.
 
- [30pdfTeX warning (ext4): destination with the same identifier (name{figure.13
+ [31pdfTeX warning (ext4): destination with the same identifier (name{figure.13
 }) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.155 
+l.157 
        <./svg-inkscape/rhg-17_svg-raw.png> <./svg-inkscape/rhg-18_svg-raw.png> 
 <./svg-inkscape/rhg-19_svg-raw.png> <./svg-inkscape/rhg-20_svg-raw.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 158--163
+Underfull \hbox (badness 10000) in paragraph at lines 160--165
 
  []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 163.
+Package cleveref Info: loaded `ngerman' language definitions on input line 165.
 
-[31pdfTeX warning (ext4): destination with the same identifier (name{figure.14}
+[32pdfTeX warning (ext4): destination with the same identifier (name{figure.14}
 ) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.163 
+l.165 
        <./svg-inkscape/pair-17_svg-raw.png> <./svg-inkscape/pair-18_svg-raw.png
 > <./svg-inkscape/pair-19_svg-raw.png> <./svg-inkscape/pair-20_svg-raw.png>]
-<./svg-inkscape/boruvka-default_svg-raw.png, id=504, 489.027pt x 411.4572pt>
+<./svg-inkscape/boruvka-default_svg-raw.png, id=558, 489.027pt x 411.4572pt>
 File: ./svg-inkscape/boruvka-default_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvka-default_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvka-default_svg-raw.png  used on in
-put line 167.
+put line 169.
 (pdftex.def)             Requested size: 489.02579pt x 411.45618pt.
-<./svg-inkscape/boruvka-remove_svg-raw.png, id=505, 489.027pt x 411.4572pt>
+<./svg-inkscape/boruvka-remove_svg-raw.png, id=559, 489.027pt x 411.4572pt>
 File: ./svg-inkscape/boruvka-remove_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvka-remove_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvka-remove_svg-raw.png  used on inp
-ut line 168.
+ut line 170.
 (pdftex.def)             Requested size: 489.02579pt x 411.45618pt.
-<./svg-inkscape/boruvka-mst_svg-raw.png, id=506, 489.027pt x 411.4572pt>
+<./svg-inkscape/boruvka-mst_svg-raw.png, id=560, 489.027pt x 411.4572pt>
 File: ./svg-inkscape/boruvka-mst_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvka-mst_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvka-mst_svg-raw.png  used on input 
-line 169.
+line 171.
 (pdftex.def)             Requested size: 489.02579pt x 411.45618pt.
+Package cleveref Info: loaded `ngerman' language definitions on input line 193.
 
 
-LaTeX Warning: Reference `RemoveParallel-Img' on page 1 undefined on input line
- 174.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 186--191
-
- []
-
-Package cleveref Info: loaded `ngerman' language definitions on input line 191.
-
-[32pdfTeX warning (ext4): destination with the same identifier (name{figure.15}
+[33pdfTeX warning (ext4): destination with the same identifier (name{figure.15}
 ) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.191 
+l.193 
        <./svg-inkscape/boruvka-default_svg-raw.png> <./svg-inkscape/boruvka-rem
 ove_svg-raw.png> <./svg-inkscape/boruvka-mst_svg-raw.png>]
-
-LaTeX Warning: Reference `remove-Section' on page 1 undefined on input line 193
-.
-
-
-LaTeX Warning: Reference `X-Img' on page 1 undefined on input line 195.
-
-<./svg-inkscape/boruvka-17_svg-raw.png, id=516, 489.027pt x 411.4572pt>
+<./svg-inkscape/boruvka-17_svg-raw.png, id=572, 489.027pt x 411.4572pt>
 File: ./svg-inkscape/boruvka-17_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvka-17_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvka-17_svg-raw.png  used on input l
-ine 200.
+ine 201.
 (pdftex.def)             Requested size: 489.02579pt x 411.45618pt.
-<./svg-inkscape/boruvka-18_svg-raw.png, id=517, 489.027pt x 411.4572pt>
+<./svg-inkscape/boruvka-18_svg-raw.png, id=573, 489.027pt x 411.4572pt>
 File: ./svg-inkscape/boruvka-18_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvka-18_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvka-18_svg-raw.png  used on input l
-ine 201.
+ine 202.
 (pdftex.def)             Requested size: 489.02579pt x 411.45618pt.
-<./svg-inkscape/boruvka-19_svg-raw.png, id=518, 489.027pt x 411.4572pt>
+<./svg-inkscape/boruvka-19_svg-raw.png, id=574, 489.027pt x 411.4572pt>
 File: ./svg-inkscape/boruvka-19_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/boruvka-19_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/boruvka-19_svg-raw.png  used on input l
-ine 202.
+ine 203.
 (pdftex.def)             Requested size: 489.02579pt x 411.45618pt.
-
-LaTeX Warning: Reference `Overlap-Img' on page 1 undefined on input line 207.
-
-
-LaTeX Warning: Reference `Overlap-Img' on page 1 undefined on input line 208.
-
-
-LaTeX Warning: Reference `X-Img' on page 1 undefined on input line 208.
-
-<./svg-inkscape/overlap-17_svg-raw.png, id=519, 628.9899pt x 522.2712pt>
+<./svg-inkscape/overlap-17_svg-raw.png, id=578, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/overlap-17_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/overlap-17_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/overlap-17_svg-raw.png  used on input l
-ine 212.
+ine 213.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
-<./svg-inkscape/overlap-18_svg-raw.png, id=520, 628.9899pt x 522.2712pt>
+<./svg-inkscape/overlap-18_svg-raw.png, id=579, 628.9899pt x 522.2712pt>
 File: ./svg-inkscape/overlap-18_svg-raw.png Graphic file (type png)
 <use ./svg-inkscape/overlap-18_svg-raw.png>
 Package pdftex.def Info: ./svg-inkscape/overlap-18_svg-raw.png  used on input l
-ine 213.
+ine 214.
 (pdftex.def)             Requested size: 628.98836pt x 522.26991pt.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1033) has occurred while \output is active []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 217.
+Package cleveref Info: loaded `ngerman' language definitions on input line 218.
 
- [33pdfTeX warning (ext4): destination with the same identifier (name{figure.16
+ [34pdfTeX warning (ext4): destination with the same identifier (name{figure.16
 }) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.217 
+l.218 
        <./svg-inkscape/boruvka-17_svg-raw.png> <./svg-inkscape/boruvka-18_svg-r
 aw.png> <./svg-inkscape/boruvka-19_svg-raw.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 218--219
+Underfull \hbox (badness 10000) in paragraph at lines 219--220
 
  []
 
 )
-Package cleveref Info: loaded `ngerman' language definitions on input line 248.
+Package cleveref Info: loaded `ngerman' language definitions on input line 250.
 
- [34pdfTeX warning (ext4): destination with the same identifier (name{figure.17
+ [35pdfTeX warning (ext4): destination with the same identifier (name{figure.17
 }) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.248 \include{modules/6-Ergebnisse}
+l.250 \include{modules/6-Ergebnisse}
                                      <./svg-inkscape/overlap-17_svg-raw.png> <.
 /svg-inkscape/overlap-18_svg-raw.png>]
 \openout2 = `modules/7-Fazit.aux'.
 
  (./modules/7-Fazit.tex
-Overfull \hbox (3.96849pt too wide) in paragraph at lines 3--6
+Overfull \hbox (3.96849pt too wide) in paragraph at lines 3--9
 \T1/lmr/m/sc/12 MST \T1/lmr/m/n/12 sel-ten k¸r-ze-re Lauf-zei-ten als \T1/lmr/m
 /sc/12 Bor∑vka-Allreduce \T1/lmr/m/n/12 be-sitzt, so wa-ren \T1/lmr/m/sc/12 Bor
 ∑vka-Mixed-
  []
 
 )
-Package cleveref Info: loaded `ngerman' language definitions on input line 249.
+Package cleveref Info: loaded `ngerman' language definitions on input line 251.
 
- [35
+ [36
 
 
 
@@ -2188,9 +2156,9 @@ Package cleveref Info: loaded `ngerman' language definitions on input line 1.
 \tf@lof=\write7
 \openout7 = `Main.lof'.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 258.
+Package cleveref Info: loaded `ngerman' language definitions on input line 260.
 
- [36
+ [37
 
 
 ]
@@ -2205,29 +2173,29 @@ Class scrartcl Warning: \float@listhead detected!
 (scrartcl)              Loading of package `scrhack' may help to
 (scrartcl)              avoid this warning, if you are using a
 (scrartcl)              a package that still implements the
-(scrartcl)              deprecated \float@listhead interface on input line 260.
+(scrartcl)              deprecated \float@listhead interface on input line 262.
 
 
 (./Main.loa)
 \tf@loa=\write8
 \openout8 = `Main.loa'.
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 262.
+Package cleveref Info: loaded `ngerman' language definitions on input line 264.
 
- [37]
-Overfull \hbox (10.03238pt too wide) in paragraph at lines 269--269
+ [38]
+Overfull \hbox (10.03238pt too wide) in paragraph at lines 271--271
 []\T1/lmr/m/n/12 Mohsen Koo-hi Es-faha-ni, Pe-ter Kil-pa-trick und Hans Van-die
 -ren-donck. ^^R  MA-STIFF: structure-
  []
 
-Package cleveref Info: loaded `ngerman' language definitions on input line 268.
+Package cleveref Info: loaded `ngerman' language definitions on input line 270.
 
-[38
+[39
 
 ]
-Package cleveref Info: loaded `ngerman' language definitions on input line 271.
+Package cleveref Info: loaded `ngerman' language definitions on input line 273.
 
- [39] (./Main.aux
+ [40] (./Main.aux
 Package cleveref Info: loaded `ngerman' language definitions on input line 27.
  (./modules/0-Zusammenfassung.aux)
 (./modules/1-Einf√ºhrung.aux) (./modules/2-Grundlagen.aux)
@@ -2237,29 +2205,20 @@ Package cleveref Info: loaded `ngerman' language definitions on input line 27.
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `Main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-
-Package biblatex Warning: Please rerun LaTeX.
-
 Package logreq Info: Writing requests to 'Main.run.xml'.
 \openout1 = `Main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 38893 strings out of 479527
- 767058 string characters out of 5875031
- 1614983 words of memory out of 5000000
- 55905 multiletter control sequences out of 15000+600000
+ 38900 strings out of 479527
+ 767268 string characters out of 5875031
+ 1623837 words of memory out of 5000000
+ 55913 multiletter control sequences out of 15000+600000
  553027 words of font info for 99 fonts, out of 8000000 for 9000
  397 hyphenation exceptions out of 8191
- 108i,12n,106p,10599b,2367s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 108i,12n,106p,10599b,2812s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dv
 ips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/s
 hare/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm
@@ -2276,10 +2235,10 @@ lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb></usr/share/texmf/
 fonts/type1/public/lm/lmtt10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt12
 .pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.
 pfb>
-Output written on Main.pdf (39 pages, 8702735 bytes).
+Output written on Main.pdf (40 pages, 8708107 bytes).
 PDF statistics:
- 864 PDF objects out of 1000 (max. 8388607)
- 702 compressed objects within 8 object streams
+ 917 PDF objects out of 1000 (max. 8388607)
+ 754 compressed objects within 8 object streams
  217 named destinations out of 1000 (max. 500000)
- 563 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 555 words of extra memory for PDF output out of 10000 (max. 10000000)
 
