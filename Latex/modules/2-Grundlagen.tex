@@ -8,15 +8,15 @@ Im Allgemeinen sind Kanten bei dem MST Problem ungerichtet, das bedeutet, dass j
 %Wir nennen einen Graph dicht, wenn er deutlich mehr Kanten als Knoten besitzt, also wenn $m \gg n$ gilt.\\
 
 Ein minimaler Spannbaum (engl. \textbf{M}inimum \textbf{S}panning \textbf{T}ree oder kurz MST) ist die Teilmenge eines Graphen, bei dem alle Knoten miteinander verbunden sind und die Summe aller Kantengewichte minimal ist. Besteht der Eingabegraph aus einer einzigen Komponente, so ist das Ergebnis einer MST Berechnung ein einzelner Baum. Also ein Graph mit genau $n-1$ Kanten, bei dem alle Knoten über einen eindeutigen Pfad aus Kanten verbunden sind.
-Ist der Graph nicht zusammenhängend, also besteht er aus mehr als einer Komponente, so kann iterativ auf jeder Komponente eine MST Berechnung durchgeführt werden. Das Ergebnis ist in diesem Fall ein minimaler Spannwald (engl. \textbf{M}inimum \textbf{S}panning \textbf{F}orest).
+Ist der Graph nicht zusammenhängend, also besteht er aus mehr als einer Komponente, dann kann iterativ auf jeder Komponente eine MST Berechnung durchgeführt werden. Das Ergebnis ist in diesem Fall ein minimaler Spannwald (engl. \textbf{M}inimum \textbf{S}panning \textbf{F}orest).
 Um also immer einen MST als Ergebnis zu erhalten, können wie ohne Beschränkung der Allgemeinheit annehmen, dass der Eingabegraph aus genau einer Komponente besteht.\\
-Der MST eines Graphen ist nicht immer eindeutig. Hat beispielsweise jede Kante in einem Graph Gewicht 1, so kann es eine Vielzahl an unterschiedlichen MSTs geben, wenn es mehrere Möglichkeiten gibt die Knoten miteinander zu verbinden. Sind die Kantengewichte allerdings eindeutig, also kommt jedes Kantengewicht im Graphen höchstens ein mal vor, so ist der resultierende MST auch eindeutig \cite{sanders2019sequential}. 
+Der MST eines Graphen ist nicht immer eindeutig. Hat beispielsweise jede Kante in einem Graph Gewicht 1, so kann es eine Vielzahl an unterschiedlichen MSTs geben, wenn es mehrere Möglichkeiten gibt die Knoten miteinander zu verbinden. Der resultierende MST ist eindeutig, wenn jedes Kantengewicht im Graphen höchstens ein Mal vor kommt \cite{sanders2019sequential}. 
 
 
 \subsection{Schnitt- und Kreiseigenschaft}\label{Eigenschaften}
 
 Die Schnitteigenschaft, zusammen mit der Kreiseigenschaft, bilden wichtige Merkmale für die Auswahl von MST Kanten in einem Graph. Anhand dieser Eigenschaften konnte die Korrektheit von verschiedenen MST Algorithmen bewiesen werden.
-In \hyperref[Korrektheit]{Kapitel} \ref{Korrektheit} nutzen wie die Kreiseigenschaft um die Korrektheit eines verteilten Algorithmus zu begründen.
+In \hyperref[Korrektheit]{Kapitel} \ref{Korrektheit} wird die Kreiseigenschaft benutzt, um die Korrektheit eines verteilten Algorithmus zu begründen.
 
 \begin{mdframed}
 \begin{thm}\label{Schnitteigenschaft}
@@ -43,7 +43,7 @@ In \cref{Schnitt-Img} sind die Teilmengen $S_1=\{A, D, E\}$ und $S_2=\{B, C, F\}
 \begin{thm} \label{Kreiseigenschaft}
     Kreiseigenschaft
 \end{thm}
-Sei $K \subseteq E$ ein beliebiger Kreis des Graphen $G$. Dann besagt die Kreiseigenschaft, dass die Kante $e \in K$ mit dem höchsten Gewicht aus K nicht im MST von G enthalten ist.
+Sei $K \subseteq E$ ein beliebiger Kreis des Graphen $G$. Dann besagt die Kreiseigenschaft, dass die Kante $e \in K$, mit dem höchsten Gewicht aus K, nicht im MST von G enthalten ist.
 \end{mdframed}
 
 Wir sehen in \cref{Kreis-Img} einen Graphen mit eingefärbten Kreis $K =\{(A,B,7), (B,C,2), (C,E,5), \\ (D,E,4), (A,D,1)\}$.
@@ -62,31 +62,31 @@ Einen Beweis für die Kreis- und Schnitteigenschaft findet man beispielsweise im
 
 
 \subsection{Sequenzielle Algorithmen}
-Auch wenn wir uns im Folgenden nur mit verteilt parallelen Algorithmen auseinander setzen, spielen auch lokale MST Berechnungen bei diesen eine wichtige Rolle.\\
+Auch wenn wir uns im Folgenden nur mit verteilt parallelen Algorithmen auseinandersetzen, spielen auch lokale MST Berechnungen bei diesen eine wichtige Rolle.\\
 Die Algorithmen von Kruskal \cite{kruskal1956shortest}, Jarník und Prim \cite{prim1957shortest} sowie \boruvka \cite{boruuvka1926jistem} bilden die bekanntesten sequenziellen MST Algorithmen.
 
-Bor{\r u}vkas Algorithmus wurde in 1926 veröffentlicht und ist damit der älteste MST Algorithmus. Dieser fügt in jeder Iteration die leichtesten inzidenten Kanten aller Knoten zum MST hinzu und kontrahiert anschließend den Graph, bis nur noch ein Knoten übrig ist. Die Laufzeit liegt dabei in $O(n \log(m)$.
+Bor{\r u}vkas Algorithmus wurde in 1926 veröffentlicht und ist damit der älteste MST Algorithmus. Dieser fügt in jeder Iteration die leichtesten inzidenten Kanten aller Knoten zum MST hinzu und kontrahiert anschließend den Graph, bis nur noch ein Knoten übrig ist. Die Laufzeit liegt dabei in $O(n \log(m))$.
 Ein ausschlaggebender Vorteil von Bor{\r u}vkas Algorithmus ist, dass man ihn sehr einfach und effektiv parallelisieren kann.\\
 
-Der Jarník-Prim Algorithmus wurde 1930 von Jarník entwickelt und 1957 von Prim wieder entdeckt. Er nutzt die Schnitteigenschaft (\hyperref[Schnitteigenschaft]{Theorem} \ref{Schnitteigenschaft}) aus um den MST zu berechnen. So startet der Algorithmus mit einem beliebigen Knoten von G und fügt in jeder Iteration, die leichteste Schnittkante und zwischen den bisher hinzugefügten Knoten und dem restlichen Graph hinzu. So wird nach der Schnitteigenschaft in jedem Schritt eine MST-Kante und ein Knoten hinzugefügt, solange bis alle Knoten hinzugefügt wurden. Unter Verwendungen einer geeigneten Prioritätswarteschlange (z.B Fibonacci Heaps) liegt die Laufzeit von Jarník und Prims Algorithmus in $O(m+n\log n)$.
+Der Jarník-Prim Algorithmus wurde 1930 von Jarník entwickelt und 1957 von Prim wieder entdeckt. Er nutzt die \hyperref[Schnitteigenschaft]{Schnitteigenschaft} aus, um den MST zu berechnen. So startet der Algorithmus mit einem beliebigen Knoten von G und fügt in jeder Iteration, die leichteste Schnittkante zwischen den bisher hinzugefügten Knoten und dem restlichen Graphen hinzu. So werden nach der \hyperref[Schnitteigenschaft]{Schnitteigenschaft} in jedem Schritt eine MST-Kante und ein Knoten hinzugefügt, solange bis alle Knoten hinzugefügt wurden. Unter Verwendungen einer geeigneten Prioritätswarteschlange (z.B Fibonacci Heaps) liegt die Laufzeit von Jarník und Prims Algorithmus in $O(m+n\log n)$.
 
-1956 hat Kruskal seinen Algorithmus entwickelt welcher nach und nach die leichteste Kante des Graphen zum MST hinzufügt, sofern sie keinen Kreis im Graphen schließt. 
+1956 hat Kruskal seinen Algorithmus entwickelt, welcher nach und nach die leichteste Kante des Graphen zum MST hinzufügt, sofern sie keinen Kreis im Graphen schließt. 
 Mit einer Laufzeit von $O(m\log m)$ ist Kruskal auf ausreichend dichten Graphen asymptotisch ineffizienter als Jarník-Prim oder Bor{\r u}vka. 
 Allerdings zeigen Osipov et. al \cite{osipov2009filter}, dass (Filter-)Kruskal in der Praxis für viele Graphinstanzen effizienter ist als Jarník-Prim. 
-Zusätzlich ist Kruskal auch simpler zu Implementieren und aus diesen beiden Gründen nutzen wir im folgenden ausschließlich Kruskal (bzw. Filter-Kruskal) für unsere lokalen MST Berechnungen.
+Zusätzlich ist Kruskal einfacher zu Implementieren. Aus diesen beiden Gründen nutzen wir im Folgenden ausschließlich Kruskal (bzw. Filter-Kruskal) für lokale MST Berechnungen.
 
-Bor{\r u}vkas Algorithmus bildet in \hyperref[Algorithms]{Kapitel} \ref{Algorithms} eine wichtige Basis für die verteilten Algorithmen, wobei Kruskal für die lokalen MST Berechnungen am effizientesten ist. Da uns Jarník-Prim keine ausschlaggebenden Vorteile bietet, betrachten wir diesen nicht weiter und gehen im Folgenden genauer auf das Vorgehen von \boruvka und Kruskal ein.
+Bor{\r u}vkas Algorithmus bildet in \hyperref[Algorithms]{Kapitel} \ref{Algorithms} eine wichtige Basis für die verteilten Algorithmen, wobei Kruskal für die lokalen MST Berechnungen am effizientesten ist. Da uns Jarník-Prim keinen ausschlaggebenden Vorteil bietet, betrachten wir diesen nicht weiter und gehen im Folgenden genauer auf das Vorgehen von Bor{\r u}vkas und Kruskals Algorithmus ein.
 
 \subsubsection{Bor{\r u}vkas Algorithmus}
 Zu Beginn jeder Iteration von Bor{\r u}vkas Algorithmus wird für jeden Knoten, die inzidente Kante mit dem geringsten Gewicht zum MST hinzugefügt.
 Als nächstes werden alle Knoten, die über diese leichtesten inzidenten Kanten verbunden sind, kontrahiert und die noch übrigen Kanten entsprechend umbenannt. \\
-Bei der Umbenennung entstehen dann gegebenenfalls mehrmals die gleichen (parallele) Kanten, von denen man alle bis auf die leichteste entfernen kann. Das entfernen der parallelen Kanten ist hierbei für die Korrektheit des Algorithmus nicht zwangsläufig nötig. \\
+Bei der Umbenennung entstehen dann gegebenenfalls mehrmals die gleichen (parallele) Kanten, von denen man alle, bis auf die leichteste, entfernen kann. Das Entfernen der parallelen Kanten ist hierbei für die Korrektheit des Algorithmus nicht zwangsläufig nötig, kann aber in der Praxis die folgenden Iterationen beschleunigen. \\
 Dieses Vorgehen wiederholen wir so oft, bis nur noch ein Graph mit einem Knoten übrig ist. \\
-Da bei einer Kontraktion des Graphen, immer mindestens zwei Knoten entlang einer Kante zusammengefügt werden, verringert sich in jeder Iteration, die Anzahl an Knoten um mindestens die Hälfte. Damit 
-sind höchstens $\log(n)$ Iterationen notwendig um den MST zu berechnen. In jeder Iteration werden alle $m$ Kanten einmal durchlaufen um die leichtesten inzidenten Kanten zu finde und ein weiteres mal um diese umzubenennen. Die Kontraktion des Graphen ist in $O(n) \subseteq O(m)$ möglich. Die gesamte Laufzeit von Bor{\r u}vkas sequenziellen Algorithmus liegt damit in $O(m\log(n))$.\\
+Da bei einer Kontraktion des Graphen, immer mindestens zwei Knoten entlang einer Kante kontrahiert werden, verringert sich in jeder Iteration die Anzahl an Knoten um mindestens die Hälfte. Damit 
+sind höchstens $\log(n)$ Iterationen notwendig, um den MST zu berechnen. In jeder Iteration werden alle $m$ Kanten einmal durchlaufen um die leichtesten inzidenten Kanten zu finde und ein weiteres Mal um diese umzubenennen. Die Kontraktion des Graphen ist in $O(n) \subseteq O(m)$ möglich. Die gesamte Laufzeit von Bor{\r u}vkas sequenziellen Algorithmus liegt damit in $O(m\log(n))$.\\
 Aufgrund der Umbenennung der Kanten muss man allerdings zum Schluss diese wieder in ihre Ursprungsform bringen, sofern man nicht nur am Gewicht interessiert ist.\\
 
-Der Pseuocode zu einer parallelen Variante von \boruvka findet sich bei \cref{Boruvka-Allreduce-Algo}. In \cref{Boruvka-Img} ist ein kompletter Durchlauf als Beispiel zu sehen. Hier werden in der ersten Iteration von \boruvka die Kanten $(A,D,1)$, $(B,C,2)$ und $(E,F,3)$ zum MST hinzugefügt und die jeweiligen Knoten zusammengefasst. Damit sind im nächsten Schritt nur noch 3 Knoten übrig, wobei hier die Kanten $(AD,EF,4)$ und $(BC,EF,5)$ zum MST gehören. Anschließend können alle Knoten zu einem kontrahiert werden, der Algorithmus terminiert und liefert den MST mit Gewicht 15.
+Der Pseudocode zu einer parallelen Variante von \boruvka findet sich bei \cref{Boruvka-Allreduce-Algo}. In \cref{Boruvka-Img} ist ein schematischer Durchlauf zu sehen. Hier werden in der ersten Iteration von \boruvka die Kanten $(A,D,1)$, $(B,C,2)$ und $(E,F,3)$ zum MST hinzugefügt und die jeweiligen Knoten zusammengefasst. Damit sind im nächsten Schritt nur noch 3 Knoten übrig, wobei hier die Kanten $(AD,EF,4)$ und $(BC,EF,5)$ zum MST gehören. Anschließend können alle Knoten zu einem kontrahiert werden, der Algorithmus terminiert und liefert den MST mit Gewicht 15.
 
 \begin{figure}[H]
     \centering
@@ -98,10 +98,10 @@ Der Pseuocode zu einer parallelen Variante von \boruvka findet sich bei \cref{Bo
 
 \subsubsection{Kruskals Algorithmus}
 Als erstes sortiert Kruskals Algorithmus
-alle Kanten aufsteigend nach Kantengewicht. Anschließend wird für jede Kante ${s,t}$ überprüft ob die Knoten $s$ und $t$ bereits über andere Kanten verbunden sind. Ist das der Fall, so schließt diese Kante einen Kreis, da $s$ und $t$ bereits über einen anderen Pfad verbunden sind. Wegen der Sortierung ist diese Kante im Kreis diejenige mit dem größten Gewicht und kann nach der \hyperref[Kreiseigenschaft]{Kreiseigenschaft} verworfen werden.
+alle Kanten aufsteigend nach Kantengewicht. Anschließend wird für jede Kante $\{s,t\}$ überprüft, ob die Knoten $s$ und $t$ bereits über andere Kanten verbunden sind. Ist das der Fall, so schließt diese Kante einen Kreis, da $s$ und $t$ bereits über einen anderen Pfad verbunden sind. Wegen der Sortierung ist diese Kante im Kreis diejenige mit dem größten Gewicht und kann nach der \hyperref[Kreiseigenschaft]{Kreiseigenschaft} verworfen werden.
 Andernfalls wird die Kante zum MST hinzugefügt.\\
-Um effizient zu überprüfen ob $s$ und $t$ bereits in der selben Komponente liegen, wird häufig die UnionFind Datenstruktur verwendet. Diese Datenstruktur verfügt über die Operation \emph{union(s,t)} und \emph{find(s)}, welche zwei Knoten zur selben Zusammenhangskomponente hinzufügt (union) oder überprüft (find) in welcher Zusammenhangskomponente ein Knoten bereits enthalten ist. Eine union bzw. find Operation benötigt $O(\log(n))$ Operationen, so dass der Kruskal Algorithmus $O(m(\log(m))$ Operation zum Sortieren, gefolgt von $O(n)$ union und $O(m)$ find Operationen benötigt.
-Insgesamt hat Kruskals Algorithmus eine amortisierte Laufzeit von $O(m \alpha(m,n))$, wobei $\alpha$ die inverse Ackermann-Funktion ist.
+Um effizient zu überprüfen ob $s$ und $t$ bereits in derselben Komponente liegen, wird häufig die UnionFind Datenstruktur verwendet. Diese Datenstruktur verfügt über die Operation \emph{union(s,t)} und \emph{find(s)}, welche zwei Knoten zur selben Zusammenhangskomponente hinzufügt (union) oder überprüft (find) in welcher Zusammenhangskomponente ein Knoten bereits enthalten ist. Eine union bzw. find Operation benötigt $O(\log(n))$ Operationen, so dass der Kruskal Algorithmus $O(m(\log(m))$ Operation zum Sortieren, gefolgt von $O(n)$ union und $O(m)$ find Operationen benötigt.
+Insgesamt hat Kruskals Algorithmus eine amortisierte Laufzeit von $O(m \cdot \alpha(m,n))$, wobei $\alpha$ die inverse Ackermann-Funktion ist.
 Der folgende Pseudocode von \cref{Kruskal-Algo} zeigt das Vorgehen von Kruskal.
 
 \begin{algorithm} 
@@ -128,12 +128,10 @@ Der folgende Pseudocode von \cref{Kruskal-Algo} zeigt das Vorgehen von Kruskal.
 
 \subsection{Filter-Kruskal}
 Der \textsc{Filter-Kruskal} Algorithmus \cite{osipov2009filter} ist eine Abwandlung von Kruskals Algorithmus und dient ebenso zur sequenziellen Berechnung von MSTs. Die Idee ist es den Hauptaufwand von Kruskal, dem Sortieren der Kanten, in der Praxis zu verbessern.\\
-Hierfür wird ein Ansatz ähnlich zum \emph{quick sort Algorithmus} \cite{hoare1962quicksort} verwendet: \\
+Hierfür wird ein Ansatz ähnlich zum \emph{quick-sort Algorithmus} \cite{hoare1962quicksort} verwendet: \\
 Zunächst wird eine zufällige Kante als Pivot ausgewählt und die zu sortierende Kantenmenge in zwei Mengen $E_{\leq}$ und $E_>$ aufgeteilt. Wobei in $E_>$ alle Kanten mit einem größeren Gewicht, als die Pivotkante enthalten sind und in $E_{\leq}$ die übrigen Kanten.
-Ist $E_{\leq}$ klein genug, so wird auf dieser Menge der normale Kruskal ausgeführt, ansonsten wird erneut eine $E_{\leq}$ und $E_>$ Menge gebildet. Auf $E_>$ führen wir anschließend einen filter-Schritt durch. Dabei wird mithilfe der UnionFind Datenstruktur überprüft, ob Kanten aus dieser Menge bereits nicht mehr benötigt werden. Schließlich wird auch diese Menge (sofern nötig) erneut in $E_{\leq}$ und $E_>$ aufgeteilt. Der Wert für die Grenze, die angibt ab wann Kruskals Algorithmus ausgeführt wird, kann variieren, sollte aber in $O(n)$ liegen \cite{osipov2009filter}.
-Der Pseudocoe von \cref{Filter-Kruskal-Algo} zeigt dieses Vorgehen im Detail.\\
-
-
+Ist $E_{\leq}$ \emph{klein genug}, so wird auf dieser Menge der normale Kruskal ausgeführt, ansonsten wird erneut eine $E_{\leq}$ und $E_>$ Menge gebildet. Auf $E_>$ führen wir anschließend einen \textsc{Filter}-Schritt durch. Dabei wird mithilfe der UnionFind Datenstruktur überprüft, ob Kanten aus dieser Menge bereits nicht mehr benötigt werden. Schließlich wird diese Menge (sofern nötig) erneut in $E_{\leq}$ und $E_>$ aufgeteilt. Der Wert für die Grenze, die angibt ab wann Kruskals Algorithmus ausgeführt wird, kann variieren, sollte aber in $O(n)$ liegen \cite{osipov2009filter}.
+Der Pseudocode von \cref{Filter-Kruskal-Algo} zeigt dieses Vorgehen im Detail.\\
 
 \begin{algorithm} 
 \caption{\textsc{Filter-Kruskal}(V, E, UF: UnionFind, Grenze: int): Kantenliste}
@@ -169,8 +167,7 @@ Der Pseudocoe von \cref{Filter-Kruskal-Algo} zeigt dieses Vorgehen im Detail.\\
 \end{algorithm}
 
 
-
-Die erhöhte Effizienz in der Praxis stammt daher, dass in vielen MSTs nur \emph{leichte} Kanten enthalten sind. In diesem Fall werden \enquote{schweren} Kanten nicht mit sortiert, sonder über den \textsc{Filter} Aufruf vorher entfernt. Die asymptotische Laufzeit ist also identisch zu Kruskal, aber auf zufälligen Graphen liegt die erwartete Laufzeit in 
+Die erhöhte Effizienz in der Praxis stammt daher, dass in vielen MSTs nur \emph{leichte} Kanten enthalten sind. In diesem Fall werden \enquote{schweren} Kanten nicht mit sortiert, sondern über den \textsc{Filter} Aufruf vorher entfernt. Die asymptotische Laufzeit ist also identisch zu Kruskal, aber auf zufälligen Graphen liegt die erwartete Laufzeit in 
 $O(m + n\log n \log \frac{m}{n})$ \cite{osipov2009filter}.
 
 
@@ -178,18 +175,18 @@ $O(m + n\log n \log \frac{m}{n})$ \cite{osipov2009filter}.
 
 
 \subsection{Parallele Modelle}
-Es gibt verschiedene theoretische (Berechnungs-) Modelle um die Operationen (und Komplexität) von parallelen Algorithmen zu beschreiben. Da wir uns  mit verteilten Algorithmen beschäftigen, sind Modelle, die für geteilten Speicher entwickelt wurden, wie PRAM (\textbf{p}arallel \textbf{R}andom \textbf{A}ccess \textbf{M}achines) für uns nicht ausreichend. Wir wollen die Komplexität von
-Nachrichtenübertragungen explizit mit berücksichtigen und betrachten daher im Folgenden das BSP und $\alpha$/$\beta$ Modell.
+Es gibt verschiedene theoretische (Berechnungs-) Modelle, um die Operationen (und Komplexität) von parallelen Algorithmen zu beschreiben. Da wir uns  mit verteilten Algorithmen beschäftigen, sind Modelle, die für geteilten Speicher entwickelt wurden, wie PRAM (\textbf{p}arallel \textbf{R}andom \textbf{A}ccess \textbf{M}achines) für uns nicht ausreichend. Wir wollen die Komplexität von
+Nachrichtenübertragungen explizit mitberücksichtigen und betrachten daher im Folgenden das BSP und $\alpha$/$\beta$ Modell.
 
 
 \subsubsection{Das Bulk Synchronous Parallel Modell}
-1990 wurde das BSP Modell von Valiant et al. \cite{valiant1990bridging} entwickelt um die Kommunikation und Synchronisation von verteilten Algorithmen berücksichtigen zu können. 
+1990 wurde das BSP Modell von Valiant et al. \cite{valiant1990bridging} entwickelt, um die Kommunikation und Synchronisation von verteilten Algorithmen berücksichtigen zu können. 
 In diesem Modell gibt es eine Maschine mit $p$ Prozessoren, wobei jeder Prozessor seinen eigenen Speicherbereich besitzt. Zusätzlich gibt es einen Router mit Kommunikationsdurchatz $g$. Eine Synchronisation kann alle $L$ Zeitschritte stattfinden. Ein BSP Algorithmus besteht aus einer Reihe von sogenannten \textit{Supersteps}, welche von Barrieren-Synchronisationen getrennt sind. Insofern können Nachrichten, die in Superstep i gesendet werden, erst im folgenden Superstep i+1 für die Berechnung verwendet werden.
-Jeder Superstep i hat einen Aufwand von $w_i+gh_i+L$. Dabei ist im i-ten Superstep $w_i$ die größte Anzahl an lokalen Operationen, und $h_i$ an gesendeten oder empfangenen Nachrichten, aller p Prozessoren.
+Jeder Superstep i hat einen Aufwand von $w_i+gh_i+L$. Dabei ist im i-ten Superstep $w_i$ die größte Anzahl an lokalen Operationen, und $h_i$ an gesendeten oder empfangenen Nachrichten, aller $p$ Prozessoren.
 Die gesamten Kosten eines Algorithmus sind als $W+gH+LT$ angegeben, wobei $W=\sum_i w_i$, $H=\sum_i h_i$ und $T$ die Anzahl an Supersteps ist.
 
 
-Dieses Modell haben Dehne et al. \cite{dehne1998practical} und Adler et al. \cite{adler1998communication} verwendet um die Komplexität der uns zugrunde legenden Algorithmen anzugeben. Wir werden die Algorithmen zusätzlich im fein-körnigeren Alpha-Beta Modell evaluieren um einen zusätzlichen Einblick in die jeweiligen Laufzeiten zu erhalten.
+In diesem Modell haben Dehne et al. \cite{dehne1998practical} und Adler et al. \cite{adler1998communication} die Komplexität der uns zugrunde legenden Algorithmen angegeben. Wir werden die Algorithmen zusätzlich im fein-körnigeren Alpha-Beta Modell evaluieren, um einen zusätzlichen Einblick in die jeweiligen Laufzeiten zu erhalten.
 
 
 
@@ -198,18 +195,18 @@ Dieses Modell haben Dehne et al. \cite{dehne1998practical} und Adler et al. \cit
 
 \subsubsection{Das \boldmath$\alpha$/$\beta$ Modell}
 Im Gegensatz zum BSP Modell werden im $\alpha$/$\beta$ (Alpha/Beta) Modell alle Nachrichtenübertragung zwischen \textit{processing elements} (PEs) einzeln Berücksichtigt \cite{sanders2019sequential}. Das ermöglicht eine detailliertere Analyse für die Laufzeit und Komplexität verteilter Algorithmen.
-Die Übertragung einer Nachricht der Länge $\ell$ zwischen zwei PEs benötigt $\alpha + \beta \ell$ Zeit. Wobei $\alpha$ die Zeit für die Initialisierung (Startup) der Übertragung ist und $\beta$ die Zeit zum senden einer Dateneinheit angibt.
+Die Übertragung einer Nachricht der Länge $\ell$ zwischen zwei PEs benötigt $\alpha + \beta \ell$ Zeit. Wobei $\alpha$ die Zeit für die Initialisierung (Startup) der Übertragung ist und $\beta$ die Zeit zum Senden einer Dateneinheit angibt.
 
 
 \subsection{Kollektive Operationen}
-Kollektive Operationen sind Bestimme Aufrufe, die für die Kommunikation zwischen PEs verwendet werden.
-Sie ermöglichen einen einfachen und effizienten Umgang für den Nachrichtenaustausch von zwei PEs, bis hin zu allen auf einmal. Da kollektive Operationen für die Algorithmen ein wichtiger Bestandteil sind, geben wir nun eine kurze Übersicht über deren Funktionsweise und Komplexität. 
+Kollektive Operationen sind bestimme Aufrufe, die für die Kommunikation zwischen PEs verwendet werden.
+Sie ermöglichen einen einfachen und effizienten Umgang für den Nachrichtenaustausch von mehreren PEs. Da kollektive Operationen für die Algorithmen ein wichtiger Bestandteil sind, geben wir nun eine kurze Übersicht über deren Funktionsweise und Komplexität. 
 
 \subsubsection{Boradcast}
 Der \emph{Boradcast} Aufruf wird verwendet, wenn ein PE eine Nachricht der Länge $\ell$ mit alle anderen PEs teilen will. Die untere Schranke für die Laufzeit ist dabei $\alpha + \log(p) + \beta \ell$ \cite{sanders2009two}. 
-Die Laufzeit ergibt sich logarithmisch in der Anzahl $p$ an PEs, da sich die Anzahl an PEs, die die Nachricht weiter senden kann, in jedem Schritt verdoppelt.
+Die Laufzeit ergibt sich logarithmisch in der Anzahl $p$ an PEs, da sich die Anzahl an PEs, die die Nachricht weitersenden können, in jedem Schritt verdoppelt.
 
 \subsubsection{(All-)Reduce}
 Angenommen jeder PE i besitzt einen Vektor $M_i$ der Länge $\ell$ von Typ $T$. Sei zusätzlich $\bigoplus$ eine assoziative binäre Operation auf dem Datentyp $T$.
 Der \emph{Reduce} Aufruf führt alle Daten auf einem PE zusammen und berechnet $M := \bigoplus_{i=0}^{p-1} M_i$. Ein \textbf{All}reduce hingegen funktioniert  wie ein Reduce gefoltg von einem Boradcast Aufruf.
-Das bedeutet nach dem Allreduce Aufruf liegt  $M$ anschließend nicht nur auf einem PE, sonder auf allen PE's vor. Dabei liegt die Laufzeit von einer Reduce als auch Allreduce Operation in $O(\alpha \log(p) + \beta \ell)$ \cite{sanders2009two}.
+Das bedeutet nach dem Allreduce Aufruf liegt  $M$ anschließend nicht nur auf einem PE, sondern auf allen PE's vor. Dabei liegt die Laufzeit von einer Reduce als auch Allreduce Operation in $O(\alpha \log(p) + \beta \ell)$ \cite{sanders2009two}.

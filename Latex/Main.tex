@@ -22,7 +22,7 @@
 \usepackage{amsthm}
 % Einige Standard-Mathematik Pakete
 \usepackage{latexsym,amssymb,mathtools,textcomp}
-\usepackage[ngerman,nameinlink]{cleveref}
+\usepackage[ngerman,noabbrev,nameinlink]{cleveref}
 
 \usepackage[Algorithmus]{algorithm}  % include code snippits
 \usepackage{algorithmic}  % include code snippits
@@ -214,7 +214,9 @@ Ort, Datum, Name\\
 
 
 \include{modules/0-Zusammenfassung}
-
+\newpage
+\
+\newpage
 
 
 
@@ -231,7 +233,7 @@ Ort, Datum, Name\\
 
 
 
-\newcommand{\mergeStep}{\textsc{MergeStep}}
+\newcommand{\mergeStep}{\textsc{MergeStep} }
 \newcommand{\boruvkaStep}{\textsc{Bor{\r u}vkaStep} }
 \newcommand{\boruvka}{Bor{\r u}vka }
 \newcommand{\boruvkasAlgorithmus}{Bor{\r u}vkas Algorithmus }
@@ -243,11 +245,20 @@ Ort, Datum, Name\\
 \newcommand{\boruvkaThenMerge}{\textsc{Bor{\r u}vka-Then-Merge} }
 
 \include{modules/1-Einführung}
+\newpage
+\
+\newpage
 \include{modules/2-Grundlagen}
 \include{modules/3-Related-Work}
+\newpage
+\
+\newpage
 \include{modules/4-Algorithmen}
 \include{modules/5-Implementierung}
 \include{modules/6-Ergebnisse}
+\newpage
+\
+\newpage
 \include{modules/7-Fazit}
 
 
@@ -257,7 +268,6 @@ Ort, Datum, Name\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \listoffigures
-\newpage
 %\listoftables
 \listofalgorithms
 

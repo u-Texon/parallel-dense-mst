@@ -1,9 +1,9 @@
-\contentsline {algorithm}{\numberline {1}{\ignorespaces Kruskal(V, E, UF: UnionFind): Kantenliste}}{12}{algorithm.1}%
-\contentsline {algorithm}{\numberline {2}{\ignorespaces \textsc {Filter-Kruskal}(V, E, UF: UnionFind, Grenze: int): Kantenliste}}{13}{algorithm.2}%
-\contentsline {algorithm}{\numberline {3}{\ignorespaces \textsc {Filter}(E, UF: UnionFind): Kantenliste}}{13}{algorithm.3}%
-\contentsline {algorithm}{\numberline {4}{\ignorespaces \textsc {MergeStep}(V, MST: Kantenliste, D: int)}}{17}{algorithm.4}%
-\contentsline {algorithm}{\numberline {5}{\ignorespaces \textsc {Merge-Local-MST}(V, E, D: int): Kantenliste}}{17}{algorithm.5}%
-\contentsline {algorithm}{\numberline {6}{\ignorespaces \textsc {Bor{\r u}vkaStep} (V, E, MST: Kantenliste)}}{19}{algorithm.6}%
-\contentsline {algorithm}{\numberline {7}{\ignorespaces \textsc {Bor{\r u}vka-Allreduce}(V, E): Kantenliste}}{19}{algorithm.7}%
-\contentsline {algorithm}{\numberline {8}{\ignorespaces \textsc {Bor{\r u}vka-Mixed-Merge}(V, E, D: int): Kantenliste}}{20}{algorithm.8}%
-\contentsline {algorithm}{\numberline {9}{\ignorespaces \textsc {Bor{\r u}vka-Then-Merge}(V, E, D: int, Border: int): Kantenliste}}{21}{algorithm.9}%
+\contentsline {algorithm}{\numberline {1}{\ignorespaces Kruskal(V, E, UF: UnionFind): Kantenliste}}{14}{algorithm.1}%
+\contentsline {algorithm}{\numberline {2}{\ignorespaces \textsc {Filter-Kruskal}(V, E, UF: UnionFind, Grenze: int): Kantenliste}}{15}{algorithm.2}%
+\contentsline {algorithm}{\numberline {3}{\ignorespaces \textsc {Filter}(E, UF: UnionFind): Kantenliste}}{15}{algorithm.3}%
+\contentsline {algorithm}{\numberline {4}{\ignorespaces \textsc {MergeStep}(V, MST: Kantenliste, D: int)}}{20}{algorithm.4}%
+\contentsline {algorithm}{\numberline {5}{\ignorespaces \textsc {Merge-Local-MST}(V, E, D: int): Kantenliste}}{20}{algorithm.5}%
+\contentsline {algorithm}{\numberline {6}{\ignorespaces \textsc {Bor{\r u}vkaStep} (V, E, MST: Kantenliste)}}{22}{algorithm.6}%
+\contentsline {algorithm}{\numberline {7}{\ignorespaces \textsc {Bor{\r u}vka-Allreduce}(V, E): Kantenliste}}{22}{algorithm.7}%
+\contentsline {algorithm}{\numberline {8}{\ignorespaces \textsc {Bor{\r u}vka-Mixed-Merge}(V, E, D: int): Kantenliste}}{23}{algorithm.8}%
+\contentsline {algorithm}{\numberline {9}{\ignorespaces \textsc {Bor{\r u}vka-Then-Merge}(V, E, D: int, Border: int): Kantenliste}}{24}{algorithm.9}%

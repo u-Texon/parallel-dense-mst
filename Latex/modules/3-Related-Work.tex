@@ -1,15 +1,15 @@
 \section{Verwandte Arbeiten}\label{RelatedWork}
 
-Da das MST Problem eines der grundlegendsten Graphenprobleme ist, wird sich schon lange damit beschäftigt, effiziente Algorithmen für dieses Problem zu finden. Seitdem die bereits erwähnten Algorithmen von Kruskal \cite{kruskal1956shortest}, Jarnik und Prim \cite{prim1957shortest} sowie Boruvka \cite{boruuvka1926jistem} entwickelt wurden, gibt es viele Arbeiten die darauf aufbauen.
+Da das MST Problem eines der grundlegendsten Graphenprobleme ist, wird sich schon lange damit beschäftigt, effiziente Algorithmen für dieses Problem zu finden. Seitdem die bereits erwähnten Algorithmen von Kruskal \cite{kruskal1956shortest}, Jarnik und Prim \cite{prim1957shortest} sowie \boruvka \cite{boruuvka1926jistem} entwickelt wurden, gibt es viele Arbeiten, die darauf aufbauen.
 
-So hat zum Beispiel in 1995 Karger et al. \cite{karger1995randomized} den KKT-Algorithmus entworfen. Dieser kombiniert Boruvka zusammen mit randomisierten Stichproben und effektivem Kanten filtern, sodass dieser eine erwartete lineare Laufzeit erreicht hat.
-Ansosnten hat Osipov et al. \cite{osipov2009filter} in 2009 den Filter-Kruskal Algorithmus entwickelt. 
+So hat zum Beispiel in 1995 Karger et al. \cite{karger1995randomized} den KKT-Algorithmus entworfen. Dieser kombiniert \boruvka zusammen mit randomisierten Stichproben und effektivem Kanten filtern, sodass dieser eine erwartete lineare Laufzeit erreicht hat.
+Ansonsten hat Osipov et al. \cite{osipov2009filter} in 2009 den Filter-Kruskal Algorithmus entwickelt. 
 Dieser Algorithmus verbessert in der Praxis den hohen Aufwand des Kanten Sortierens bei Kruskal, weshalb wir ihn auch für unsere lokale Berechnungen weiter verwenden. 
 
-Natürlich gibt es mittlerweile auch eine Vielzahl an parallelen MST Algorithmen. In 2021 hat Dhulipala \cite{dhulipala2021theoretically} eine shared-memory Varainte von Boruvkas Algorithmus entwickelt. Wobei erst letztes Jahr Esfahani et al. \cite{koohi2022mastiff} einen \textit{structure aware} Algorithmus veröffentlicht hat, der diesen noch übertrifft.
+Natürlich gibt es mittlerweile auch eine Vielzahl an parallelen MST Algorithmen. In 2021 hat Dhulipala \cite{dhulipala2021theoretically} eine shared-memory Varainte von \boruvkasAlgorithmus entwickelt. Wobei erst letztes Jahr Esfahani et al. \cite{koohi2022mastiff} einen \textit{structure aware} Algorithmus veröffentlicht hat, der diesen noch übertrifft.
 
-Neben diesen shared-memory Varianten gibt es noch weitere parallele Algorithmen, die wie wir auf geteiltem Speicher arbeiten. So haben Chung et al. \cite{chung1996parallel} in 1996 erstmalige eine verteilte Versions von Boruvkas Algorithmus entwickelt. Nur zwei Jahre später veröffentlichten Dehne und Götz \cite{dehne1998practical} ihre Algorithmen, auf denen wir mit unserer Arbeit aufbauen.
+Neben diesen shared-memory Varianten gibt es noch weitere parallele Algorithmen, die wie wir auf geteiltem Speicher arbeiten. So haben Chung et al. \cite{chung1996parallel} in 1996 erstmalige eine verteilte Versions von \boruvkasAlgorithmus entwickelt. Nur zwei Jahre später veröffentlichten Dehne und Götz \cite{dehne1998practical} ihre Algorithmen, auf denen wir mit unserer Arbeit aufbauen.
 Im selben Jahr veröffentlichten auch Adler et al. \cite{adler1998communication} eine ähnliche Reihe an Kommunikationsoptimalen Algorithmen.
 
-Im Gegensatz zu diesen Algorithmen, die für dichte Graphen konstruiert wurden haben Sanders und Schimek \cite{sanders2023engineering} kürzlich einen \textit{generel purpose} Algorithmus entwickelt. Dieser beruht auch auf Boruvkas Algorithmus und wurde auf über 65.000 Prozessoren evaluiert.
+Im Gegensatz zu diesen Algorithmen, die für dichte Graphen konstruiert, wurden haben Sanders und Schimek \cite{sanders2023engineering} kürzlich einen \textit{generel purpose} Algorithmus entwickelt. Dieser beruht auch auf \boruvkasAlgorithmus und wurde auf über 65.000 Prozessoren evaluiert.
 

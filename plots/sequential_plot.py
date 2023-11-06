@@ -70,9 +70,9 @@ k_avg = []
 f_avg = []
 labels = []
 for i in range(minEdges, maxEdges + 1):
-    k_avg.append(get_average(k_edges, k_times, i) / pow(2, i))
-    f_avg.append(get_average(f_edges, f_times, i) / pow(2, i))
-    labels.append(str((pow(2, i) / pow(2, numVertices))))
+    k_avg.append(get_average(k_edges, k_times, i) / pow(2, i+1))
+    f_avg.append(get_average(f_edges, f_times, i) / pow(2, i+1))
+    labels.append(str(int((pow(2, i+1) / pow(2, numVertices)))))
 
 
 
